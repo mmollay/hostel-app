@@ -3,290 +3,450 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Stromverbrauch</title>
+    <title>Willkommen im Hostel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --cream: #FAF8F5;
+            --warm-white: #FFFEFB;
+            --sand: #E8E2D9;
+            --sage: #9CAF88;
+            --sage-light: #B8C9A9;
+            --sage-dark: #7A9168;
+            --forest: #2D4A3E;
+            --earth: #8B7355;
+            --earth-light: #A69076;
+            --rose: #D4A5A5;
+            --rose-light: #E8C4C4;
+            --sky: #A7C5D4;
+            --text: #3D3D3D;
+            --text-light: #6B6B6B;
+            --text-muted: #9A9A9A;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            user-select: none;
-            -webkit-user-select: none;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            font-family: 'Nunito', sans-serif;
+            background: var(--cream);
+            color: var(--text);
+            line-height: 1.6;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: #fff;
-            padding: 20px;
-            overflow-x: hidden;
         }
 
-        .container {
-            width: 100%;
-            max-width: 800px;
-        }
-
+        /* Header */
         .header {
+            background: linear-gradient(135deg, var(--forest) 0%, var(--sage-dark) 100%);
+            color: white;
+            padding: 60px 24px 80px;
             text-align: center;
-            margin-bottom: 24px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .welcome-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            display: block;
         }
 
         .header h1 {
-            font-size: 1.5rem;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.5rem;
             font-weight: 300;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-        }
-
-        .admin-btn {
-            background: transparent;
-            border: none;
-            color: #475569;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 8px;
-            transition: all 0.2s;
-            font-size: 1.2rem;
-        }
-
-        .admin-btn:hover {
-            background: rgba(255,255,255,0.1);
-            color: #94a3b8;
-        }
-
-        .admin-btn.logged-in {
-            color: #22d3ee;
-        }
-
-        /* Current Power - Main Display */
-        .current-power {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 24px;
-            padding: 32px;
-            text-align: center;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .current-power .label {
-            font-size: 1rem;
-            color: #94a3b8;
-            margin-bottom: 8px;
-        }
-
-        .current-power .value {
-            font-size: 4rem;
-            font-weight: 700;
-            line-height: 1;
-        }
-
-        .current-power .value.consuming { color: #22d3ee; }
-        .current-power .value.feeding { color: #4ade80; }
-
-        .current-power .unit {
-            font-size: 1.5rem;
-            font-weight: 300;
-            margin-left: 8px;
-        }
-
-        .current-power .value.consuming + .unit { color: #67e8f9; }
-        .current-power .value.feeding + .unit { color: #86efac; }
-
-        .feed-indicator {
-            margin-top: 8px;
-            font-size: 0.9rem;
-            color: #4ade80;
-            display: none;
-        }
-
-        .feed-indicator.active { display: block; }
-
-        /* Phase Details */
-        .phases-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .phase-card {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 16px;
-            padding: 16px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .phase-card .phase-name {
-            font-size: 0.75rem;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-        }
-
-        .phase-card .phase-value {
-            font-size: 1.4rem;
-            font-weight: 600;
-        }
-
-        .phase-card .phase-value.positive { color: #f87171; }
-        .phase-card .phase-value.negative { color: #4ade80; }
-        .phase-card .phase-value.neutral { color: #94a3b8; }
-
-        .phase-card .phase-unit {
-            font-size: 0.8rem;
-            color: #64748b;
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 20px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .stat-card .period {
-            font-size: 0.8rem;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             margin-bottom: 12px;
         }
 
-        .stat-card .energy {
-            font-size: 1.6rem;
-            font-weight: 600;
-            color: #a78bfa;
-            margin-bottom: 4px;
+        .header .subtitle {
+            font-size: 1.1rem;
+            font-weight: 300;
+            opacity: 0.9;
+            letter-spacing: 1px;
         }
 
-        .stat-card .energy-unit {
-            font-size: 0.85rem;
-            color: #c4b5fd;
+        .admin-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: rgba(255,255,255,0.6);
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+            z-index: 10;
         }
 
-        .stat-card .cost {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #4ade80;
-            margin-top: 8px;
+        .admin-btn:hover {
+            background: rgba(255,255,255,0.2);
+            color: white;
         }
 
-        .stat-card .cost-currency {
-            font-size: 0.9rem;
-            color: #86efac;
+        .admin-btn.logged-in {
+            color: var(--sage-light);
         }
 
-        .stat-card.monthly {
-            grid-column: 1 / -1;
+        /* Main Content */
+        .main {
+            max-width: 900px;
+            margin: -40px auto 40px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
         }
 
-        .stat-card.monthly .energy {
-            font-size: 2rem;
+        /* Cards */
+        .card {
+            background: var(--warm-white);
+            border-radius: 24px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            border: 1px solid rgba(0,0,0,0.03);
         }
 
-        .stat-card.monthly .cost {
-            font-size: 2.8rem;
-        }
-
-        /* Extra Stats Row */
-        .extra-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
+        .card-header {
+            display: flex;
+            align-items: center;
             gap: 12px;
             margin-bottom: 20px;
         }
 
-        .mini-stat {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 12px;
-            padding: 14px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.06);
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--sage-light) 0%, var(--sage) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
         }
 
-        .mini-stat .mini-label {
-            font-size: 0.7rem;
-            color: #64748b;
+        .card-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--forest);
+        }
+
+        .card-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Welcome Card */
+        .welcome-card {
+            text-align: center;
+            padding: 40px 32px;
+        }
+
+        .welcome-card .greeting {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 400;
+            color: var(--forest);
+            margin-bottom: 12px;
+        }
+
+        .welcome-card .message {
+            color: var(--text-light);
+            font-size: 1.05rem;
+            max-width: 500px;
+            margin: 0 auto 24px;
+            line-height: 1.7;
+        }
+
+        .time-display {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--sand);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        /* Info Grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+        }
+
+        .info-item {
+            background: var(--cream);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .info-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+        }
+
+        .info-item .icon {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .info-item .label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .info-item .value {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        /* Energy Section */
+        .energy-card {
+            background: linear-gradient(135deg, var(--warm-white) 0%, #F5F8F3 100%);
+        }
+
+        .energy-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .energy-value {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3.5rem;
+            font-weight: 600;
+            color: var(--sage-dark);
+            line-height: 1;
+        }
+
+        .energy-value.feeding {
+            color: var(--sage);
+        }
+
+        .energy-unit {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-left: 4px;
+        }
+
+        .energy-status {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--sage-dark);
+            margin-bottom: 24px;
+            padding: 8px 16px;
+            background: rgba(156, 175, 136, 0.15);
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .energy-status.feeding {
+            color: var(--sage);
+            background: rgba(156, 175, 136, 0.2);
+        }
+
+        .energy-center {
+            text-align: center;
+        }
+
+        .energy-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .energy-stat {
+            text-align: center;
+            padding: 16px;
+            background: var(--warm-white);
+            border-radius: 16px;
+        }
+
+        .energy-stat .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 6px;
         }
 
-        .mini-stat .mini-value {
-            font-size: 1.2rem;
+        .energy-stat .stat-value {
+            font-size: 1.3rem;
             font-weight: 600;
-            color: #e2e8f0;
+            color: var(--earth);
         }
 
-        .mini-stat .mini-unit {
-            font-size: 0.7rem;
-            color: #64748b;
+        .energy-stat .stat-unit {
+            font-size: 0.8rem;
+            color: var(--text-muted);
         }
 
-        .mini-stat.co2 .mini-value { color: #34d399; }
-        .mini-stat.peak .mini-value { color: #fbbf24; }
-        .mini-stat.price .mini-value { color: #a78bfa; }
+        .energy-stat .stat-cost {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--sage-dark);
+            margin-top: 4px;
+        }
 
-        /* Price Display */
-        .price-info {
-            text-align: center;
-            padding: 12px;
-            background: rgba(255,255,255,0.02);
+        /* Amenities */
+        .amenities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .amenity {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px;
+            background: var(--cream);
+            border-radius: 14px;
+            transition: background 0.2s;
+        }
+
+        .amenity:hover {
+            background: var(--sand);
+        }
+
+        .amenity .amenity-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--warm-white);
             border-radius: 12px;
-            margin-bottom: 16px;
-            border: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
         }
 
-        .price-info span {
-            color: #64748b;
+        .amenity .amenity-text h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 2px;
+        }
+
+        .amenity .amenity-text p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Contact Card */
+        .contact-card {
+            background: linear-gradient(135deg, var(--forest) 0%, var(--sage-dark) 100%);
+            color: white;
+        }
+
+        .contact-card .card-icon {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .contact-card .card-title {
+            color: white;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .contact-item .contact-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .contact-item .contact-label {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .contact-item .contact-value {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 32px 20px;
+            color: var(--text-muted);
             font-size: 0.85rem;
         }
 
-        .price-info .price-value {
-            color: #a78bfa;
-            font-weight: 600;
+        .footer .update-time {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        /* Status Footer */
-        .last-update {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 0.8rem;
-            color: #64748b;
-        }
-
-        .status-indicator {
-            display: inline-block;
+        .status-dot {
             width: 8px;
             height: 8px;
-            background: #22c55e;
+            background: var(--sage);
             border-radius: 50%;
-            margin-right: 6px;
             animation: pulse 2s infinite;
         }
 
-        .status-indicator.error {
-            background: #ef4444;
+        .status-dot.error {
+            background: var(--rose);
             animation: none;
         }
 
@@ -295,24 +455,27 @@
             50% { opacity: 0.5; }
         }
 
+        /* Error Message */
         .error-message {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid rgba(239, 68, 68, 0.5);
-            border-radius: 12px;
+            background: var(--rose-light);
+            border: 1px solid var(--rose);
+            border-radius: 16px;
             padding: 20px;
             text-align: center;
-            color: #fca5a5;
+            color: var(--text);
+            margin-bottom: 24px;
             display: none;
         }
 
-        /* Modal */
+        /* Modal Styles */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.8);
+            background: rgba(45, 74, 62, 0.8);
+            backdrop-filter: blur(4px);
             display: none;
             align-items: center;
             justify-content: center;
@@ -325,17 +488,19 @@
         }
 
         .modal {
-            background: #1e293b;
-            border-radius: 20px;
-            padding: 32px;
+            background: var(--warm-white);
+            border-radius: 24px;
+            padding: 40px;
             width: 100%;
             max-width: 400px;
-            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
         }
 
         .modal h2 {
-            color: #e2e8f0;
-            font-size: 1.3rem;
+            font-family: 'Cormorant Garamond', serif;
+            color: var(--forest);
+            font-size: 1.5rem;
+            font-weight: 500;
             margin-bottom: 24px;
             text-align: center;
         }
@@ -346,34 +511,37 @@
 
         .form-group label {
             display: block;
-            color: #94a3b8;
+            color: var(--text-light);
             font-size: 0.85rem;
             margin-bottom: 8px;
+            font-weight: 500;
         }
 
         .form-group input {
             width: 100%;
-            padding: 14px 16px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
+            padding: 14px 18px;
+            background: var(--cream);
+            border: 2px solid transparent;
             border-radius: 12px;
-            color: #fff;
+            color: var(--text);
             font-size: 1rem;
+            font-family: inherit;
             outline: none;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, background 0.2s;
         }
 
         .form-group input:focus {
-            border-color: #22d3ee;
+            border-color: var(--sage);
+            background: var(--warm-white);
         }
 
         .form-group input::placeholder {
-            color: #475569;
+            color: var(--text-muted);
         }
 
         .form-group .input-hint {
             font-size: 0.75rem;
-            color: #64748b;
+            color: var(--text-muted);
             margin-top: 6px;
         }
 
@@ -384,41 +552,43 @@
             border-radius: 12px;
             font-size: 1rem;
             font-weight: 600;
+            font-family: inherit;
             cursor: pointer;
             transition: all 0.2s;
         }
 
         .btn-primary {
-            background: #22d3ee;
-            color: #0f172a;
+            background: linear-gradient(135deg, var(--sage) 0%, var(--sage-dark) 100%);
+            color: white;
         }
 
         .btn-primary:hover {
-            background: #67e8f9;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(156, 175, 136, 0.4);
         }
 
         .btn-secondary {
-            background: rgba(255,255,255,0.1);
-            color: #94a3b8;
+            background: var(--sand);
+            color: var(--text-light);
             margin-top: 12px;
         }
 
         .btn-secondary:hover {
-            background: rgba(255,255,255,0.15);
+            background: var(--cream);
         }
 
         .btn-danger {
-            background: rgba(239, 68, 68, 0.2);
-            color: #fca5a5;
+            background: var(--rose-light);
+            color: var(--text);
             margin-top: 12px;
         }
 
         .btn-danger:hover {
-            background: rgba(239, 68, 68, 0.3);
+            background: var(--rose);
         }
 
         .error-text {
-            color: #f87171;
+            color: #c45050;
             font-size: 0.85rem;
             text-align: center;
             margin-top: 12px;
@@ -426,7 +596,7 @@
         }
 
         .success-text {
-            color: #4ade80;
+            color: var(--sage-dark);
             font-size: 0.85rem;
             text-align: center;
             margin-top: 12px;
@@ -435,156 +605,243 @@
 
         /* Responsive */
         @media (max-width: 600px) {
-            .current-power .value {
-                font-size: 3rem;
+            .header {
+                padding: 48px 20px 70px;
             }
-            .phases-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 8px;
+
+            .header h1 {
+                font-size: 2rem;
             }
-            .phase-card {
-                padding: 12px 8px;
+
+            .main {
+                margin-top: -30px;
             }
-            .phase-card .phase-value {
-                font-size: 1.1rem;
+
+            .card {
+                padding: 24px;
+                border-radius: 20px;
             }
-            .extra-stats {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 8px;
+
+            .energy-value {
+                font-size: 2.8rem;
             }
-            .mini-stat {
-                padding: 10px 6px;
+
+            .energy-stats {
+                grid-template-columns: 1fr;
+                gap: 12px;
             }
-            .mini-stat .mini-value {
-                font-size: 1rem;
+
+            .info-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
-            .stat-card .cost {
-                font-size: 1.6rem;
+
+            .amenities-grid {
+                grid-template-columns: 1fr;
             }
-            .stat-card.monthly .cost {
-                font-size: 2.2rem;
+
+            .contact-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Stromverbrauch</h1>
-            <button class="admin-btn" id="adminBtn" title="Admin">⚙️</button>
+    <!-- Header -->
+    <header class="header">
+        <button class="admin-btn" id="adminBtn" title="Admin">⚙️</button>
+        <div class="header-content">
+            <span class="welcome-icon">🌿</span>
+            <h1>Willkommen im Hostel</h1>
+            <p class="subtitle">Ihr Ort der Ruhe und Erholung</p>
         </div>
+    </header>
 
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Error Message -->
         <div class="error-message" id="errorMessage">
-            <p>Verbindung fehlgeschlagen</p>
-            <p style="margin-top: 10px; font-size: 0.85rem;">Bitte später erneut versuchen</p>
+            <p>Verbindung wird hergestellt...</p>
         </div>
 
         <div id="dashboard">
-            <!-- Current Power -->
-            <div class="current-power">
-                <div class="label">Aktueller Verbrauch</div>
-                <div>
-                    <span class="value consuming" id="currentPower">--</span>
-                    <span class="unit">W</span>
-                </div>
-                <div class="feed-indicator" id="feedIndicator">↑ Einspeisung ins Netz</div>
-            </div>
-
-            <!-- Phase Details -->
-            <div class="phases-grid" id="phasesGrid">
-                <div class="phase-card">
-                    <div class="phase-name">Phase A</div>
-                    <div>
-                        <span class="phase-value neutral" id="phaseA">--</span>
-                        <span class="phase-unit">W</span>
-                    </div>
-                </div>
-                <div class="phase-card">
-                    <div class="phase-name">Phase B</div>
-                    <div>
-                        <span class="phase-value neutral" id="phaseB">--</span>
-                        <span class="phase-unit">W</span>
-                    </div>
-                </div>
-                <div class="phase-card">
-                    <div class="phase-name">Phase C</div>
-                    <div>
-                        <span class="phase-value neutral" id="phaseC">--</span>
-                        <span class="phase-unit">W</span>
-                    </div>
+            <!-- Welcome Card -->
+            <div class="card welcome-card">
+                <h2 class="greeting">Schön, dass Sie da sind!</h2>
+                <p class="message">
+                    Genießen Sie Ihren Aufenthalt in unserem liebevoll gestalteten Hostel.
+                    Hier finden Sie alle wichtigen Informationen für einen entspannten Aufenthalt.
+                </p>
+                <div class="time-display">
+                    <span>🕐</span>
+                    <span id="currentTime">--:--</span>
+                    <span>•</span>
+                    <span id="currentDate">--. --- ----</span>
                 </div>
             </div>
 
-            <!-- Extra Stats -->
-            <div class="extra-stats">
-                <div class="mini-stat peak">
-                    <div class="mini-label">Peak Heute</div>
+            <!-- Quick Info -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">ℹ️</div>
                     <div>
-                        <span class="mini-value" id="peakPower">--</span>
-                        <span class="mini-unit">W</span>
+                        <h3 class="card-title">Wichtige Infos</h3>
+                        <p class="card-subtitle">Alles auf einen Blick</p>
                     </div>
                 </div>
-                <div class="mini-stat co2">
-                    <div class="mini-label">CO₂ Heute</div>
-                    <div>
-                        <span class="mini-value" id="co2Today">--</span>
-                        <span class="mini-unit">kg</span>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="icon">🔑</span>
+                        <div class="label">Check-out</div>
+                        <div class="value">11:00 Uhr</div>
                     </div>
-                </div>
-                <div class="mini-stat price">
-                    <div class="mini-label">Preis/kWh</div>
-                    <div>
-                        <span class="mini-value" id="priceDisplay">--</span>
-                        <span class="mini-unit">ct</span>
+                    <div class="info-item">
+                        <span class="icon">📶</span>
+                        <div class="label">WLAN</div>
+                        <div class="value">Hostel-Gast</div>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon">🔒</span>
+                        <div class="label">WLAN-Code</div>
+                        <div class="value">willkommen</div>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon">🌡️</span>
+                        <div class="label">Heizung</div>
+                        <div class="value">Thermostat</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Main Stats -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="period">Heute</div>
-                    <div class="energy">
-                        <span id="todayEnergy">--</span>
-                        <span class="energy-unit">kWh</span>
-                    </div>
-                    <div class="cost">
-                        <span id="todayCost">--</span>
-                        <span class="cost-currency">€</span>
+            <!-- Amenities -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">✨</div>
+                    <div>
+                        <h3 class="card-title">Annehmlichkeiten</h3>
+                        <p class="card-subtitle">Für Ihren Komfort</p>
                     </div>
                 </div>
-
-                <div class="stat-card">
-                    <div class="period">Gestern</div>
-                    <div class="energy">
-                        <span id="yesterdayEnergy">--</span>
-                        <span class="energy-unit">kWh</span>
+                <div class="amenities-grid">
+                    <div class="amenity">
+                        <div class="amenity-icon">☕</div>
+                        <div class="amenity-text">
+                            <h4>Kaffee & Tee</h4>
+                            <p>Kostenlos in der Küche</p>
+                        </div>
                     </div>
-                    <div class="cost">
-                        <span id="yesterdayCost">--</span>
-                        <span class="cost-currency">€</span>
+                    <div class="amenity">
+                        <div class="amenity-icon">🛁</div>
+                        <div class="amenity-text">
+                            <h4>Handtücher</h4>
+                            <p>Im Badezimmer</p>
+                        </div>
                     </div>
-                </div>
-
-                <div class="stat-card monthly">
-                    <div class="period">Dieser Monat</div>
-                    <div class="energy">
-                        <span id="monthEnergy">--</span>
-                        <span class="energy-unit">kWh</span>
+                    <div class="amenity">
+                        <div class="amenity-icon">🧴</div>
+                        <div class="amenity-text">
+                            <h4>Pflegeprodukte</h4>
+                            <p>Shampoo, Seife & mehr</p>
+                        </div>
                     </div>
-                    <div class="cost">
-                        <span id="monthCost">--</span>
-                        <span class="cost-currency">€</span>
+                    <div class="amenity">
+                        <div class="amenity-icon">📺</div>
+                        <div class="amenity-text">
+                            <h4>Smart TV</h4>
+                            <p>Netflix verfügbar</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="last-update">
-                <span class="status-indicator" id="statusIndicator"></span>
-                Aktualisiert: <span id="lastUpdate">--</span>
+            <!-- Energy Card -->
+            <div class="card energy-card">
+                <div class="card-header">
+                    <div class="card-icon">⚡</div>
+                    <div>
+                        <h3 class="card-title">Energieverbrauch</h3>
+                        <p class="card-subtitle">Live-Anzeige</p>
+                    </div>
+                </div>
+
+                <div class="energy-center">
+                    <div class="energy-display">
+                        <span class="energy-value" id="currentPower">--</span>
+                        <span class="energy-unit">Watt</span>
+                    </div>
+                    <div class="energy-status" id="energyStatus">Aktueller Verbrauch</div>
+                </div>
+
+                <div class="energy-stats">
+                    <div class="energy-stat">
+                        <div class="stat-label">Heute</div>
+                        <div>
+                            <span class="stat-value" id="todayEnergy">--</span>
+                            <span class="stat-unit">kWh</span>
+                        </div>
+                        <div class="stat-cost"><span id="todayCost">--</span> €</div>
+                    </div>
+                    <div class="energy-stat">
+                        <div class="stat-label">Gestern</div>
+                        <div>
+                            <span class="stat-value" id="yesterdayEnergy">--</span>
+                            <span class="stat-unit">kWh</span>
+                        </div>
+                        <div class="stat-cost"><span id="yesterdayCost">--</span> €</div>
+                    </div>
+                    <div class="energy-stat">
+                        <div class="stat-label">Dieser Monat</div>
+                        <div>
+                            <span class="stat-value" id="monthEnergy">--</span>
+                            <span class="stat-unit">kWh</span>
+                        </div>
+                        <div class="stat-cost"><span id="monthCost">--</span> €</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Card -->
+            <div class="card contact-card">
+                <div class="card-header">
+                    <div class="card-icon">💬</div>
+                    <div>
+                        <h3 class="card-title">Kontakt & Hilfe</h3>
+                        <p class="card-subtitle" style="color: rgba(255,255,255,0.7);">Wir sind für Sie da</p>
+                    </div>
+                </div>
+                <div class="contact-grid">
+                    <div class="contact-item">
+                        <div class="contact-icon">📞</div>
+                        <div>
+                            <div class="contact-label">Telefon</div>
+                            <div class="contact-value">+43 123 456 789</div>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">✉️</div>
+                        <div>
+                            <div class="contact-label">E-Mail</div>
+                            <div class="contact-value">info@hostel.at</div>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">🚨</div>
+                        <div>
+                            <div class="contact-label">Notfall</div>
+                            <div class="contact-value">112</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="update-time">
+            <span class="status-dot" id="statusIndicator"></span>
+            <span>Aktualisiert: <span id="lastUpdate">--:--</span></span>
+        </div>
+    </footer>
 
     <!-- Login Modal -->
     <div class="modal-overlay" id="loginModal">
@@ -592,7 +849,7 @@
             <h2>🔐 Admin Login</h2>
             <div class="form-group">
                 <label>Passwort</label>
-                <input type="password" id="loginPassword" placeholder="Admin-Passwort eingeben">
+                <input type="password" id="loginPassword" placeholder="Passwort eingeben">
             </div>
             <button class="btn btn-primary" id="loginBtn">Anmelden</button>
             <button class="btn btn-secondary" id="closeLoginBtn">Abbrechen</button>
@@ -607,7 +864,7 @@
             <div class="form-group">
                 <label>Strompreis (Cent/kWh)</label>
                 <input type="number" id="settingsPrice" step="0.1" min="0" max="100" placeholder="29">
-                <div class="input-hint">Aktueller Österreich-Durchschnitt: 29 ct/kWh</div>
+                <div class="input-hint">Aktueller Durchschnitt: 29 ct/kWh</div>
             </div>
             <div class="form-group">
                 <label>CO₂-Faktor (kg/kWh)</label>
@@ -618,11 +875,71 @@
             <button class="btn btn-secondary" id="closeSettingsBtn">Abbrechen</button>
             <button class="btn btn-danger" id="logoutBtn">Abmelden</button>
             <div class="error-text" id="settingsError">Fehler beim Speichern</div>
-            <div class="success-text" id="settingsSuccess">Einstellungen gespeichert!</div>
+            <div class="success-text" id="settingsSuccess">Gespeichert!</div>
         </div>
+    </div>
+
+    <!-- Hidden elements for compatibility -->
+    <div style="display:none">
+        <span id="phaseA"></span>
+        <span id="phaseB"></span>
+        <span id="phaseC"></span>
+        <span id="peakPower"></span>
+        <span id="co2Today"></span>
+        <span id="priceDisplay"></span>
+        <span id="feedIndicator"></span>
     </div>
 
     <script src="config.js"></script>
     <script src="app.js"></script>
+    <script>
+        // Update time display
+        function updateDateTime() {
+            const now = new Date();
+            const timeEl = document.getElementById('currentTime');
+            const dateEl = document.getElementById('currentDate');
+
+            if (timeEl) {
+                timeEl.textContent = now.toLocaleTimeString('de-DE', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+
+            if (dateEl) {
+                dateEl.textContent = now.toLocaleDateString('de-DE', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+            }
+        }
+
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // Update energy status text
+        const originalUpdateUI = window.updateUI;
+        if (originalUpdateUI) {
+            window.updateUI = function(status) {
+                originalUpdateUI(status);
+
+                const totalPower = status.total_act_power || 0;
+                const isFeeding = totalPower < 0;
+                const statusEl = document.getElementById('energyStatus');
+                const powerEl = document.getElementById('currentPower');
+
+                if (statusEl) {
+                    statusEl.textContent = isFeeding ? '↑ Einspeisung ins Netz' : 'Aktueller Verbrauch';
+                    statusEl.classList.toggle('feeding', isFeeding);
+                }
+
+                if (powerEl) {
+                    powerEl.classList.toggle('feeding', isFeeding);
+                }
+            };
+        }
+    </script>
 </body>
 </html>
