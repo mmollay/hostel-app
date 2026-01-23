@@ -6,7 +6,13 @@ compatibility_date = "2024-01-01"
 # wrangler secret put SHELLY_AUTH_KEY
 # wrangler secret put SHELLY_DEVICE_ID
 # wrangler secret put SHELLY_CLOUD_SERVER
+# wrangler secret put ADMIN_PASSWORD
 
 [vars]
 # Nur non-sensitive defaults hier
 SHELLY_CLOUD_SERVER = "https://shelly-237-eu.shelly.cloud"
+
+# KV Namespace für Einstellungen
+[[kv_namespaces]]
+binding = "SETTINGS"
+id = "58c3a9f2bb9448608271ddef91c4752f"
