@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Willkommen im Hostel</title>
+    <title>Genieße dein Haus | Hollenthon</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --cream: #FAF8F5;
@@ -37,11 +37,13 @@
         }
 
         body {
-            font-family: 'Nunito', sans-serif;
+            font-family: 'DM Sans', sans-serif;
             background: var(--cream);
             color: var(--text);
             line-height: 1.6;
             min-height: 100vh;
+            font-weight: 400;
+            letter-spacing: 0.01em;
         }
 
         /* Header */
@@ -79,10 +81,10 @@
         }
 
         .header h1 {
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'Playfair Display', serif;
             font-size: 2.5rem;
-            font-weight: 300;
-            letter-spacing: 2px;
+            font-weight: 500;
+            letter-spacing: 1px;
             margin-bottom: 12px;
         }
 
@@ -155,9 +157,9 @@
         }
 
         .card-title {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.5rem;
-            font-weight: 500;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-weight: 600;
             color: var(--forest);
         }
 
@@ -173,9 +175,9 @@
         }
 
         .welcome-card .greeting {
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'Playfair Display', serif;
             font-size: 1.8rem;
-            font-weight: 400;
+            font-weight: 600;
             color: var(--forest);
             margin-bottom: 12px;
         }
@@ -253,9 +255,9 @@
         }
 
         .energy-value {
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'Playfair Display', serif;
             font-size: 3.5rem;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--sage-dark);
             line-height: 1;
         }
@@ -497,10 +499,10 @@
         }
 
         .modal h2 {
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'Playfair Display', serif;
             color: var(--forest);
-            font-size: 1.5rem;
-            font-weight: 500;
+            font-size: 1.4rem;
+            font-weight: 600;
             margin-bottom: 24px;
             text-align: center;
         }
@@ -650,9 +652,9 @@
     <header class="header">
         <button class="admin-btn" id="adminBtn" title="Admin">⚙️</button>
         <div class="header-content">
-            <span class="welcome-icon">🌿</span>
-            <h1>Willkommen im Hostel</h1>
-            <p class="subtitle">Ihr Ort der Ruhe und Erholung</p>
+            <span class="welcome-icon">🏡</span>
+            <h1>Genieße dein Haus</h1>
+            <p class="subtitle">am angrenzenden Wald • Hollenthon</p>
         </div>
     </header>
 
@@ -666,10 +668,10 @@
         <div id="dashboard">
             <!-- Welcome Card -->
             <div class="card welcome-card">
-                <h2 class="greeting">Schön, dass Sie da sind!</h2>
+                <h2 class="greeting">Herzlich Willkommen!</h2>
                 <p class="message">
-                    Genießen Sie Ihren Aufenthalt in unserem liebevoll gestalteten Hostel.
-                    Hier finden Sie alle wichtigen Informationen für einen entspannten Aufenthalt.
+                    Genießen Sie Ihren Aufenthalt in unserem bewusst minimalistisch eingerichteten Haus
+                    am Waldrand. Hier finden Sie Ruhe, Erholung und alles für einen entspannten Aufenthalt.
                 </p>
                 <div class="time-display">
                     <span>🕐</span>
@@ -690,24 +692,44 @@
                 </div>
                 <div class="info-grid">
                     <div class="info-item">
+                        <span class="icon">🚪</span>
+                        <div class="label">Check-in</div>
+                        <div class="value">ab 15:00</div>
+                    </div>
+                    <div class="info-item">
                         <span class="icon">🔑</span>
                         <div class="label">Check-out</div>
-                        <div class="value">11:00 Uhr</div>
+                        <div class="value">bis 11:00</div>
                     </div>
                     <div class="info-item">
                         <span class="icon">📶</span>
                         <div class="label">WLAN</div>
-                        <div class="value">Hostel-Gast</div>
+                        <div class="value">Hostel Power</div>
                     </div>
                     <div class="info-item">
                         <span class="icon">🔒</span>
                         <div class="label">WLAN-Code</div>
-                        <div class="value">willkommen</div>
+                        <div class="value">hostl21</div>
                     </div>
                     <div class="info-item">
-                        <span class="icon">🌡️</span>
-                        <div class="label">Heizung</div>
-                        <div class="value">Thermostat</div>
+                        <span class="icon">🔐</span>
+                        <div class="label">Schlüssel</div>
+                        <div class="value">Schlüsselbox</div>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon">🐕</span>
+                        <div class="label">Haustiere</div>
+                        <div class="value">Erlaubt</div>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon">🚭</span>
+                        <div class="label">Rauchen</div>
+                        <div class="value">Verboten</div>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon">🚗</span>
+                        <div class="label">Parken</div>
+                        <div class="value">Kostenlos</div>
                     </div>
                 </div>
             </div>
@@ -723,31 +745,59 @@
                 </div>
                 <div class="amenities-grid">
                     <div class="amenity">
-                        <div class="amenity-icon">☕</div>
+                        <div class="amenity-icon">🍳</div>
                         <div class="amenity-text">
-                            <h4>Kaffee & Tee</h4>
-                            <p>Kostenlos in der Küche</p>
+                            <h4>Voll ausgestattete Küche</h4>
+                            <p>Herd, Ofen, Kühlschrank, Kaffeemaschine</p>
+                        </div>
+                    </div>
+                    <div class="amenity">
+                        <div class="amenity-icon">🔥</div>
+                        <div class="amenity-text">
+                            <h4>Kamin</h4>
+                            <p>Pellets & Holz vorhanden</p>
+                        </div>
+                    </div>
+                    <div class="amenity">
+                        <div class="amenity-icon">🌳</div>
+                        <div class="amenity-text">
+                            <h4>Garten mit Feuerstelle</h4>
+                            <p>Gartenmöbel & Hängematte</p>
+                        </div>
+                    </div>
+                    <div class="amenity">
+                        <div class="amenity-icon">🥩</div>
+                        <div class="amenity-text">
+                            <h4>Grill & Außenküche</h4>
+                            <p>Essbereich im Freien</p>
+                        </div>
+                    </div>
+                    <div class="amenity">
+                        <div class="amenity-icon">👕</div>
+                        <div class="amenity-text">
+                            <h4>Waschmaschine</h4>
+                            <p>Kostenlos nutzbar</p>
+                        </div>
+                    </div>
+                    <div class="amenity">
+                        <div class="amenity-icon">📚</div>
+                        <div class="amenity-text">
+                            <h4>Bibliothek</h4>
+                            <p>Bücher & Lesematerial</p>
                         </div>
                     </div>
                     <div class="amenity">
                         <div class="amenity-icon">🛁</div>
                         <div class="amenity-text">
-                            <h4>Handtücher</h4>
-                            <p>Im Badezimmer</p>
+                            <h4>Handtücher & Bettwäsche</h4>
+                            <p>Pflegeprodukte inklusive</p>
                         </div>
                     </div>
                     <div class="amenity">
-                        <div class="amenity-icon">🧴</div>
+                        <div class="amenity-icon">👶</div>
                         <div class="amenity-text">
-                            <h4>Pflegeprodukte</h4>
-                            <p>Shampoo, Seife & mehr</p>
-                        </div>
-                    </div>
-                    <div class="amenity">
-                        <div class="amenity-icon">📺</div>
-                        <div class="amenity-text">
-                            <h4>Smart TV</h4>
-                            <p>Netflix verfügbar</p>
+                            <h4>Familienfreundlich</h4>
+                            <p>Kindergeschirr vorhanden</p>
                         </div>
                     </div>
                 </div>
