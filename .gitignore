@@ -1,0 +1,12 @@
+# Dependencies
+node_modules/
+
+# Debug logs
+*.log
+firebase-debug.log
+
+# OS files
+.DS_Store
+
+# Local development secrets (falls jemand eine lokale config mit echten Keys hat)
+# config.local.js

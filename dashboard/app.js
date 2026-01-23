@@ -106,35 +106,96 @@ function scheduleDailyReset() {
  */
 async function fetchData() {
   try {
-    const shellyUrl = `http://${CONFIG.SHELLY_IP}`;
-
-    // Auth Header falls nötig
-    const headers = {};
-    if (CONFIG.SHELLY_USER && CONFIG.SHELLY_PASSWORD) {
-      headers["Authorization"] =
-        "Basic " + btoa(`${CONFIG.SHELLY_USER}:${CONFIG.SHELLY_PASSWORD}`);
+    if (CONFIG.USE_CLOUD_API) {
+      await fetchFromCloud();
+    } else {
+      await fetchFromLocal();
     }
-
-    // Aktuelle Leistung abrufen (EM.GetStatus)
-    const statusResponse = await fetch(`${shellyUrl}/rpc/EM.GetStatus?id=0`, {
-      headers,
-    });
-    const statusData = await statusResponse.json();
-
-    // Energie-Daten abrufen (EMData.GetStatus)
-    const energyResponse = await fetch(
-      `${shellyUrl}/rpc/EMData.GetStatus?id=0`,
-      { headers },
-    );
-    const emData = await energyResponse.json();
-
-    // UI aktualisieren
-    updateUI(statusData, emData);
-    showConnected();
   } catch (error) {
     console.error("Fehler beim Abrufen der Daten:", error);
     showError();
   }
+}
+
+/**
+ * Daten über Shelly Cloud API abrufen
+ * Nutzt API_PROXY_URL wenn gesetzt, sonst direkte Cloud API
+ */
+async function fetchFromCloud() {
+  let response;
+
+  if (CONFIG.API_PROXY_URL) {
+    // Produktion: Über Cloudflare Worker Proxy (Auth-Key sicher auf Server)
+    response = await fetch(CONFIG.API_PROXY_URL);
+  } else {
+    // Lokal: Direkte Cloud API Verbindung
+    const url = `${CONFIG.SHELLY_CLOUD_SERVER}/device/status`;
+    response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: `auth_key=${encodeURIComponent(CONFIG.SHELLY_AUTH_KEY)}&id=${encodeURIComponent(CONFIG.SHELLY_DEVICE_ID)}`,
+    });
+  }
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  }
+
+  const result = await response.json();
+
+  if (!result.isok) {
+    const errorMsg = Array.isArray(result.errors)
+      ? result.errors.join(", ")
+      : typeof result.errors === "string"
+        ? result.errors
+        : "Cloud API Fehler";
+    throw new Error(errorMsg);
+  }
+
+  const data = result.data.device_status;
+
+  // Cloud API liefert em:0 für EM-Daten
+  const emData = data["em:0"] || {};
+  const emDataEnergy = data["emdata:0"] || {};
+
+  // Konvertiere Cloud-Format zu lokalem Format
+  const statusData = {
+    a_act_power: emData.a_act_power || 0,
+    b_act_power: emData.b_act_power || 0,
+    c_act_power: emData.c_act_power || 0,
+    total_act_energy: (emDataEnergy.total_act || 0) * 1000, // kWh to Wh
+  };
+
+  updateUI(statusData, {});
+  showConnected();
+}
+
+/**
+ * Daten über lokale IP abrufen (Fallback)
+ */
+async function fetchFromLocal() {
+  const shellyUrl = `http://${CONFIG.SHELLY_IP}`;
+
+  const headers = {};
+  if (CONFIG.SHELLY_USER && CONFIG.SHELLY_PASSWORD) {
+    headers["Authorization"] =
+      "Basic " + btoa(`${CONFIG.SHELLY_USER}:${CONFIG.SHELLY_PASSWORD}`);
+  }
+
+  const statusResponse = await fetch(`${shellyUrl}/rpc/EM.GetStatus?id=0`, {
+    headers,
+  });
+  const statusData = await statusResponse.json();
+
+  const energyResponse = await fetch(`${shellyUrl}/rpc/EMData.GetStatus?id=0`, {
+    headers,
+  });
+  const emData = await energyResponse.json();
+
+  updateUI(statusData, emData);
+  showConnected();
 }
 
 /**

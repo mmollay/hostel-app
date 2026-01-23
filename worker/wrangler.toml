@@ -1,0 +1,12 @@
+name = "energy-kiosk-api"
+main = "index.js"
+compatibility_date = "2024-01-01"
+
+# Secrets werden über `wrangler secret put` gesetzt:
+# wrangler secret put SHELLY_AUTH_KEY
+# wrangler secret put SHELLY_DEVICE_ID
+# wrangler secret put SHELLY_CLOUD_SERVER
+
+[vars]
+# Nur non-sensitive defaults hier
+SHELLY_CLOUD_SERVER = "https://shelly-237-eu.shelly.cloud"

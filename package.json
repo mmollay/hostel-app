@@ -1,0 +1,19 @@
+{
+  "name": "energy-kiosk",
+  "version": "1.0.0",
+  "description": "Energy Monitoring Kiosk Dashboard for Shelly Pro 3EM",
+  "scripts": {
+    "dev": "npx serve dashboard -p 8080",
+    "build": "echo 'Static site - no build needed'",
+    "preview": "npx serve dashboard -p 3000"
+  },
+  "keywords": [
+    "energy",
+    "monitoring",
+    "shelly",
+    "kiosk",
+    "dashboard"
+  ],
+  "author": "SSI",
+  "license": "MIT"
+}
