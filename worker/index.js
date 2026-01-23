@@ -1,5 +1,5 @@
 /**
- * Cloudflare Worker - Energy Kiosk API
+ * Cloudflare Worker - Hostel-App API
  * - Shelly Cloud API Proxy (Auth-Key sicher auf Server)
  * - Settings Storage (KV)
  * - Admin Authentication

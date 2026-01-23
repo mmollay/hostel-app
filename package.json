@@ -1,17 +1,18 @@
 {
-  "name": "energy-kiosk",
+  "name": "hostel-app",
   "version": "1.0.0",
-  "description": "Energy Monitoring Kiosk Dashboard for Shelly Pro 3EM",
+  "description": "Hostel Guest Portal with Energy Monitoring",
   "scripts": {
     "dev": "npx serve dashboard -p 8080",
     "build": "echo 'Static site - no build needed'",
     "preview": "npx serve dashboard -p 3000"
   },
   "keywords": [
+    "hostel",
+    "guest-portal",
     "energy",
     "monitoring",
     "shelly",
-    "kiosk",
     "dashboard"
   ],
   "author": "SSI",

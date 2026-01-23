@@ -1,13 +1,14 @@
-# Energy Kiosk - Claude Projektanweisungen
+# Hostel-App - Claude Projektanweisungen
 
 ## Projektübersicht
 
-Dieses Projekt richtet Android-Geräte als Kiosk-Displays für Energiemonitoring ein.
+Guest Portal für Hostel/Airbnb mit integriertem Energiemonitoring.
 
 **Hauptkomponenten:**
 - Shelly Pro 3EM (Energiemessgerät)
-- Android-Gerät als Kiosk
-- Web-Dashboard für Kostenanzeige
+- Web-Dashboard (Cloudflare Pages)
+- API Proxy (Cloudflare Worker)
+- Optional: Android-Gerät als Kiosk
 
 ## Wichtige Pfade
 
@@ -15,23 +16,37 @@ Dieses Projekt richtet Android-Geräte als Kiosk-Displays für Energiemonitoring
 |-----|------|
 | Dashboard | `dashboard/` |
 | Konfiguration | `dashboard/config.js` |
+| Worker | `worker/` |
 | Dokumentation | `docs/` |
 | Deploy-Script | `scripts/deploy-to-android.sh` |
-| ADB Tools | `/Users/martinmollay/Downloads/platform-tools/` |
+
+## URLs
+
+| Service | URL |
+|---------|-----|
+| Dashboard | https://hostel.ssi.at |
+| API Worker | https://hostel-app-api.office-509.workers.dev |
 
 ## Häufige Aufgaben
+
+### Dashboard deployen (Cloudflare Pages)
+```bash
+# Automatisch via GitHub Push
+git push origin main
+```
+
+### Worker deployen
+```bash
+cd worker && npx wrangler deploy
+```
 
 ### Neues Kiosk-Gerät einrichten
 → Folge `docs/KIOSK-SETUP-ANLEITUNG.md`
 
-### Dashboard auf Gerät deployen
+### Dashboard auf Android deployen
 ```bash
 ./scripts/deploy-to-android.sh
 ```
-
-### Config aktualisieren (Shelly IP ändern)
-1. `dashboard/config.js` bearbeiten
-2. Deploy-Script ausführen
 
 ## Shelly Pro 3EM API
 
@@ -43,11 +58,11 @@ Dieses Projekt richtet Android-Geräte als Kiosk-Displays für Energiemonitoring
 | `EMData.GetStatus?id=0` | Historische Energiedaten |
 | `Shelly.GetStatus` | Gesamtstatus des Geräts |
 
-## Android Kiosk
+## Android Kiosk (optional)
 
 **Device Owner:** TestDPC (`com.afwsamples.testdpc`)
 **Kiosk Browser:** Fully Kiosk Browser (`de.ozerov.fully`)
-**Dashboard-Pfad auf Android:** `/sdcard/energy-dashboard/`
+**Dashboard-Pfad auf Android:** `/sdcard/hostel-dashboard/`
 
 ### Wichtige ADB-Befehle
 
@@ -55,30 +70,17 @@ Dieses Projekt richtet Android-Geräte als Kiosk-Displays für Energiemonitoring
 # Geräte auflisten
 ./adb devices
 
-# TestDPC öffnen
-./adb shell am start -n "com.afwsamples.testdpc/.PolicyManagementActivity"
-
 # Fully Kiosk starten
 ./adb shell am start -n de.ozerov.fully/.FullyKioskActivity
 
-# Lock Task Status prüfen
-./adb shell dumpsys activity activities | grep "mLockTaskModeState"
-
 # Dashboard-Dateien updaten
-./adb push dashboard/* /sdcard/energy-dashboard/
+./adb push dashboard/* /sdcard/hostel-dashboard/
 ```
-
-## Beim Fortsetzen beachten
-
-1. **ADB-Pfad:** `/Users/martinmollay/Downloads/platform-tools/`
-2. **Gerät verbunden?** `./adb devices` prüfen
-3. **Shelly installiert?** IP-Adresse in config.js eintragen
-4. **Kiosk aktiv?** Lock Task Status prüfen
 
 ## Offene Punkte / TODOs
 
-- [ ] Shelly Pro 3EM installieren und IP ermitteln
-- [ ] Config mit echter IP aktualisieren
-- [ ] Fully Kiosk Browser auf Android installieren
-- [ ] Von Shelly-App-Kiosk zu Dashboard-Kiosk wechseln
-- [ ] Optional: Raspberry Pi als Dashboard-Host
+- [x] Dashboard auf Cloudflare Pages
+- [x] Worker für API Proxy
+- [x] Admin-Bereich für Einstellungen
+- [ ] Kontaktdaten updaten (Telefon, Email)
+- [ ] Optional: Weitere Airbnb-Daten integrieren

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ============================================
-# Energy Kiosk - Deploy Dashboard to Android
+# Hostel-App - Deploy Dashboard to Android
 # ============================================
 
 # Farben
@@ -15,10 +15,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 DASHBOARD_DIR="$PROJECT_DIR/dashboard"
 ADB_PATH="/Users/martinmollay/Downloads/platform-tools/adb"
-ANDROID_PATH="/sdcard/energy-dashboard"
+ANDROID_PATH="/sdcard/hostel-dashboard"
 
 echo "=========================================="
-echo "  Energy Kiosk - Dashboard Deployment"
+echo "  Hostel-App - Dashboard Deployment"
 echo "=========================================="
 echo ""
 

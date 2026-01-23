@@ -1,5 +1,5 @@
 /**
- * Energy Kiosk Dashboard - Extended Version
+ * Hostel-App Dashboard
  * ==========================================
  * - Phase monitoring
  * - Feed-in detection
@@ -31,7 +31,7 @@ let adminToken = null;
 
 // LocalStorage Keys
 const STORAGE_KEY = "shelly_energy_data";
-const ADMIN_TOKEN_KEY = "energy_kiosk_admin";
+const ADMIN_TOKEN_KEY = "hostel_app_admin";
 
 /**
  * Initialisierung

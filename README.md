@@ -1,107 +1,100 @@
-# Energy Kiosk
+# Hostel-App
 
-Dediziertes Kiosk-System zur Anzeige von Stromverbrauch und Kosten mit Shelly Pro 3EM.
+Guest Portal für Hostel/Airbnb mit integriertem Energiemonitoring (Shelly Pro 3EM).
 
 ## Übersicht
 
-Dieses Projekt ermöglicht es, Android-Geräte (z.B. Samsung Galaxy M32) als dedizierte Kiosk-Displays für Energiemonitoring einzurichten.
+Web-Dashboard für Gäste mit:
+- Hausinformationen (Check-in/out, WLAN, Regeln)
+- Ausstattung & Amenities
+- Live-Energiemonitoring
+- Admin-Bereich für Einstellungen
+
+**Live:** https://hostel.ssi.at
+
+## Architektur
 
 ```
-┌─────────────────────────────────┐
-│      STROMVERBRAUCH             │
-│                                 │
-│    Aktuell: 1.234 W             │
-│                                 │
-│    Heute:    12,5 kWh / 3,75 €  │
-│    Monat:   245,8 kWh / 73,74 € │
-└─────────────────────────────────┘
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  Cloudflare     │────▶│  Cloudflare     │────▶│  Shelly Cloud   │
+│  Pages          │     │  Worker         │     │  API            │
+│  (Dashboard)    │     │  (API Proxy)    │     │                 │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
 ```
 
 ## Komponenten
 
 | Komponente | Beschreibung |
 |------------|--------------|
+| **Dashboard** | Cloudflare Pages (hostel.ssi.at) |
+| **API Worker** | Cloudflare Worker (hostel-app-api) |
 | **Shelly Pro 3EM** | 3-Phasen Energiemessgerät |
-| **Android Kiosk** | Samsung Galaxy M32 (oder ähnlich) |
-| **Dashboard** | Web-basierte Kostenanzeige |
-| **TestDPC** | Android Device Owner für Kiosk-Modus |
+| **KV Storage** | Einstellungen (Strompreis, CO2) |
 
 ## Projektstruktur
 
 ```
-energy-kiosk/
+hostel-app/
 ├── dashboard/              # Web-Dashboard
-│   ├── index.html          # UI
-│   ├── config.js           # Konfiguration (IP, Strompreis)
+│   ├── index.html          # UI (Lucide Icons, Cormorant/Lato)
+│   ├── config.js           # Konfiguration
 │   └── app.js              # Logik
+├── worker/                 # Cloudflare Worker
+│   ├── index.js            # API Proxy
+│   └── wrangler.toml       # Worker Config
 ├── docs/                   # Dokumentation
-│   ├── KIOSK-SETUP-ANLEITUNG.md   # Android Kiosk einrichten
-│   ├── ANDROID-SETUP.md           # Dashboard auf Android
-│   └── DASHBOARD.md               # Dashboard-Dokumentation
 ├── scripts/                # Hilfs-Scripts
-│   └── deploy-to-android.sh       # Dashboard auf Gerät kopieren
-├── android-tools/          # ADB & Tools
-│   └── (symlink zu platform-tools)
 ├── README.md
 └── CLAUDE.md               # Projektanweisungen für Claude
 ```
 
-## Schnellstart
+## Deployment
 
-### Neues Kiosk-Gerät einrichten
-
-1. **Dokumentation lesen:** `docs/KIOSK-SETUP-ANLEITUNG.md`
-2. **TestDPC als Device Owner** einrichten
-3. **Dashboard konfigurieren:** `dashboard/config.js`
-4. **Auf Gerät deployen:** `./scripts/deploy-to-android.sh`
-
-### Bestehendes Gerät updaten
-
+### Dashboard (Cloudflare Pages)
 ```bash
-# Config anpassen
-nano dashboard/config.js
-
-# Auf Gerät deployen
-./scripts/deploy-to-android.sh
+git push origin main  # Auto-Deploy
 ```
 
-## Hardware-Anforderungen
-
-### Android-Gerät
-- Android 10+ (getestet mit Android 13)
-- WLAN-fähig
-- USB-Debugging möglich
-- Empfohlen: Samsung Galaxy M32 oder ähnlich
-
-### Shelly Pro 3EM
-- Im gleichen WLAN-Netzwerk
-- Zugriff auf lokale API (Standard)
+### Worker (Cloudflare)
+```bash
+cd worker && npx wrangler deploy
+```
 
 ## Konfiguration
 
-Die Datei `dashboard/config.js` enthält:
+### Worker Secrets
+```bash
+wrangler secret put SHELLY_AUTH_KEY
+wrangler secret put SHELLY_DEVICE_ID
+wrangler secret put ADMIN_PASSWORD
+```
 
+### Dashboard Config (`dashboard/config.js`)
 ```javascript
 const CONFIG = {
-  SHELLY_IP: "192.168.1.XXX",  // Shelly Pro 3EM IP
-  PRICE_PER_KWH: 0.30,         // Strompreis in €/kWh
-  UPDATE_INTERVAL: 2000,       // Aktualisierung in ms
+  API_PROXY_URL: "https://hostel-app-api.office-509.workers.dev",
+  UPDATE_INTERVAL: 5000,
   // ...
 };
 ```
 
-## Dokumentation
+## Features
 
-| Dokument | Beschreibung |
-|----------|--------------|
-| [KIOSK-SETUP-ANLEITUNG.md](docs/KIOSK-SETUP-ANLEITUNG.md) | Vollständige Anleitung für Android Kiosk |
-| [ANDROID-SETUP.md](docs/ANDROID-SETUP.md) | Dashboard auf Android installieren |
-| [DASHBOARD.md](docs/DASHBOARD.md) | Dashboard-Dokumentation & API |
+- ✅ Live-Energiemonitoring (3-Phasen)
+- ✅ Einspeisung-Erkennung (PV)
+- ✅ Tages-/Monats-Statistiken
+- ✅ Kostenberechnung
+- ✅ CO2-Tracking
+- ✅ Admin-Bereich mit Login
+- ✅ Responsive Design
+- ✅ Lucide Icons
+- ✅ Elegante Typografie (Cormorant + Lato)
 
 ## Changelog
 
 ### 2025-01-23
-- Initiales Projekt erstellt
-- Dashboard für Shelly Pro 3EM
-- Android Kiosk-Setup mit TestDPC
-- Dokumentation für Replikation
+- Umbenennung: Energy Kiosk → Hostel-App
+- Lucide Icons statt Emojis
+- Cormorant + Lato Schriftarten
+- Airbnb-Daten integriert
+- Guest Portal Design

@@ -6,7 +6,8 @@
     <title>Genieße dein Haus | Hollenthon</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@300;400;500;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
             --cream: #FAF8F5;
@@ -37,13 +38,13 @@
         }
 
         body {
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Lato', sans-serif;
             background: var(--cream);
             color: var(--text);
-            line-height: 1.6;
+            line-height: 1.7;
             min-height: 100vh;
             font-weight: 400;
-            letter-spacing: 0.01em;
+            letter-spacing: 0.02em;
         }
 
         /* Header */
@@ -75,24 +76,30 @@
         }
 
         .welcome-icon {
-            font-size: 3rem;
             margin-bottom: 16px;
             display: block;
         }
 
+        .welcome-icon .header-icon {
+            width: 48px;
+            height: 48px;
+            stroke-width: 1.5;
+        }
+
         .header h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.5rem;
+            font-family: 'Cormorant', serif;
+            font-size: 2.8rem;
             font-weight: 500;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             margin-bottom: 12px;
         }
 
         .header .subtitle {
-            font-size: 1.1rem;
-            font-weight: 300;
+            font-family: 'Cormorant', serif;
+            font-size: 1.2rem;
+            font-weight: 400;
             opacity: 0.9;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
         }
 
         .admin-btn {
@@ -153,14 +160,21 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.4rem;
+            color: white;
+        }
+
+        .card-icon svg {
+            width: 22px;
+            height: 22px;
+            stroke-width: 1.5;
         }
 
         .card-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.4rem;
+            font-family: 'Cormorant', serif;
+            font-size: 1.5rem;
             font-weight: 600;
             color: var(--forest);
+            letter-spacing: 0.5px;
         }
 
         .card-subtitle {
@@ -175,11 +189,12 @@
         }
 
         .welcome-card .greeting {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.8rem;
+            font-family: 'Cormorant', serif;
+            font-size: 2rem;
             font-weight: 600;
             color: var(--forest);
             margin-bottom: 12px;
+            letter-spacing: 1px;
         }
 
         .welcome-card .message {
@@ -222,9 +237,15 @@
         }
 
         .info-item .icon {
-            font-size: 1.8rem;
             margin-bottom: 10px;
             display: block;
+            color: var(--sage-dark);
+        }
+
+        .info-item .icon svg {
+            width: 28px;
+            height: 28px;
+            stroke-width: 1.5;
         }
 
         .info-item .label {
@@ -255,9 +276,9 @@
         }
 
         .energy-value {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Cormorant', serif;
             font-size: 3.5rem;
-            font-weight: 700;
+            font-weight: 600;
             color: var(--sage-dark);
             line-height: 1;
         }
@@ -360,8 +381,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.3rem;
             flex-shrink: 0;
+            color: var(--sage-dark);
+        }
+
+        .amenity .amenity-icon svg {
+            width: 22px;
+            height: 22px;
+            stroke-width: 1.5;
         }
 
         .amenity .amenity-text h4 {
@@ -410,7 +437,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem;
+        }
+
+        .contact-item .contact-icon svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 1.5;
         }
 
         .contact-item .contact-label {
@@ -499,12 +531,13 @@
         }
 
         .modal h2 {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Cormorant', serif;
             color: var(--forest);
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             font-weight: 600;
             margin-bottom: 24px;
             text-align: center;
+            letter-spacing: 0.5px;
         }
 
         .form-group {
@@ -650,9 +683,9 @@
 <body>
     <!-- Header -->
     <header class="header">
-        <button class="admin-btn" id="adminBtn" title="Admin">⚙️</button>
+        <button class="admin-btn" id="adminBtn" title="Admin"><i data-lucide="settings"></i></button>
         <div class="header-content">
-            <span class="welcome-icon">🏡</span>
+            <span class="welcome-icon"><i data-lucide="home" class="header-icon"></i></span>
             <h1>Genieße dein Haus</h1>
             <p class="subtitle">am angrenzenden Wald • Hollenthon</p>
         </div>
@@ -674,7 +707,7 @@
                     am Waldrand. Hier finden Sie Ruhe, Erholung und alles für einen entspannten Aufenthalt.
                 </p>
                 <div class="time-display">
-                    <span>🕐</span>
+                    <i data-lucide="clock" style="width: 16px; height: 16px;"></i>
                     <span id="currentTime">--:--</span>
                     <span>•</span>
                     <span id="currentDate">--. --- ----</span>
@@ -684,7 +717,7 @@
             <!-- Quick Info -->
             <div class="card">
                 <div class="card-header">
-                    <div class="card-icon">ℹ️</div>
+                    <div class="card-icon"><i data-lucide="info"></i></div>
                     <div>
                         <h3 class="card-title">Wichtige Infos</h3>
                         <p class="card-subtitle">Alles auf einen Blick</p>
@@ -692,42 +725,42 @@
                 </div>
                 <div class="info-grid">
                     <div class="info-item">
-                        <span class="icon">🚪</span>
+                        <span class="icon"><i data-lucide="log-in"></i></span>
                         <div class="label">Check-in</div>
                         <div class="value">ab 15:00</div>
                     </div>
                     <div class="info-item">
-                        <span class="icon">🔑</span>
+                        <span class="icon"><i data-lucide="log-out"></i></span>
                         <div class="label">Check-out</div>
                         <div class="value">bis 11:00</div>
                     </div>
                     <div class="info-item">
-                        <span class="icon">📶</span>
+                        <span class="icon"><i data-lucide="wifi"></i></span>
                         <div class="label">WLAN</div>
                         <div class="value">Hostel Power</div>
                     </div>
                     <div class="info-item">
-                        <span class="icon">🔒</span>
+                        <span class="icon"><i data-lucide="lock"></i></span>
                         <div class="label">WLAN-Code</div>
                         <div class="value">hostl21</div>
                     </div>
                     <div class="info-item">
-                        <span class="icon">🔐</span>
+                        <span class="icon"><i data-lucide="key"></i></span>
                         <div class="label">Schlüssel</div>
                         <div class="value">Schlüsselbox</div>
                     </div>
                     <div class="info-item">
-                        <span class="icon">🐕</span>
+                        <span class="icon"><i data-lucide="heart"></i></span>
                         <div class="label">Haustiere</div>
                         <div class="value">Erlaubt</div>
                     </div>
                     <div class="info-item">
-                        <span class="icon">🚭</span>
+                        <span class="icon"><i data-lucide="cigarette-off"></i></span>
                         <div class="label">Rauchen</div>
                         <div class="value">Verboten</div>
                     </div>
                     <div class="info-item">
-                        <span class="icon">🚗</span>
+                        <span class="icon"><i data-lucide="car"></i></span>
                         <div class="label">Parken</div>
                         <div class="value">Kostenlos</div>
                     </div>
@@ -737,7 +770,7 @@
             <!-- Amenities -->
             <div class="card">
                 <div class="card-header">
-                    <div class="card-icon">✨</div>
+                    <div class="card-icon"><i data-lucide="sparkles"></i></div>
                     <div>
                         <h3 class="card-title">Annehmlichkeiten</h3>
                         <p class="card-subtitle">Für Ihren Komfort</p>
@@ -745,56 +778,56 @@
                 </div>
                 <div class="amenities-grid">
                     <div class="amenity">
-                        <div class="amenity-icon">🍳</div>
+                        <div class="amenity-icon"><i data-lucide="chef-hat"></i></div>
                         <div class="amenity-text">
                             <h4>Voll ausgestattete Küche</h4>
                             <p>Herd, Ofen, Kühlschrank, Kaffeemaschine</p>
                         </div>
                     </div>
                     <div class="amenity">
-                        <div class="amenity-icon">🔥</div>
+                        <div class="amenity-icon"><i data-lucide="flame"></i></div>
                         <div class="amenity-text">
                             <h4>Kamin</h4>
                             <p>Pellets & Holz vorhanden</p>
                         </div>
                     </div>
                     <div class="amenity">
-                        <div class="amenity-icon">🌳</div>
+                        <div class="amenity-icon"><i data-lucide="trees"></i></div>
                         <div class="amenity-text">
                             <h4>Garten mit Feuerstelle</h4>
                             <p>Gartenmöbel & Hängematte</p>
                         </div>
                     </div>
                     <div class="amenity">
-                        <div class="amenity-icon">🥩</div>
+                        <div class="amenity-icon"><i data-lucide="utensils"></i></div>
                         <div class="amenity-text">
                             <h4>Grill & Außenküche</h4>
                             <p>Essbereich im Freien</p>
                         </div>
                     </div>
                     <div class="amenity">
-                        <div class="amenity-icon">👕</div>
+                        <div class="amenity-icon"><i data-lucide="washing-machine"></i></div>
                         <div class="amenity-text">
                             <h4>Waschmaschine</h4>
                             <p>Kostenlos nutzbar</p>
                         </div>
                     </div>
                     <div class="amenity">
-                        <div class="amenity-icon">📚</div>
+                        <div class="amenity-icon"><i data-lucide="book-open"></i></div>
                         <div class="amenity-text">
                             <h4>Bibliothek</h4>
                             <p>Bücher & Lesematerial</p>
                         </div>
                     </div>
                     <div class="amenity">
-                        <div class="amenity-icon">🛁</div>
+                        <div class="amenity-icon"><i data-lucide="bath"></i></div>
                         <div class="amenity-text">
                             <h4>Handtücher & Bettwäsche</h4>
                             <p>Pflegeprodukte inklusive</p>
                         </div>
                     </div>
                     <div class="amenity">
-                        <div class="amenity-icon">👶</div>
+                        <div class="amenity-icon"><i data-lucide="baby"></i></div>
                         <div class="amenity-text">
                             <h4>Familienfreundlich</h4>
                             <p>Kindergeschirr vorhanden</p>
@@ -806,7 +839,7 @@
             <!-- Energy Card -->
             <div class="card energy-card">
                 <div class="card-header">
-                    <div class="card-icon">⚡</div>
+                    <div class="card-icon"><i data-lucide="zap"></i></div>
                     <div>
                         <h3 class="card-title">Energieverbrauch</h3>
                         <p class="card-subtitle">Live-Anzeige</p>
@@ -852,7 +885,7 @@
             <!-- Contact Card -->
             <div class="card contact-card">
                 <div class="card-header">
-                    <div class="card-icon">💬</div>
+                    <div class="card-icon"><i data-lucide="message-circle"></i></div>
                     <div>
                         <h3 class="card-title">Kontakt & Hilfe</h3>
                         <p class="card-subtitle" style="color: rgba(255,255,255,0.7);">Wir sind für Sie da</p>
@@ -860,21 +893,21 @@
                 </div>
                 <div class="contact-grid">
                     <div class="contact-item">
-                        <div class="contact-icon">📞</div>
+                        <div class="contact-icon"><i data-lucide="phone"></i></div>
                         <div>
                             <div class="contact-label">Telefon</div>
                             <div class="contact-value">+43 123 456 789</div>
                         </div>
                     </div>
                     <div class="contact-item">
-                        <div class="contact-icon">✉️</div>
+                        <div class="contact-icon"><i data-lucide="mail"></i></div>
                         <div>
                             <div class="contact-label">E-Mail</div>
                             <div class="contact-value">info@hostel.at</div>
                         </div>
                     </div>
                     <div class="contact-item">
-                        <div class="contact-icon">🚨</div>
+                        <div class="contact-icon"><i data-lucide="siren"></i></div>
                         <div>
                             <div class="contact-label">Notfall</div>
                             <div class="contact-value">112</div>
@@ -968,6 +1001,9 @@
 
         updateDateTime();
         setInterval(updateDateTime, 1000);
+
+        // Initialize Lucide icons
+        lucide.createIcons();
 
         // Update energy status text
         const originalUpdateUI = window.updateUI;

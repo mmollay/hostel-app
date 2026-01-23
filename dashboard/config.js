@@ -1,6 +1,6 @@
 const CONFIG = {
   // API Proxy URL (Cloudflare Worker - hält Auth-Key sicher)
-  API_PROXY_URL: "https://energy-kiosk-api.office-509.workers.dev",
+  API_PROXY_URL: "https://hostel-app-api.office-509.workers.dev",
 
   // Für lokale Entwicklung: Direkte Cloud API Verbindung
   // ACHTUNG: Diese Werte NICHT committen wenn das Repo public ist!
