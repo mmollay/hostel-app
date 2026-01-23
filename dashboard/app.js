@@ -106,7 +106,8 @@ function scheduleDailyReset() {
  */
 async function fetchData() {
   try {
-    if (CONFIG.USE_CLOUD_API) {
+    // Cloud API nutzen wenn API_PROXY_URL oder SHELLY_AUTH_KEY gesetzt
+    if (CONFIG.API_PROXY_URL || CONFIG.SHELLY_AUTH_KEY) {
       await fetchFromCloud();
     } else {
       await fetchFromLocal();
