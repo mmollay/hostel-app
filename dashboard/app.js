@@ -203,9 +203,12 @@ function updateUI(status) {
   feedIndicator.classList.toggle("active", isFeeding);
 
   // Label anpassen
-  document.querySelector(".current-power .label").textContent = isFeeding
-    ? "Aktuelle Einspeisung"
-    : "Aktueller Verbrauch";
+  const statusEl = document.getElementById("energyStatus");
+  if (statusEl) {
+    statusEl.textContent = isFeeding
+      ? "Aktuelle Einspeisung"
+      : "Aktueller Verbrauch";
+  }
 
   // Phasen anzeigen
   updatePhase("phaseA", status.a_act_power);
