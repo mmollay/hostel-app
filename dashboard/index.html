@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Stromverbrauch</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .current-power {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .current-power .label {
+            font-size: 1rem;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+
+        .current-power .value {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #22d3ee;
+            line-height: 1;
+        }
+
+        .current-power .unit {
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: #67e8f9;
+            margin-left: 8px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 24px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-card .period {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+
+        .stat-card .energy {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #a78bfa;
+            margin-bottom: 4px;
+        }
+
+        .stat-card .energy-unit {
+            font-size: 0.9rem;
+            color: #c4b5fd;
+        }
+
+        .stat-card .cost {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #4ade80;
+            margin-top: 12px;
+        }
+
+        .stat-card .cost-currency {
+            font-size: 1rem;
+            color: #86efac;
+        }
+
+        .stat-card.monthly {
+            grid-column: 1 / -1;
+        }
+
+        .stat-card.monthly .energy {
+            font-size: 2.2rem;
+        }
+
+        .stat-card.monthly .cost {
+            font-size: 3rem;
+        }
+
+        .last-update {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            margin-right: 6px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.error {
+            background: #ef4444;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            color: #fca5a5;
+            display: none;
+        }
+
+        /* Loading Animation */
+        .loading {
+            color: #64748b;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .current-power .value {
+                font-size: 3rem;
+            }
+            .stat-card .cost {
+                font-size: 1.8rem;
+            }
+            .stat-card.monthly .cost {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Stromverbrauch</h1>
+        </div>
+
+        <div class="error-message" id="errorMessage">
+            <p>Verbindung zum Shelly fehlgeschlagen</p>
+            <p style="margin-top: 10px; font-size: 0.85rem;">Prüfe die IP-Adresse in config.js</p>
+        </div>
+
+        <div id="dashboard">
+            <div class="current-power">
+                <div class="label">Aktueller Verbrauch</div>
+                <div>
+                    <span class="value" id="currentPower">--</span>
+                    <span class="unit">W</span>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="period">Heute</div>
+                    <div class="energy">
+                        <span id="todayEnergy">--</span>
+                        <span class="energy-unit">kWh</span>
+                    </div>
+                    <div class="cost">
+                        <span id="todayCost">--</span>
+                        <span class="cost-currency">€</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="period">Gestern</div>
+                    <div class="energy">
+                        <span id="yesterdayEnergy">--</span>
+                        <span class="energy-unit">kWh</span>
+                    </div>
+                    <div class="cost">
+                        <span id="yesterdayCost">--</span>
+                        <span class="cost-currency">€</span>
+                    </div>
+                </div>
+
+                <div class="stat-card monthly">
+                    <div class="period">Dieser Monat</div>
+                    <div class="energy">
+                        <span id="monthEnergy">--</span>
+                        <span class="energy-unit">kWh</span>
+                    </div>
+                    <div class="cost">
+                        <span id="monthCost">--</span>
+                        <span class="cost-currency">€</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="last-update">
+                <span class="status-indicator" id="statusIndicator"></span>
+                Aktualisiert: <span id="lastUpdate">--</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
