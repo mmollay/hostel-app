@@ -1668,7 +1668,7 @@
                     <div class="card-icon"><i data-lucide="sparkles"></i></div>
                     <div>
                         <h3 class="card-title">Annehmlichkeiten</h3>
-                        <p class="card-subtitle">Für Ihren Komfort</p>
+                        <p class="card-subtitle" id="amenitiesSubtitle">Für Ihren Komfort</p>
                     </div>
                 </div>
                 <div class="amenities-grid">
@@ -1708,7 +1708,7 @@
                             </div>
                             <h4 style="color: var(--forest); font-size: 1.1rem; margin: 0;">Sauna</h4>
                         </div>
-                        <p style="color: var(--text-light); font-size: 0.95rem; line-height: 1.6; margin: 0;">Tiefe Entspannung und Reinigung für Körper und Seele. Bald können Sie hier zur Ruhe kommen.</p>
+                        <p id="saunaComingSoonText" style="color: var(--text-light); font-size: 0.95rem; line-height: 1.6; margin: 0;">Tiefe Entspannung und Reinigung für Körper und Seele. Bald können Sie hier zur Ruhe kommen.</p>
                         <div style="margin-top: 12px; padding: 8px 12px; background: var(--sage-light); border-radius: 8px; display: inline-block;">
                             <span style="color: white; font-size: 0.85rem; font-weight: 500;">✨ Coming Soon</span>
                         </div>
@@ -1865,7 +1865,7 @@
                         </div>
                     </div>
 
-                    <p style="margin-top: 20px; color: var(--text-muted); font-size: 0.85rem; text-align: center;">
+                    <p id="qrCodeInstruction" style="margin-top: 20px; color: var(--text-muted); font-size: 0.85rem; text-align: center;">
                         Scannen Sie den QR-Code mit Ihrer Kamera, um sich automatisch zu verbinden.
                     </p>
                 </div>
@@ -1912,7 +1912,7 @@
                     <div class="card-icon"><i data-lucide="message-circle"></i></div>
                     <div>
                         <h3 class="card-title">Kontakt & Hilfe</h3>
-                        <p class="card-subtitle" style="color: rgba(255,255,255,0.7);">Wir sind für Sie da</p>
+                        <p id="contactSubtitle" class="card-subtitle" style="color: rgba(255,255,255,0.7);">Wir sind für Sie da</p>
                     </div>
                 </div>
                 <div class="contact-grid">
@@ -1960,11 +1960,11 @@
                     <div class="card-icon"><i data-lucide="info"></i></div>
                     <div>
                         <h3 class="card-title">Transparenz & Information</h3>
-                        <p class="card-subtitle">Für Ihre Unterlagen</p>
+                        <p id="transparencySubtitle" class="card-subtitle">Für Ihre Unterlagen</p>
                     </div>
                 </div>
                 <div style="padding: 0 20px 20px;">
-                    <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.6;">
+                    <p id="transparencyText" style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.6;">
                         Im Rahmen Ihres Aufenthalts können Kurtaxe und Energiekosten anfallen.
                         Für Ihre Unterlagen und vollständige Transparenz finden Sie hier die Kontodaten:
                     </p>
@@ -2037,7 +2037,7 @@
     <div class="modal-overlay" id="guestLoginModal">
         <div class="modal">
             <h2>Gast-Anmeldung</h2>
-            <p style="color: #6B6B6B; margin-bottom: 20px; text-align: center;">
+            <p id="loginInstruction" style="color: #6B6B6B; margin-bottom: 20px; text-align: center;">
                 Geben Sie Ihre Zugangsdaten ein, die Sie bei der Buchung erhalten haben.
             </p>
             <div class="form-group">

@@ -11,6 +11,7 @@ compatibility_date = "2024-01-01"
 [vars]
 # Nur non-sensitive defaults hier
 SHELLY_CLOUD_SERVER = "https://shelly-237-eu.shelly.cloud"
+GOOGLE_MAPS_API_KEY = "AIzaSyD96KZTjSABxmBHZGwmSLZdJI94Za0lHtA"
 
 # KV Namespace für Einstellungen
 [[kv_namespaces]]

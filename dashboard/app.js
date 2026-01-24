@@ -59,6 +59,34 @@ const TEXT_VARIANTS = {
     du: "Möge dieser Ort Kraft geben und Ruhe schenken.",
     sie: "Möge dieser Ort Kraft geben und Ruhe schenken.",
   },
+  amenitiesSubtitle: {
+    du: "Für deinen Komfort",
+    sie: "Für Ihren Komfort",
+  },
+  contactSubtitle: {
+    du: "Wir sind für dich da",
+    sie: "Wir sind für Sie da",
+  },
+  transparencySubtitle: {
+    du: "Für deine Unterlagen",
+    sie: "Für Ihre Unterlagen",
+  },
+  transparencyText: {
+    du: "Im Rahmen deines Aufenthalts können Kurtaxe und Energiekosten anfallen. Für deine Unterlagen und vollständige Transparenz findest du hier die Kontodaten:",
+    sie: "Im Rahmen Ihres Aufenthalts können Kurtaxe und Energiekosten anfallen. Für Ihre Unterlagen und vollständige Transparenz finden Sie hier die Kontodaten:",
+  },
+  qrCodeInstruction: {
+    du: "Scanne den QR-Code mit deiner Kamera, um dich automatisch zu verbinden.",
+    sie: "Scannen Sie den QR-Code mit Ihrer Kamera, um sich automatisch zu verbinden.",
+  },
+  saunaComingSoonText: {
+    du: "Tiefe Entspannung und Reinigung für Körper und Seele. Bald kannst du hier zur Ruhe kommen.",
+    sie: "Tiefe Entspannung und Reinigung für Körper und Seele. Bald können Sie hier zur Ruhe kommen.",
+  },
+  loginInstruction: {
+    du: "Gib deine Zugangsdaten ein, die du bei der Buchung erhalten hast.",
+    sie: "Geben Sie Ihre Zugangsdaten ein, die Sie bei der Buchung erhalten haben.",
+  },
 };
 
 // LocalStorage Keys
@@ -87,6 +115,7 @@ async function init() {
   initGuestUI();
   updateGuestUI(); // CRITICAL: Hide guest-only cards on page load
   updateGreeting();
+  updateFormalAddressTexts(); // Du/Sie-Texte initialisieren
   setInterval(updateGreeting, 60000); // Aktualisiere Begrüßung jede Minute
 
   // Auto-Refresh: Daten alle 5 Minuten komplett neu laden (gegen Cache)
@@ -752,9 +781,9 @@ function updateGuestUI() {
   if (wifiCard) wifiCard.style.display = guestToken ? "block" : "none";
 
   // WiFi-Infos in "Wichtige Infos" nur für eingeloggte Gäste anzeigen
-  if (wifiInfoName) wifiInfoName.style.display = guestToken ? "flex" : "none";
+  if (wifiInfoName) wifiInfoName.style.display = guestToken ? "block" : "none";
   if (wifiInfoPassword)
-    wifiInfoPassword.style.display = guestToken ? "flex" : "none";
+    wifiInfoPassword.style.display = guestToken ? "block" : "none";
 
   // Quick Navigation nur für eingeloggte Gäste anzeigen
   if (quickNav) quickNav.style.display = guestToken ? "flex" : "none";
@@ -839,6 +868,28 @@ function updateGreeting() {
     lucide.createIcons();
     messageEl.textContent = TEXT_VARIANTS.welcome[formalAddress];
   }
+}
+
+/**
+ * Aktualisiert alle Du/Sie-Texte basierend auf formalAddress
+ */
+function updateFormalAddressTexts() {
+  const elements = {
+    amenitiesSubtitle: document.getElementById("amenitiesSubtitle"),
+    contactSubtitle: document.getElementById("contactSubtitle"),
+    transparencySubtitle: document.getElementById("transparencySubtitle"),
+    transparencyText: document.getElementById("transparencyText"),
+    qrCodeInstruction: document.getElementById("qrCodeInstruction"),
+    saunaComingSoonText: document.getElementById("saunaComingSoonText"),
+    loginInstruction: document.getElementById("loginInstruction"),
+  };
+
+  // Aktualisiere alle Texte basierend auf formalAddress
+  Object.keys(elements).forEach((key) => {
+    if (elements[key] && TEXT_VARIANTS[key]) {
+      elements[key].textContent = TEXT_VARIANTS[key][formalAddress];
+    }
+  });
 }
 
 /**
@@ -1330,6 +1381,19 @@ async function enrichPlacesWithDrivingDistance(places) {
           places[index].drivingDuration = element.duration.text;
         }
       });
+    } else {
+      // API nicht aktiviert oder Fehler → Fallback auf Luftlinie
+      console.log(
+        "Distance Matrix not available, using straight-line distance",
+      );
+      places.forEach((place) => {
+        place.drivingDistance = calculateDistance(
+          LOCATION.lat,
+          LOCATION.lon,
+          place.geometry.location.lat,
+          place.geometry.location.lng,
+        );
+      });
     }
   } catch (error) {
     console.error("Distance Matrix Error:", error);
@@ -1623,6 +1687,8 @@ async function loadHostelInfo() {
         formalAddress = info.formalAddress;
         // Begrüßung neu generieren mit korrekter Anrede
         updateGreeting();
+        // Alle Du/Sie-Texte aktualisieren
+        updateFormalAddressTexts();
       }
 
       // Kontaktdaten aktualisieren

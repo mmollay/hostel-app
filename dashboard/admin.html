@@ -1153,7 +1153,7 @@
                 <div class="form-hint">Link wird automatisch mit dem Apartment verknüpft</div>
             </div>
 
-            <button class="btn btn-primary" style="width: 100%;" onclick="createGuestFromModal()">Gast anlegen</button>
+            <button class="btn btn-primary" style="width: 100%;" onclick="createGuestFromModal()" id="guestSubmitBtn">Gast anlegen</button>
             <div class="error-text" id="guestError"></div>
             <div class="success-text" id="guestSuccess"></div>
         </div>
@@ -1659,6 +1659,14 @@
                 energyDisplay = `<span><i data-lucide="zap"></i> Wird erfasst...</span>`;
             }
 
+            // Gender display
+            let genderDisplay = '';
+            if (guest.gender === 'weiblich') {
+                genderDisplay = `<span style="color: var(--sage-dark);">♀ Weiblich</span>`;
+            } else if (guest.gender === 'männlich') {
+                genderDisplay = `<span style="color: var(--forest);">♂ Männlich</span>`;
+            }
+
             return `
                 <div class="guest-item" data-guest-name="${guest.name.toLowerCase()}" data-guest-username="${guest.username.toLowerCase()}">
                     <div class="guest-avatar">${guest.name.charAt(0).toUpperCase()}</div>
@@ -1666,6 +1674,7 @@
                         <h3>${guest.name}</h3>
                         <div class="guest-meta">
                             <span><i data-lucide="user"></i> ${guest.username}</span>
+                            ${genderDisplay}
                             <span><i data-lucide="users"></i> ${persons} ${persons === 1 ? 'Person' : 'Personen'}</span>
                             <span><i data-lucide="calendar"></i> ${checkInDate} - ${checkOutDate}</span>
                             ${energyDisplay}
@@ -1903,11 +1912,13 @@
             document.getElementById('guestPassword').value = '';
             document.getElementById('guestCheckIn').value = '';
             document.getElementById('guestCheckOut').value = '';
+            // Reset modal title, labels, and button text
+            document.getElementById('guestModalTitle').textContent = 'Neuen Gast anlegen';
+            document.getElementById('guestPasswordLabel').textContent = 'Passwort';
+            document.getElementById('guestSubmitBtn').textContent = 'Gast anlegen';
             document.getElementById('guestPersons').value = '1';
             document.getElementById('guestError').style.display = 'none';
             document.getElementById('guestSuccess').style.display = 'none';
-            document.getElementById('guestModalTitle').textContent = 'Neuen Gast anlegen';
-            document.getElementById('guestPasswordLabel').textContent = 'Passwort *';
         }
 
         // Edit existing guest
@@ -1947,9 +1958,10 @@
                 document.getElementById('guestCheckOut').value = guest.checkOut;
                 document.getElementById('guestPersons').value = guest.numberOfPersons || 1;
 
-                // Update modal title and password label
+                // Update modal title, password label, and button text
                 document.getElementById('guestModalTitle').textContent = 'Gast bearbeiten';
                 document.getElementById('guestPasswordLabel').textContent = 'Passwort (leer lassen = nicht ändern)';
+                document.getElementById('guestSubmitBtn').textContent = 'Gast speichern';
 
                 // Open modal
                 document.getElementById('guestModal').classList.add('active');
