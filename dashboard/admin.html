@@ -1098,7 +1098,7 @@
             <button class="modal-close" onclick="closeGuestModal()">
                 <i data-lucide="x"></i>
             </button>
-            <h2>Neuen Gast anlegen</h2>
+            <h2 id="guestModalTitle">Neuen Gast anlegen</h2>
 
             <div class="form-group">
                 <label>Name</label>
@@ -1111,7 +1111,7 @@
             </div>
 
             <div class="form-group">
-                <label>Passwort (für Gast-Login)</label>
+                <label id="guestPasswordLabel">Passwort (für Gast-Login)</label>
                 <input type="text" id="guestPassword" placeholder="z.B. Hollenthon2024">
             </div>
 
@@ -1658,6 +1658,9 @@
                         </div>
                     </div>
                     <div class="guest-actions">
+                        <button class="icon-btn" onclick="editGuest('${guest.id}')" title="Bearbeiten">
+                            <i data-lucide="edit-2"></i>
+                        </button>
                         <button class="icon-btn delete" onclick="deleteGuest('${guest.id}')" title="Löschen">
                             <i data-lucide="trash-2"></i>
                         </button>
@@ -1767,6 +1770,70 @@
             }
         }
 
+        // Update Guest
+        async function updateGuest() {
+            const name = document.getElementById('guestName').value;
+            const username = document.getElementById('guestUsername').value;
+            const password = document.getElementById('guestPassword').value;
+            const checkIn = document.getElementById('guestCheckIn').value;
+            const checkOut = document.getElementById('guestCheckOut').value;
+            const numberOfPersons = parseInt(document.getElementById('guestPersons').value) || 1;
+            const apartmentId = parseInt(document.getElementById('guestApartment').value) || 1;
+
+            const errorEl = document.getElementById('guestError');
+            const successEl = document.getElementById('guestSuccess');
+
+            errorEl.style.display = 'none';
+            successEl.style.display = 'none';
+
+            if (!name || !username || !checkIn || !checkOut) {
+                errorEl.textContent = 'Bitte alle Felder ausfüllen';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            try {
+                const requestBody = {
+                    name,
+                    username,
+                    checkIn,
+                    checkOut,
+                    numberOfPersons,
+                    apartmentId
+                };
+
+                // Only include password if it was changed
+                if (password && password.trim() !== '') {
+                    requestBody.password = password;
+                }
+
+                const response = await fetch(`${API_URL}/guests/${editingGuestId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    successEl.textContent = 'Gast erfolgreich aktualisiert!';
+                    successEl.style.display = 'block';
+
+                    // Reload guests
+                    loadGuests();
+                } else {
+                    errorEl.textContent = data.error || 'Fehler beim Aktualisieren';
+                    errorEl.style.display = 'block';
+                }
+            } catch (error) {
+                errorEl.textContent = 'Verbindungsfehler';
+                errorEl.style.display = 'block';
+            }
+        }
+
         // Delete Guest
         async function deleteGuest(id) {
             if (!confirm('Gast wirklich löschen?')) return;
@@ -1806,6 +1873,7 @@
 
         function closeGuestModal() {
             document.getElementById('guestModal').classList.remove('active');
+            editingGuestId = null;
             // Clear form
             document.getElementById('guestName').value = '';
             document.getElementById('guestUsername').value = '';
@@ -1815,10 +1883,67 @@
             document.getElementById('guestPersons').value = '1';
             document.getElementById('guestError').style.display = 'none';
             document.getElementById('guestSuccess').style.display = 'none';
+            document.getElementById('guestModalTitle').textContent = 'Neuen Gast anlegen';
+            document.getElementById('guestPasswordLabel').textContent = 'Passwort *';
+        }
+
+        // Edit existing guest
+        async function editGuest(guestId) {
+            try {
+                const response = await fetch(`${API_URL}/guests`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                const data = await response.json();
+                const guest = data.guests.find(g => g.id === guestId);
+
+                if (!guest) {
+                    alert('Gast nicht gefunden');
+                    return;
+                }
+
+                editingGuestId = guestId;
+
+                // Load apartments if not already loaded
+                if (apartments.length === 0) {
+                    await loadApartments();
+                }
+
+                // Populate apartment select
+                const apartmentSelect = document.getElementById('guestApartment');
+                apartmentSelect.innerHTML = apartments.map(apt =>
+                    `<option value="${apt.id}" ${apt.id === guest.apartment_id ? 'selected' : ''}>${apt.name} (${apt.slug})</option>`
+                ).join('');
+
+                // Fill form with guest data
+                document.getElementById('guestName').value = guest.name;
+                document.getElementById('guestUsername').value = guest.username;
+                document.getElementById('guestPassword').value = ''; // Leave empty for security
+                document.getElementById('guestCheckIn').value = guest.checkIn;
+                document.getElementById('guestCheckOut').value = guest.checkOut;
+                document.getElementById('guestPersons').value = guest.numberOfPersons || 1;
+
+                // Update modal title and password label
+                document.getElementById('guestModalTitle').textContent = 'Gast bearbeiten';
+                document.getElementById('guestPasswordLabel').textContent = 'Passwort (leer lassen = nicht ändern)';
+
+                // Open modal
+                document.getElementById('guestModal').classList.add('active');
+                lucide.createIcons();
+            } catch (error) {
+                console.error('Error loading guest:', error);
+                alert('Fehler beim Laden der Gastdaten');
+            }
         }
 
         async function createGuestFromModal() {
-            await createGuest();
+            if (editingGuestId) {
+                // Update existing guest
+                await updateGuest();
+            } else {
+                // Create new guest
+                await createGuest();
+            }
+
             // If successful, close modal after 1.5 seconds
             const successEl = document.getElementById('guestSuccess');
             if (successEl.style.display === 'block') {
@@ -2237,6 +2362,7 @@
 
         let currentApartmentId = null;
         let apartments = [];
+        let editingGuestId = null; // ID des zu bearbeitenden Gastes
 
         // Load Apartments
         async function loadApartments() {

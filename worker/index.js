@@ -64,6 +64,12 @@ export default {
         return await createGuest(request, env, corsHeaders);
       }
 
+      // PUT /guests/:id - Gast aktualisieren (Admin only)
+      if (path.startsWith("/guests/") && request.method === "PUT") {
+        const id = path.split("/")[2];
+        return await updateGuest(request, env, corsHeaders, id);
+      }
+
       // DELETE /guests/:id - Gast löschen (Admin only)
       if (path.startsWith("/guests/") && request.method === "DELETE") {
         const id = path.split("/")[2];
@@ -505,6 +511,93 @@ async function createGuest(request, env, corsHeaders) {
   return new Response(JSON.stringify({ success: true, guest }), {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
+}
+
+/**
+ * Gast aktualisieren (PUT /guests/:id)
+ */
+async function updateGuest(request, env, corsHeaders, id) {
+  // Admin Auth prüfen
+  if (!(await isAdmin(request, env))) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const body = await request.json();
+  const {
+    name,
+    username,
+    password,
+    checkIn,
+    checkOut,
+    numberOfPersons,
+    apartmentId,
+  } = body;
+
+  // Validierung (ohne Passwort, da optional)
+  if (!name || !username || !checkIn || !checkOut) {
+    return new Response(
+      JSON.stringify({
+        error: "Name, Username, Check-in und Check-out sind erforderlich",
+      }),
+      {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+
+  const guests = await loadGuests(env);
+  const guestIndex = guests.findIndex((g) => g.id === id);
+
+  if (guestIndex === -1) {
+    return new Response(JSON.stringify({ error: "Gast nicht gefunden" }), {
+      status: 404,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  // Username bereits von anderem Gast vergeben?
+  const existingGuest = guests.find(
+    (g) => g.username === username && g.id !== id,
+  );
+  if (existingGuest) {
+    return new Response(
+      JSON.stringify({ error: "Benutzername bereits vergeben" }),
+      {
+        status: 409,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+
+  // Gast aktualisieren
+  guests[guestIndex] = {
+    ...guests[guestIndex],
+    name,
+    username,
+    checkIn,
+    checkOut,
+    numberOfPersons: numberOfPersons || 1,
+    apartmentId: apartmentId || 1,
+    updatedAt: new Date().toISOString(),
+  };
+
+  // Passwort nur aktualisieren wenn angegeben
+  if (password && password.trim() !== "") {
+    guests[guestIndex].password = password;
+  }
+
+  await env.SETTINGS.put("guests", JSON.stringify(guests));
+
+  return new Response(
+    JSON.stringify({ success: true, guest: guests[guestIndex] }),
+    {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    },
+  );
 }
 
 /**
