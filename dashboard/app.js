@@ -1299,13 +1299,6 @@ async function fetchNearbyPlaces() {
         ? ["tourist_attraction", "restaurant", "spa", "museum", "park"]
         : [currentCategory];
 
-    console.log(
-      "[Recommendations] Category:",
-      currentCategory,
-      "Types:",
-      types,
-    );
-
     // Worker-Proxy verwenden (um CORS zu vermeiden)
     const placesPromises = types.map((type) =>
       fetch(
@@ -1318,30 +1311,14 @@ async function fetchNearbyPlaces() {
     // Alle Results zusammenführen
     const allPlaces = results.flatMap((r) => r.results || []);
 
-    console.log("[Recommendations] API returned", allPlaces.length, "places");
-
     // Nur gute Bewertungen filtern (oder Orte ohne Rating behalten)
     const filteredPlaces = allPlaces.filter(
       (p) => !p.rating || p.rating >= 3.5,
     );
 
-    console.log(
-      "[Recommendations] After rating filter:",
-      filteredPlaces.length,
-      "places",
-    );
-
     if (filteredPlaces.length === 0) {
-      const categoryName =
-        currentCategory === "spa"
-          ? "Thermen"
-          : currentCategory === "restaurant"
-            ? "Restaurants"
-            : currentCategory === "tourist_attraction"
-              ? "Sehenswürdigkeiten"
-              : "Empfehlungen";
       showRecommendationsError(
-        `Keine ${categoryName} mit guter Bewertung gefunden. API lieferte ${allPlaces.length} Ergebnisse, Rating-Filter entfernte ${allPlaces.length - filteredPlaces.length}.`,
+        "Keine Empfehlungen mit guter Bewertung gefunden. Versuche einen größeren Umkreis.",
       );
       return;
     }
@@ -1349,30 +1326,15 @@ async function fetchNearbyPlaces() {
     // Tatsächliche Fahrstrecke mit Distance Matrix API berechnen
     await enrichPlacesWithDrivingDistance(filteredPlaces);
 
-    console.log(
-      "[Recommendations] After distance enrichment - places with distance:",
-      filteredPlaces.filter((p) => p.drivingDistance).length,
-    );
-
     // Nach tatsächlicher Fahrstrecke sortieren
     const sortedPlaces = filteredPlaces
       .filter((p) => p.drivingDistance) // Nur Places mit berechneter Distanz
       .sort((a, b) => a.drivingDistance - b.drivingDistance)
       .slice(0, 10); // Top 10 nächstgelegene
 
-    console.log("[Recommendations] Final sorted places:", sortedPlaces.length);
-
     if (sortedPlaces.length === 0) {
-      const categoryName =
-        currentCategory === "spa"
-          ? "Thermen"
-          : currentCategory === "restaurant"
-            ? "Restaurants"
-            : currentCategory === "tourist_attraction"
-              ? "Sehenswürdigkeiten"
-              : "Empfehlungen";
       showRecommendationsError(
-        `${filteredPlaces.length} ${categoryName} gefunden, aber KEINE Distanz berechnet! Prüfe Console-Log (F12) für Details. Dies ist ein BUG.`,
+        "Keine Empfehlungen gefunden. Versuche einen größeren Umkreis.",
       );
       return;
     }
@@ -1419,9 +1381,6 @@ async function enrichPlacesWithDrivingDistance(places) {
       });
     } else {
       // API nicht aktiviert oder Fehler → Fallback auf Luftlinie
-      console.log(
-        "Distance Matrix not available, using straight-line distance",
-      );
       places.forEach((place) => {
         place.drivingDistance = calculateDistance(
           LOCATION.lat,
@@ -1451,23 +1410,12 @@ async function enrichPlacesWithDrivingDistance(places) {
  * Empfehlungen anzeigen
  */
 function displayRecommendations(places) {
-  console.log("[displayRecommendations] Called with", places.length, "places");
   const listEl = document.getElementById("recommendationsList");
-  if (!listEl) {
-    console.error(
-      "[displayRecommendations] ERROR: recommendationsList element not found!",
-    );
-    return;
-  }
+  if (!listEl) return;
 
-  console.log("[displayRecommendations] Clearing list and rendering...");
   listEl.innerHTML = "";
 
-  places.forEach((place, index) => {
-    console.log(
-      `[displayRecommendations] Rendering place ${index + 1}/${places.length}:`,
-      place.name,
-    );
+  places.forEach((place) => {
     const item = document.createElement("div");
     item.className = "recommendation-item";
 
@@ -1536,25 +1484,7 @@ function displayRecommendations(places) {
     listEl.appendChild(item);
   });
 
-  console.log(
-    "[displayRecommendations] Finished rendering. Total items:",
-    listEl.children.length,
-  );
-
-  // DEBUG: Add red border to all items for visibility test
-  Array.from(listEl.children).forEach((item, i) => {
-    item.style.border = "3px solid red";
-    item.style.minHeight = "100px";
-    const rect = item.getBoundingClientRect();
-    console.log(
-      `Item ${i}: height=${item.offsetHeight}px, visible=${item.offsetHeight > 0}, rect=`,
-      rect,
-    );
-  });
-
-  console.log("[displayRecommendations] Creating Lucide icons...");
   lucide.createIcons();
-  console.log("[displayRecommendations] DONE!");
 }
 
 /**
