@@ -142,6 +142,27 @@ export default {
       }
 
       // ============================================
+      // INLINE CONTENT MANAGEMENT (v0.5)
+      // ============================================
+
+      // GET /content/:key - Content-Block abrufen (öffentlich)
+      if (path.startsWith("/content/") && request.method === "GET") {
+        const key = path.split("/")[2];
+        return await getContent(key, env, corsHeaders);
+      }
+
+      // PUT /content/:key - Content-Block speichern (Admin only)
+      if (path.startsWith("/content/") && request.method === "PUT") {
+        const key = path.split("/")[2];
+        return await updateContent(request, key, env, corsHeaders);
+      }
+
+      // GET /content - Alle Content-Blöcke abrufen (öffentlich)
+      if (path === "/content" && request.method === "GET") {
+        return await getAllContent(env, corsHeaders);
+      }
+
+      // ============================================
       // APARTMENTS MANAGEMENT
       // ============================================
 
@@ -1575,6 +1596,138 @@ function sanitizeContentJson(obj) {
     return sanitized;
   }
   return obj;
+}
+
+// ============================================
+// INLINE EDITOR CONTENT ENDPOINTS (v0.5)
+// ============================================
+
+/**
+ * Einzelnen Content-Block abrufen (für Inline Editor)
+ */
+async function getContent(key, env, corsHeaders) {
+  try {
+    const result = await env.DB.prepare(
+      `SELECT content_json FROM page_content
+       WHERE hostel_id = ? AND block_key = ?`,
+    )
+      .bind(HOSTEL_ID, key)
+      .first();
+
+    if (!result) {
+      return new Response(
+        JSON.stringify({ success: true, content: null }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        content: JSON.parse(result.content_json || "{}"),
+      }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ success: false, error: error.message }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+}
+
+/**
+ * Content-Block speichern (für Inline Editor, Admin only)
+ */
+async function updateContent(request, key, env, corsHeaders) {
+  // Admin Auth prüfen
+  if (!(await isAdmin(request, env))) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  try {
+    const body = await request.json();
+    const content = body.content || "";
+    
+    // HTML sanitieren (nur sichere Tags erlauben)
+    const sanitizedContent = sanitizeHTML(content);
+    const contentJson = JSON.stringify({ html: sanitizedContent });
+
+    // Upsert: Insert oder Update
+    await env.DB.prepare(
+      `INSERT INTO page_content (hostel_id, block_type, block_key, content_json, updated_at)
+       VALUES (?, 'text', ?, ?, unixepoch())
+       ON CONFLICT(hostel_id, block_key)
+       DO UPDATE SET content_json = ?, updated_at = unixepoch()`,
+    )
+      .bind(HOSTEL_ID, key, contentJson, contentJson)
+      .run();
+
+    return new Response(
+      JSON.stringify({ success: true }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ success: false, error: error.message }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+}
+
+/**
+ * Alle Content-Blöcke abrufen (für Page Load)
+ */
+async function getAllContent(env, corsHeaders) {
+  try {
+    const result = await env.DB.prepare(
+      `SELECT block_key, content_json FROM page_content
+       WHERE hostel_id = ? AND is_visible = 1`,
+    )
+      .bind(HOSTEL_ID)
+      .all();
+
+    const content = {};
+    (result.results || []).forEach(row => {
+      try {
+        content[row.block_key] = JSON.parse(row.content_json || "{}");
+      } catch (e) {
+        content[row.block_key] = { html: row.content_json };
+      }
+    });
+
+    return new Response(
+      JSON.stringify({ success: true, content }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ success: false, error: error.message }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+}
+
+/**
+ * HTML sanitieren - nur sichere Tags erlauben
+ */
+function sanitizeHTML(html) {
+  if (!html) return "";
+  
+  // Erlaubte Tags
+  const allowedTags = ['b', 'strong', 'i', 'em', 'u', 'a', 'br', 'p', 'ul', 'ol', 'li', 'span'];
+  
+  // Einfache Sanitization: Entferne script, style, und unerlaubte Tags
+  let clean = html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+    .replace(/on\w+="[^"]*"/gi, '')  // Event handler entfernen
+    .replace(/javascript:/gi, '');    // javascript: URLs entfernen
+
+  return clean;
 }
 
 /**

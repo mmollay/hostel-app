@@ -1,0 +1,240 @@
+/**
+ * Inline Editor Styles v0.5.0
+ */
+
+/* Edit Mode Toggle Button */
+.edit-mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--border-light, #e0e0e0);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #666);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-mode-toggle:hover {
+  background: white;
+  border-color: var(--forest, #4a5d23);
+  color: var(--forest, #4a5d23);
+}
+
+.edit-mode-toggle.active {
+  background: var(--forest, #4a5d23);
+  border-color: var(--forest, #4a5d23);
+  color: white;
+}
+
+.edit-mode-toggle i {
+  width: 16px;
+  height: 16px;
+}
+
+/* Editable Elements - Basis */
+.inline-editable {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+/* Highlight im Edit-Mode */
+body.inline-edit-mode .inline-editable.editable-highlight {
+  outline: 2px dashed var(--sage, #9caf88);
+  outline-offset: 4px;
+  cursor: pointer;
+}
+
+body.inline-edit-mode .inline-editable.editable-highlight:hover {
+  outline-color: var(--forest, #4a5d23);
+  background: rgba(156, 175, 136, 0.1);
+}
+
+/* Aktiv bearbeitetes Element */
+.inline-editable.inline-editing {
+  outline: 2px solid var(--forest, #4a5d23) !important;
+  outline-offset: 4px;
+  background: rgba(255, 255, 255, 0.95) !important;
+  padding: 8px;
+  border-radius: 4px;
+  min-height: 1.5em;
+}
+
+.inline-editable.inline-editing:focus {
+  outline: 2px solid var(--forest, #4a5d23) !important;
+}
+
+/* Toolbar */
+.inline-editor-toolbar {
+  position: absolute;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  background: white;
+  border: 1px solid var(--border-light, #e0e0e0);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.inline-editor-toolbar button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-secondary, #666);
+  transition: all 0.15s ease;
+}
+
+.inline-editor-toolbar button:hover {
+  background: var(--bg-secondary, #f5f5f5);
+  color: var(--text-primary, #333);
+}
+
+.inline-editor-toolbar button:active {
+  background: var(--sage-light, #e8ede4);
+}
+
+.inline-editor-toolbar button i {
+  width: 18px;
+  height: 18px;
+}
+
+.inline-editor-toolbar .toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border-light, #e0e0e0);
+  margin: 0 4px;
+}
+
+.inline-editor-toolbar .save-btn {
+  color: var(--forest, #4a5d23);
+}
+
+.inline-editor-toolbar .save-btn:hover {
+  background: var(--sage-light, #e8ede4);
+  color: var(--forest, #4a5d23);
+}
+
+.inline-editor-toolbar .cancel-btn {
+  color: #dc3545;
+}
+
+.inline-editor-toolbar .cancel-btn:hover {
+  background: #ffeef0;
+  color: #dc3545;
+}
+
+/* Notification Fallback */
+.inline-editor-notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  z-index: 10001;
+  animation: slideIn 0.3s ease;
+}
+
+.inline-editor-notification.success {
+  background: var(--forest, #4a5d23);
+  color: white;
+}
+
+.inline-editor-notification.error {
+  background: #dc3545;
+  color: white;
+}
+
+.inline-editor-notification.info {
+  background: #333;
+  color: white;
+}
+
+.inline-editor-notification.fade-out {
+  animation: fadeOut 0.3s ease forwards;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+}
+
+/* Edit indicator badge */
+body.inline-edit-mode .inline-editable::before {
+  content: '✏️';
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  font-size: 14px;
+  background: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+body.inline-edit-mode .inline-editable:hover::before {
+  opacity: 1;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .inline-editor-toolbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto !important;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    justify-content: center;
+    padding: 10px 16px;
+    gap: 8px;
+  }
+
+  .inline-editor-toolbar button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .edit-mode-toggle span {
+    display: none;
+  }
+
+  .edit-mode-toggle {
+    padding: 8px;
+  }
+}

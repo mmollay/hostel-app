@@ -1550,6 +1550,7 @@
             background: rgba(255,255,255,0.25);
         }
     </style>
+    <link rel="stylesheet" href="inline-editor.css">
 </head>
 <body>
     <!-- Header -->
@@ -1595,9 +1596,9 @@
     <main class="main">
         <div id="dashboard">
             <!-- Welcome Card -->
-            <div class="card welcome-card" data-editable="welcome-main">
-                <h2 class="greeting" id="greeting" data-i18n="welcome.default">Herzlich Willkommen!</h2>
-                <p class="message" id="welcomeMessage">
+            <div class="card welcome-card">
+                <h2 class="greeting" id="greeting" data-i18n="welcome.default" data-editable="welcome-title">Herzlich Willkommen!</h2>
+                <p class="message" id="welcomeMessage" data-editable="welcome-message">
                     An diesem magischen Ort, wo Wald und Himmel sich berühren, laden wir dich ein,
                     Ruhe zu finden und bei dir anzukommen. Nimm dir Zeit zum Sein.
                 </p>
@@ -1610,15 +1611,15 @@
             </div>
 
             <!-- Über diesen Ort -->
-            <div class="card" style="background: linear-gradient(135deg, var(--warm-white) 0%, var(--cream) 100%);" data-editable="text-about">
+            <div class="card" style="background: linear-gradient(135deg, var(--warm-white) 0%, var(--cream) 100%);">
                 <div class="card-header">
                     <div class="card-icon" style="background: linear-gradient(135deg, var(--forest) 0%, var(--sage) 100%);"><i data-lucide="trees"></i></div>
                     <div>
                         <h3 class="card-title" data-i18n="about.title">Über diesen Ort</h3>
-                        <p class="card-subtitle" data-i18n="about.subtitle">Wo Magie und Natur sich vereinen</p>
+                        <p class="card-subtitle" data-i18n="about.subtitle" data-editable="about-subtitle">Wo Magie und Natur sich vereinen</p>
                     </div>
                 </div>
-                <div style="color: var(--text-light); font-size: 1rem; line-height: 1.8; margin-top: 16px;">
+                <div class="about-content" data-editable="about-content" style="color: var(--text-light); font-size: 1rem; line-height: 1.8; margin-top: 16px;">
                     <p style="margin-bottom: 16px;" data-i18n="about.intro">
                         Hier, am Rand des Waldes, hat sich ein besonderer Platz entfaltet – ein Ort zum Innehalten,
                         zum Auftanken und zum Wiederfinden. Die alten Bäume flüstern ihre Geschichten,

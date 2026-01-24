@@ -1,403 +1,503 @@
 /**
- * WYSIWYG Inline Editor für Hostel-App
- * Security-First Implementation mit DOM-basierten Methoden
+ * Inline Editor v0.5.0
+ * WYSIWYG-style editing for admin users
+ * 
+ * Erlaubte HTML-Tags: <b>, <i>, <u>, <a>, <br>, <p>, <ul>, <ol>, <li>
  */
 
-class InlineEditor {
-  constructor() {
-    this.isEditMode = false;
-    this.adminToken = null;
-    this.hostelId = "hollenthon"; // Default hostel
-    this.contentBlocks = [];
-  }
+const InlineEditor = {
+  // Erlaubte HTML-Tags für Sanitization
+  ALLOWED_TAGS: ['b', 'strong', 'i', 'em', 'u', 'a', 'br', 'p', 'ul', 'ol', 'li', 'span'],
+  ALLOWED_ATTRIBUTES: {
+    'a': ['href', 'target', 'rel'],
+    'span': ['class']
+  },
+
+  // State
+  isAdmin: false,
+  editMode: false,
+  currentElement: null,
+  toolbar: null,
+  originalContent: {},
 
   /**
-   * Initialize editor (only when admin is logged in)
+   * Initialisierung
    */
-  async init() {
-    this.adminToken = localStorage.getItem("adminToken");
-    if (!this.adminToken) {
-      console.log(
-        "[InlineEditor] No admin token found, skipping initialization",
-      );
+  init() {
+    // Check if user is admin (has token in localStorage or sessionStorage)
+    const adminToken = localStorage.getItem('hostel_admin_token_v1') || 
+                       sessionStorage.getItem('hostel_admin_token_v1');
+    
+    if (!adminToken) {
+      console.log('[InlineEditor] No admin token, editor disabled');
       return;
     }
 
-    console.log("[InlineEditor] Initializing...");
-    await this.loadContentBlocks();
-    this.makeContentEditable();
-    this.showEditToolbar();
-    console.log("[InlineEditor] Ready");
-  }
+    this.isAdmin = true;
+    this.createToolbar();
+    this.markEditableElements();
+    this.addEventListeners();
+    this.addEditModeToggle();
+    
+    console.log('[InlineEditor] Initialized for admin user');
+  },
 
   /**
-   * Load content blocks from API
+   * Toolbar erstellen
    */
-  async loadContentBlocks() {
-    try {
-      const response = await fetch(
-        `${CONFIG.API_PROXY_URL}/content/${this.hostelId}`,
-        {
-          headers: { Authorization: `Bearer ${this.adminToken}` },
-        },
-      );
-      const data = await response.json();
-      this.contentBlocks = data.content || [];
-      console.log(
-        "[InlineEditor] Loaded",
-        this.contentBlocks.length,
-        "content blocks",
-      );
-    } catch (error) {
-      console.error("[InlineEditor] Failed to load content blocks:", error);
-      this.contentBlocks = [];
+  createToolbar() {
+    const toolbar = document.createElement('div');
+    toolbar.id = 'inlineEditorToolbar';
+    toolbar.className = 'inline-editor-toolbar';
+    toolbar.innerHTML = `
+      <button type="button" data-command="bold" title="Fett (Ctrl+B)">
+        <i data-lucide="bold"></i>
+      </button>
+      <button type="button" data-command="italic" title="Kursiv (Ctrl+I)">
+        <i data-lucide="italic"></i>
+      </button>
+      <button type="button" data-command="underline" title="Unterstrichen (Ctrl+U)">
+        <i data-lucide="underline"></i>
+      </button>
+      <span class="toolbar-divider"></span>
+      <button type="button" data-command="link" title="Link einfügen">
+        <i data-lucide="link"></i>
+      </button>
+      <button type="button" data-command="unlink" title="Link entfernen">
+        <i data-lucide="link-2-off"></i>
+      </button>
+      <span class="toolbar-divider"></span>
+      <button type="button" data-command="save" title="Speichern" class="save-btn">
+        <i data-lucide="save"></i>
+      </button>
+      <button type="button" data-command="cancel" title="Abbrechen" class="cancel-btn">
+        <i data-lucide="x"></i>
+      </button>
+    `;
+    
+    toolbar.style.display = 'none';
+    document.body.appendChild(toolbar);
+    this.toolbar = toolbar;
+
+    // Lucide Icons initialisieren
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
     }
-  }
 
-  /**
-   * Make elements with data-editable attribute clickable
-   */
-  makeContentEditable() {
-    const editableElements = document.querySelectorAll("[data-editable]");
-    console.log(
-      "[InlineEditor] Found",
-      editableElements.length,
-      "editable elements",
-    );
-
-    editableElements.forEach((element) => {
-      // Skip SSI-protected elements
-      if (element.closest("[data-ssi-protected]")) {
-        console.log(
-          "[InlineEditor] Skipping SSI-protected element:",
-          element.dataset.editable,
-        );
-        return;
-      }
-
-      element.classList.add("editable-element");
-      element.style.cursor = "pointer";
-
-      // Hover effect
-      element.addEventListener("mouseenter", () => {
-        element.style.outline = "2px dashed var(--sage)";
-      });
-      element.addEventListener("mouseleave", () => {
-        element.style.outline = "2px dashed transparent";
-      });
-
-      // Click to edit
-      element.addEventListener("click", (e) => {
+    // Toolbar Button Events
+    toolbar.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        this.openEditor(element);
+        const command = btn.dataset.command;
+        this.executeCommand(command);
       });
     });
-  }
+  },
 
   /**
-   * Open editor modal for an element
+   * Edit-Mode Toggle Button zum Header hinzufügen
    */
-  openEditor(element) {
-    const blockKey = element.dataset.editable;
-    console.log("[InlineEditor] Opening editor for:", blockKey);
+  addEditModeToggle() {
+    const headerActions = document.querySelector('.header-actions') || 
+                          document.querySelector('header .user-actions') ||
+                          document.querySelector('header');
+    
+    if (!headerActions) return;
 
-    const contentBlock = this.contentBlocks.find(
-      (b) => b.block_key === blockKey,
-    );
+    const toggle = document.createElement('button');
+    toggle.id = 'editModeToggle';
+    toggle.className = 'btn btn-sm edit-mode-toggle';
+    toggle.innerHTML = '<i data-lucide="edit-3"></i> <span>Bearbeiten</span>';
+    toggle.title = 'Inline-Bearbeitung aktivieren';
+    
+    toggle.addEventListener('click', () => this.toggleEditMode());
+    
+    // Am Anfang einfügen
+    headerActions.insertBefore(toggle, headerActions.firstChild);
+    
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+  },
 
-    if (!contentBlock) {
-      console.error("[InlineEditor] Content block not found:", blockKey);
-      alert(
-        "Content-Block nicht gefunden. Möglicherweise müssen Sie die Seite neu laden.",
-      );
+  /**
+   * Edit-Mode umschalten
+   */
+  toggleEditMode() {
+    this.editMode = !this.editMode;
+    const toggle = document.getElementById('editModeToggle');
+    const body = document.body;
+
+    if (this.editMode) {
+      body.classList.add('inline-edit-mode');
+      if (toggle) {
+        toggle.classList.add('active');
+        toggle.innerHTML = '<i data-lucide="eye"></i> <span>Vorschau</span>';
+      }
+      this.showEditableHints();
+    } else {
+      body.classList.remove('inline-edit-mode');
+      if (toggle) {
+        toggle.classList.remove('active');
+        toggle.innerHTML = '<i data-lucide="edit-3"></i> <span>Bearbeiten</span>';
+      }
+      this.hideToolbar();
+      this.hideEditableHints();
+    }
+
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+  },
+
+  /**
+   * Editierbare Elemente markieren
+   */
+  markEditableElements() {
+    // Finde alle Elemente mit data-editable Attribut
+    const editables = document.querySelectorAll('[data-editable]');
+    
+    editables.forEach(el => {
+      el.classList.add('inline-editable');
+      
+      // Speichere Original-Content
+      const key = el.dataset.editable;
+      this.originalContent[key] = el.innerHTML;
+    });
+
+    console.log(`[InlineEditor] Found ${editables.length} editable elements`);
+  },
+
+  /**
+   * Visuelle Hinweise für editierbare Elemente zeigen
+   */
+  showEditableHints() {
+    document.querySelectorAll('.inline-editable').forEach(el => {
+      el.classList.add('editable-highlight');
+    });
+  },
+
+  /**
+   * Visuelle Hinweise verstecken
+   */
+  hideEditableHints() {
+    document.querySelectorAll('.inline-editable').forEach(el => {
+      el.classList.remove('editable-highlight');
+    });
+  },
+
+  /**
+   * Event Listeners
+   */
+  addEventListeners() {
+    // Click auf editierbare Elemente
+    document.addEventListener('click', (e) => {
+      if (!this.editMode) return;
+
+      const editable = e.target.closest('[data-editable]');
+      
+      if (editable) {
+        e.preventDefault();
+        this.startEditing(editable);
+      } else if (!e.target.closest('#inlineEditorToolbar') && 
+                 !e.target.closest('.inline-editing')) {
+        // Click außerhalb - nichts tun (User muss explizit speichern/abbrechen)
+      }
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (!this.currentElement) return;
+
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key.toLowerCase()) {
+          case 'b':
+            e.preventDefault();
+            this.executeCommand('bold');
+            break;
+          case 'i':
+            e.preventDefault();
+            this.executeCommand('italic');
+            break;
+          case 'u':
+            e.preventDefault();
+            this.executeCommand('underline');
+            break;
+          case 's':
+            e.preventDefault();
+            this.executeCommand('save');
+            break;
+        }
+      }
+
+      if (e.key === 'Escape') {
+        this.executeCommand('cancel');
+      }
+    });
+  },
+
+  /**
+   * Bearbeitung starten
+   */
+  startEditing(element) {
+    // Falls schon ein anderes Element bearbeitet wird
+    if (this.currentElement && this.currentElement !== element) {
+      // Frage ob speichern
+      if (this.hasChanges()) {
+        if (!confirm('Ungespeicherte Änderungen. Verwerfen?')) {
+          return;
+        }
+      }
+      this.cancelEditing();
+    }
+
+    this.currentElement = element;
+    const key = element.dataset.editable;
+    
+    // Original speichern falls nicht vorhanden
+    if (!this.originalContent[key]) {
+      this.originalContent[key] = element.innerHTML;
+    }
+
+    element.setAttribute('contenteditable', 'true');
+    element.classList.add('inline-editing');
+    element.focus();
+
+    this.showToolbar(element);
+    
+    console.log(`[InlineEditor] Started editing: ${key}`);
+  },
+
+  /**
+   * Toolbar anzeigen
+   */
+  showToolbar(element) {
+    if (!this.toolbar) return;
+
+    const rect = element.getBoundingClientRect();
+    const toolbarHeight = 44;
+    
+    // Position über dem Element
+    let top = rect.top - toolbarHeight - 8 + window.scrollY;
+    let left = rect.left + window.scrollX;
+
+    // Falls zu weit oben, unter dem Element anzeigen
+    if (top < 60) {
+      top = rect.bottom + 8 + window.scrollY;
+    }
+
+    // Falls zu weit rechts
+    const toolbarWidth = 280;
+    if (left + toolbarWidth > window.innerWidth) {
+      left = window.innerWidth - toolbarWidth - 16;
+    }
+
+    this.toolbar.style.top = `${top}px`;
+    this.toolbar.style.left = `${left}px`;
+    this.toolbar.style.display = 'flex';
+  },
+
+  /**
+   * Toolbar verstecken
+   */
+  hideToolbar() {
+    if (this.toolbar) {
+      this.toolbar.style.display = 'none';
+    }
+  },
+
+  /**
+   * Command ausführen
+   */
+  executeCommand(command) {
+    switch (command) {
+      case 'bold':
+        document.execCommand('bold', false, null);
+        break;
+      case 'italic':
+        document.execCommand('italic', false, null);
+        break;
+      case 'underline':
+        document.execCommand('underline', false, null);
+        break;
+      case 'link':
+        const url = prompt('Link URL:', 'https://');
+        if (url) {
+          document.execCommand('createLink', false, url);
+          // Neue Links mit target="_blank" versehen
+          if (this.currentElement) {
+            this.currentElement.querySelectorAll('a:not([target])').forEach(a => {
+              a.setAttribute('target', '_blank');
+              a.setAttribute('rel', 'noopener noreferrer');
+            });
+          }
+        }
+        break;
+      case 'unlink':
+        document.execCommand('unlink', false, null);
+        break;
+      case 'save':
+        this.saveChanges();
+        break;
+      case 'cancel':
+        this.cancelEditing();
+        break;
+    }
+  },
+
+  /**
+   * Prüfen ob Änderungen vorhanden
+   */
+  hasChanges() {
+    if (!this.currentElement) return false;
+    const key = this.currentElement.dataset.editable;
+    return this.currentElement.innerHTML !== this.originalContent[key];
+  },
+
+  /**
+   * Änderungen speichern
+   */
+  async saveChanges() {
+    if (!this.currentElement) return;
+
+    const key = this.currentElement.dataset.editable;
+    const content = this.sanitizeHTML(this.currentElement.innerHTML);
+    
+    console.log(`[InlineEditor] Saving: ${key}`);
+
+    try {
+      const token = localStorage.getItem('hostel_admin_token_v1') || 
+                    sessionStorage.getItem('hostel_admin_token_v1');
+
+      const response = await fetch(`${window.CONFIG?.API_URL || ''}/content/${key}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ 
+          content: content,
+          blockKey: key
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Update original content
+        this.originalContent[key] = content;
+        this.currentElement.innerHTML = content;
+        
+        this.showNotification('Gespeichert!', 'success');
+        this.stopEditing();
+      } else {
+        this.showNotification(data.error || 'Fehler beim Speichern', 'error');
+      }
+    } catch (error) {
+      console.error('[InlineEditor] Save error:', error);
+      this.showNotification('Verbindungsfehler', 'error');
+    }
+  },
+
+  /**
+   * Bearbeitung abbrechen
+   */
+  cancelEditing() {
+    if (!this.currentElement) return;
+
+    const key = this.currentElement.dataset.editable;
+    
+    // Original wiederherstellen
+    if (this.originalContent[key]) {
+      this.currentElement.innerHTML = this.originalContent[key];
+    }
+
+    this.stopEditing();
+  },
+
+  /**
+   * Bearbeitung beenden
+   */
+  stopEditing() {
+    if (this.currentElement) {
+      this.currentElement.removeAttribute('contenteditable');
+      this.currentElement.classList.remove('inline-editing');
+      this.currentElement = null;
+    }
+    this.hideToolbar();
+  },
+
+  /**
+   * HTML sanitieren - nur erlaubte Tags
+   */
+  sanitizeHTML(html) {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    
+    const clean = (node) => {
+      const children = Array.from(node.childNodes);
+      
+      children.forEach(child => {
+        if (child.nodeType === Node.ELEMENT_NODE) {
+          const tagName = child.tagName.toLowerCase();
+          
+          if (!this.ALLOWED_TAGS.includes(tagName)) {
+            // Tag nicht erlaubt - durch Inhalt ersetzen
+            while (child.firstChild) {
+              node.insertBefore(child.firstChild, child);
+            }
+            node.removeChild(child);
+          } else {
+            // Nur erlaubte Attribute behalten
+            const allowedAttrs = this.ALLOWED_ATTRIBUTES[tagName] || [];
+            Array.from(child.attributes).forEach(attr => {
+              if (!allowedAttrs.includes(attr.name)) {
+                child.removeAttribute(attr.name);
+              }
+            });
+            
+            // Rekursiv säubern
+            clean(child);
+          }
+        }
+      });
+    };
+
+    clean(doc.body);
+    return doc.body.innerHTML;
+  },
+
+  /**
+   * Benachrichtigung anzeigen
+   */
+  showNotification(message, type = 'info') {
+    // Nutze bestehende Toast-Funktion falls vorhanden
+    if (typeof showToast === 'function') {
+      showToast(message, type);
       return;
     }
 
-    const modal = this.createEditorModal(contentBlock);
-    document.body.appendChild(modal);
+    // Fallback: Simple notification
+    const notification = document.createElement('div');
+    notification.className = `inline-editor-notification ${type}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+      notification.classList.add('fade-out');
+      setTimeout(() => notification.remove(), 300);
+    }, 2000);
   }
+};
 
-  /**
-   * Create editor modal (DOM-based, NO innerHTML)
-   */
-  createEditorModal(contentBlock) {
-    const content = JSON.parse(contentBlock.content_json);
-
-    // Create modal container
-    const modal = document.createElement("div");
-    modal.className = "editor-modal";
-
-    // Create overlay
-    const overlay = document.createElement("div");
-    overlay.className = "editor-overlay";
-    overlay.addEventListener("click", () => modal.remove());
-    modal.appendChild(overlay);
-
-    // Create content container
-    const contentDiv = document.createElement("div");
-    contentDiv.className = "editor-content";
-
-    // Create header
-    const header = document.createElement("div");
-    header.className = "editor-header";
-
-    const title = document.createElement("h2");
-    title.textContent = `Bearbeiten: ${content.title || contentBlock.block_key}`;
-
-    const closeBtn = document.createElement("button");
-    closeBtn.className = "editor-close";
-    closeBtn.textContent = "×";
-    closeBtn.addEventListener("click", () => modal.remove());
-
-    header.appendChild(title);
-    header.appendChild(closeBtn);
-    contentDiv.appendChild(header);
-
-    // Create form
-    const form = this.createFormElement(contentBlock.block_type, content);
-    contentDiv.appendChild(form);
-
-    modal.appendChild(contentDiv);
-
-    // Handle form submission
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      this.saveContent(contentBlock, modal);
-    });
-
-    return modal;
-  }
-
-  /**
-   * Create form element (DOM-based, NO innerHTML)
-   */
-  createFormElement(blockType, content) {
-    const form = document.createElement("form");
-    form.className = "editor-form";
-
-    // Different form fields based on block type
-    if (blockType === "text" || blockType === "card") {
-      // Title field
-      const titleGroup = this.createFormGroup(
-        "Überschrift",
-        "title",
-        "text",
-        content.title || "",
-      );
-      form.appendChild(titleGroup);
-
-      // Content textarea
-      const contentGroup = this.createFormGroup(
-        "Text",
-        "content",
-        "textarea",
-        content.content || "",
-      );
-      form.appendChild(contentGroup);
-
-      // Icon field (optional)
-      const iconGroup = this.createFormGroup(
-        "Icon (Lucide)",
-        "icon",
-        "text",
-        content.icon || "",
-        false,
-      );
-      form.appendChild(iconGroup);
-    } else if (blockType === "hero") {
-      // Title field
-      const titleGroup = this.createFormGroup(
-        "Haupttitel",
-        "title",
-        "text",
-        content.title || "",
-      );
-      form.appendChild(titleGroup);
-
-      // Subtitle field
-      const subtitleGroup = this.createFormGroup(
-        "Untertitel",
-        "subtitle",
-        "text",
-        content.subtitle || "",
-      );
-      form.appendChild(subtitleGroup);
-    }
-
-    // Actions
-    const actions = document.createElement("div");
-    actions.className = "editor-actions";
-
-    const cancelBtn = document.createElement("button");
-    cancelBtn.type = "button";
-    cancelBtn.className = "btn-secondary";
-    cancelBtn.textContent = "Abbrechen";
-    cancelBtn.addEventListener("click", () =>
-      form.closest(".editor-modal").remove(),
-    );
-
-    const saveBtn = document.createElement("button");
-    saveBtn.type = "submit";
-    saveBtn.className = "btn-primary";
-    saveBtn.textContent = "Speichern";
-
-    actions.appendChild(cancelBtn);
-    actions.appendChild(saveBtn);
-    form.appendChild(actions);
-
-    return form;
-  }
-
-  /**
-   * Create form group with label and input (DOM-based)
-   */
-  createFormGroup(label, name, type, value = "", required = true) {
-    const group = document.createElement("div");
-    group.className = "form-group";
-
-    const labelEl = document.createElement("label");
-    labelEl.textContent = label;
-    group.appendChild(labelEl);
-
-    let input;
-    if (type === "textarea") {
-      input = document.createElement("textarea");
-      input.rows = 6;
-      input.textContent = value; // SAFE: Use textContent, not innerHTML
-    } else {
-      input = document.createElement("input");
-      input.type = type;
-      input.value = value;
-    }
-
-    input.name = name;
-    input.required = required;
-    group.appendChild(input);
-
-    return group;
-  }
-
-  /**
-   * Save content (with XSS sanitization)
-   */
-  async saveContent(contentBlock, modal) {
-    const formData = new FormData(modal.querySelector("form"));
-    const updatedContent = {};
-
-    // Extract and sanitize all form fields
-    for (const [key, value] of formData.entries()) {
-      // CRITICAL: Remove HTML tags for text content
-      updatedContent[key] = value.replace(/<[^>]*>/g, "");
-    }
-
-    console.log("[InlineEditor] Saving content:", updatedContent);
-
-    try {
-      const response = await fetch(
-        `${CONFIG.API_PROXY_URL}/content/${this.hostelId}/${contentBlock.block_key}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${this.adminToken}`,
-          },
-          body: JSON.stringify({
-            content_json: JSON.stringify(updatedContent),
-          }),
-        },
-      );
-
-      if (response.ok) {
-        console.log("[InlineEditor] Content saved successfully");
-        modal.remove();
-        // Reload page to show changes
-        window.location.reload();
-      } else {
-        const error = await response.json();
-        alert(
-          "Fehler beim Speichern: " + (error.error || "Unbekannter Fehler"),
-        );
-      }
-    } catch (error) {
-      console.error("[InlineEditor] Save failed:", error);
-      alert("Fehler beim Speichern: " + error.message);
-    }
-  }
-
-  /**
-   * Render content block (update DOM with saved content)
-   */
-  renderContentBlock(block) {
-    const content = JSON.parse(block.content_json);
-    const element = document.querySelector(
-      `[data-editable="${block.block_key}"]`,
-    );
-    if (!element) return;
-
-    console.log("[InlineEditor] Rendering block:", block.block_key);
-
-    // Update text content safely
-    const titleEl = element.querySelector(".card-title, h1, h3, h2, .greeting");
-    if (titleEl && content.title) {
-      titleEl.textContent = content.title; // SAFE: No HTML parsing
-    }
-
-    const contentEl = element.querySelector(
-      ".card-content p, .subtitle, .message",
-    );
-    if (contentEl && content.content) {
-      contentEl.textContent = content.content; // SAFE: No HTML parsing
-    }
-
-    // Update icon safely
-    const iconEl = element.querySelector("[data-lucide]");
-    if (iconEl && content.icon) {
-      iconEl.setAttribute("data-lucide", content.icon);
-      if (typeof lucide !== "undefined") {
-        lucide.createIcons(); // Re-render Lucide icons
-      }
-    }
-  }
-
-  /**
-   * Show edit toolbar at the top
-   */
-  showEditToolbar() {
-    const toolbar = document.createElement("div");
-    toolbar.className = "edit-toolbar";
-
-    const content = document.createElement("div");
-    content.className = "edit-toolbar-content";
-
-    const badge = document.createElement("span");
-    badge.className = "edit-mode-badge";
-    badge.textContent = "✏️ Bearbeitungsmodus";
-
-    const exitBtn = document.createElement("button");
-    exitBtn.className = "btn-exit-edit";
-    exitBtn.textContent = "Beenden";
-    exitBtn.addEventListener("click", () => {
-      if (confirm("Bearbeitungsmodus beenden?")) {
-        location.reload();
-      }
-    });
-
-    content.appendChild(badge);
-    content.appendChild(exitBtn);
-    toolbar.appendChild(content);
-
-    document.body.insertBefore(toolbar, document.body.firstChild);
-  }
+// Auto-init wenn DOM ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => InlineEditor.init());
+} else {
+  InlineEditor.init();
 }
 
-// Lazy load: Only initialize when admin is logged in
-if (localStorage.getItem("adminToken")) {
-  console.log("[InlineEditor] Admin token found, initializing editor...");
-  const editor = new InlineEditor();
-  window.addEventListener("DOMContentLoaded", () => {
-    editor.init();
-  });
-} else {
-  console.log("[InlineEditor] No admin token, editor disabled");
+// Export für Module
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = InlineEditor;
 }
