@@ -956,6 +956,7 @@ async function toggleAmenity(request, env, corsHeaders, id) {
 
 /**
  * Hostel-Einstellungen abrufen (Admin only)
+ * UPDATED: Liest jetzt aus apartments Tabelle
  */
 async function getHostelSettings(request, env, corsHeaders) {
   // Admin Auth prüfen
@@ -966,16 +967,16 @@ async function getHostelSettings(request, env, corsHeaders) {
     });
   }
 
-  // Hostel-Daten aus DB laden
-  const hostel = await env.DB.prepare(
-    "SELECT name, location, settings_json FROM hostels WHERE id = ?",
+  // Apartment-Daten aus DB laden (ersetzt hostels)
+  const apartment = await env.DB.prepare(
+    "SELECT name, location, settings_json FROM apartments WHERE slug = ?",
   )
     .bind(HOSTEL_ID)
     .first();
 
-  if (!hostel) {
+  if (!apartment) {
     return new Response(
-      JSON.stringify({ success: false, error: "Hostel nicht gefunden" }),
+      JSON.stringify({ success: false, error: "Apartment nicht gefunden" }),
       {
         status: 404,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -986,14 +987,14 @@ async function getHostelSettings(request, env, corsHeaders) {
   // Settings aus JSON parsen
   let settings = {};
   try {
-    settings = hostel.settings_json ? JSON.parse(hostel.settings_json) : {};
+    settings = apartment.settings_json ? JSON.parse(apartment.settings_json) : {};
   } catch (e) {
     settings = {};
   }
 
   // Name und Location hinzufügen
-  settings.name = hostel.name;
-  settings.location = hostel.location;
+  settings.name = apartment.name;
+  settings.address = apartment.location;  // location = address
 
   return new Response(
     JSON.stringify({
@@ -1008,6 +1009,7 @@ async function getHostelSettings(request, env, corsHeaders) {
 
 /**
  * Hostel-Einstellungen speichern (Admin only)
+ * UPDATED: Schreibt jetzt in apartments Tabelle
  */
 async function updateHostelSettings(request, env, corsHeaders) {
   // Admin Auth prüfen
@@ -1020,14 +1022,14 @@ async function updateHostelSettings(request, env, corsHeaders) {
 
   const body = await request.json();
 
-  // Name separat extrahieren
-  const name = body.name || "Hostel Hollenthon";
+  // Name und Adresse separat (eigene Spalten)
+  const name = body.name || "Gast auf Erden";
+  const location = body.address || "";
 
-  // Settings als JSON (inkl. Adresse)
+  // Alle Settings als JSON
   const settingsObj = {
     phone: body.phone || "",
     email: body.email || "",
-    address: body.address || "",
     checkInTime: body.checkInTime || "15:00",
     checkOutTime: body.checkOutTime || "11:00",
     formalAddress: body.formalAddress || "du",
@@ -1037,17 +1039,22 @@ async function updateHostelSettings(request, env, corsHeaders) {
     uid: body.uid || "",
     pricePerKwh: body.pricePerKwh || 0.29,
     co2PerKwh: body.co2PerKwh || 0.2,
+    // Neue Felder für Frontend
+    hostName: body.hostName || "",
+    website: body.website || "",
+    tagline: body.tagline || "",
+    tagline_en: body.tagline_en || "",
   };
 
   const settings_json = JSON.stringify(settingsObj);
 
-  // Update in DB (location Spalte wird nicht mehr verwendet)
+  // Update in apartments Tabelle
   await env.DB.prepare(
-    `UPDATE hostels
-     SET name = ?, settings_json = ?
-     WHERE id = ?`,
+    `UPDATE apartments
+     SET name = ?, location = ?, settings_json = ?, updated_at = unixepoch()
+     WHERE slug = ?`,
   )
-    .bind(name, settings_json, HOSTEL_ID)
+    .bind(name, location, settings_json, HOSTEL_ID)
     .run();
 
   return new Response(JSON.stringify({ success: true }), {

@@ -1411,6 +1411,30 @@
             <div class="form-group">
                 <label>Name</label>
                 <input type="text" id="hostelName" placeholder="z.B. Gast auf Erden">
+                <div class="form-hint">Name der Unterkunft (erscheint im Subtitle)</div>
+            </div>
+
+            <div class="form-group">
+                <label>Website / Domain</label>
+                <input type="text" id="hostelWebsite" placeholder="z.B. gastauferden.at">
+                <div class="form-hint">Erscheint als Haupttitel im Header</div>
+            </div>
+
+            <div class="form-group">
+                <label>Tagline (Deutsch)</label>
+                <input type="text" id="hostelTagline" placeholder="z.B. Ein magischer Ort zum Sein">
+                <div class="form-hint">Erscheint im Subtitle vor dem Namen</div>
+            </div>
+
+            <div class="form-group">
+                <label>Tagline (Englisch)</label>
+                <input type="text" id="hostelTaglineEn" placeholder="z.B. A magical place to be">
+            </div>
+
+            <div class="form-group">
+                <label>Gastgeber-Name</label>
+                <input type="text" id="hostelHostName" placeholder="z.B. Martin Mollay">
+                <div class="form-hint">Erscheint in der Kontakt-Sektion</div>
             </div>
 
             <h4 style="margin-top: 32px; margin-bottom: 16px; color: var(--forest);">Kontaktdaten</h4>
@@ -2255,6 +2279,10 @@
 
                     // Basic Info
                     if (s.name) document.getElementById('hostelName').value = s.name;
+                    if (s.website) document.getElementById('hostelWebsite').value = s.website;
+                    if (s.tagline) document.getElementById('hostelTagline').value = s.tagline;
+                    if (s.tagline_en) document.getElementById('hostelTaglineEn').value = s.tagline_en;
+                    if (s.hostName) document.getElementById('hostelHostName').value = s.hostName;
 
                     // Contact
                     if (s.phone) document.getElementById('hostelPhone').value = s.phone;
@@ -2293,6 +2321,10 @@
 
             const settings = {
                 name: document.getElementById('hostelName').value,
+                website: document.getElementById('hostelWebsite').value,
+                tagline: document.getElementById('hostelTagline').value,
+                tagline_en: document.getElementById('hostelTaglineEn').value,
+                hostName: document.getElementById('hostelHostName').value,
                 phone: document.getElementById('hostelPhone').value,
                 email: document.getElementById('hostelEmail').value,
                 address: document.getElementById('hostelAddress').value,
