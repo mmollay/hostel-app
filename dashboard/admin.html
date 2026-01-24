@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Hostel Hollenthon</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: #FAF8F5;
+            color: #3D3D3D;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            color: #2D4A3E;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: #D4A5A5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .logout-btn:hover {
+            background: #C49595;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+            color: #2D4A3E;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #9CAF88;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            background: #8B9E77;
+        }
+
+        .guest-list {
+            list-style: none;
+        }
+
+        .guest-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid #E8E2D9;
+        }
+
+        .guest-item:last-child {
+            border-bottom: none;
+        }
+
+        .guest-info h3 {
+            margin-bottom: 4px;
+        }
+
+        .guest-info p {
+            color: #6B6B6B;
+            font-size: 0.9rem;
+        }
+
+        .delete-btn {
+            padding: 8px 16px;
+            background: #D4A5A5;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background: #C49595;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #6B6B6B;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #E8E2D9;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #9CAF88;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-secondary {
+            background: #E8E2D9;
+            color: #3D3D3D;
+        }
+
+        .btn-secondary:hover {
+            background: #D8D2C9;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #9A9A9A;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="card">
+            <h2 style="text-align: center; margin-bottom: 24px;">Admin Login</h2>
+            <div class="form-group">
+                <label>Passwort</label>
+                <input type="password" id="adminPassword" placeholder="Passwort eingeben">
+            </div>
+            <button class="btn" style="width: 100%;" onclick="handleAdminLogin()">Anmelden</button>
+            <p id="loginError" style="color: #D4A5A5; text-align: center; margin-top: 10px; display: none;">Falsches Passwort</p>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" style="display: none;">
+        <div class="container">
+            <div class="header">
+                <h1>Gästeverwaltung</h1>
+                <button class="logout-btn" onclick="handleLogout()">Abmelden</button>
+            </div>
+
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin: 0;">Gäste</h2>
+                    <button class="btn" onclick="openAddGuestModal()">+ Neuer Gast</button>
+                </div>
+
+                <ul class="guest-list" id="guestList">
+                    <li class="empty-state">Keine Gäste vorhanden</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Guest Modal -->
+    <div id="addGuestModal" class="modal">
+        <div class="modal-content">
+            <h2>Neuer Gast</h2>
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" id="guestName" placeholder="Max Mustermann">
+            </div>
+            <div class="form-group">
+                <label>Benutzername</label>
+                <input type="text" id="guestUsername" placeholder="max123">
+            </div>
+            <div class="form-group">
+                <label>Passwort</label>
+                <input type="text" id="guestPassword" placeholder="Temporäres Passwort">
+            </div>
+            <div class="form-group">
+                <label>Check-in Datum</label>
+                <input type="date" id="guestCheckIn">
+            </div>
+            <div class="form-group">
+                <label>Check-out Datum</label>
+                <input type="date" id="guestCheckOut">
+            </div>
+            <div class="btn-group">
+                <button class="btn" onclick="createGuest()">Erstellen</button>
+                <button class="btn btn-secondary" onclick="closeAddGuestModal()">Abbrechen</button>
+            </div>
+            <p id="createError" style="color: #D4A5A5; margin-top: 10px; display: none;"></p>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        let adminToken = null;
+
+        function init() {
+            adminToken = localStorage.getItem('hostel_app_admin');
+            if (adminToken) {
+                showDashboard();
+            } else {
+                document.getElementById('loginScreen').style.display = 'block';
+            }
+        }
+
+        async function handleAdminLogin() {
+            const password = document.getElementById('adminPassword').value;
+
+            try {
+                const response = await fetch(`${CONFIG.API_PROXY_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    adminToken = result.token;
+                    localStorage.setItem('hostel_app_admin', adminToken);
+                    showDashboard();
+                } else {
+                    document.getElementById('loginError').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                document.getElementById('loginError').style.display = 'block';
+            }
+        }
+
+        async function showDashboard() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('adminDashboard').style.display = 'block';
+            await loadGuests();
+        }
+
+        async function loadGuests() {
+            try {
+                const response = await fetch(`${CONFIG.API_PROXY_URL}/guests`, {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+
+                const result = await response.json();
+                const guests = result.guests || [];
+
+                const list = document.getElementById('guestList');
+                list.textContent = ''; // Clear list
+
+                if (guests.length === 0) {
+                    const emptyLi = document.createElement('li');
+                    emptyLi.className = 'empty-state';
+                    emptyLi.textContent = 'Keine Gäste vorhanden';
+                    list.appendChild(emptyLi);
+                } else {
+                    guests.forEach(guest => {
+                        const li = document.createElement('li');
+                        li.className = 'guest-item';
+
+                        const info = document.createElement('div');
+                        info.className = 'guest-info';
+
+                        const h3 = document.createElement('h3');
+                        h3.textContent = guest.name;
+                        info.appendChild(h3);
+
+                        const p = document.createElement('p');
+                        p.textContent = `Username: ${guest.username} | Check-in: ${formatDate(guest.checkIn)} | Check-out: ${formatDate(guest.checkOut)}`;
+                        info.appendChild(p);
+
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.className = 'delete-btn';
+                        deleteBtn.textContent = 'Löschen';
+                        deleteBtn.onclick = () => deleteGuest(guest.id);
+
+                        li.appendChild(info);
+                        li.appendChild(deleteBtn);
+                        list.appendChild(li);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading guests:', error);
+            }
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+
+        function openAddGuestModal() {
+            document.getElementById('addGuestModal').classList.add('active');
+            const today = new Date().toISOString().split('T')[0];
+            const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+            document.getElementById('guestCheckIn').value = today;
+            document.getElementById('guestCheckOut').value = tomorrow;
+            document.getElementById('guestPassword').value = generatePassword();
+        }
+
+        function closeAddGuestModal() {
+            document.getElementById('addGuestModal').classList.remove('active');
+            document.getElementById('guestName').value = '';
+            document.getElementById('guestUsername').value = '';
+            document.getElementById('guestPassword').value = '';
+            document.getElementById('createError').style.display = 'none';
+        }
+
+        function generatePassword() {
+            const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            let password = '';
+            for (let i = 0; i < 8; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return password;
+        }
+
+        async function createGuest() {
+            const name = document.getElementById('guestName').value;
+            const username = document.getElementById('guestUsername').value;
+            const password = document.getElementById('guestPassword').value;
+            const checkIn = document.getElementById('guestCheckIn').value;
+            const checkOut = document.getElementById('guestCheckOut').value;
+
+            if (!name || !username || !password || !checkIn || !checkOut) {
+                document.getElementById('createError').textContent = 'Alle Felder sind erforderlich';
+                document.getElementById('createError').style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${CONFIG.API_PROXY_URL}/guests`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${adminToken}`
+                    },
+                    body: JSON.stringify({ name, username, password, checkIn, checkOut })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    closeAddGuestModal();
+                    await loadGuests();
+                } else {
+                    document.getElementById('createError').textContent = result.error;
+                    document.getElementById('createError').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error creating guest:', error);
+                document.getElementById('createError').textContent = 'Fehler beim Erstellen';
+                document.getElementById('createError').style.display = 'block';
+            }
+        }
+
+        async function deleteGuest(id) {
+            if (!confirm('Gast wirklich löschen?')) return;
+
+            try {
+                const response = await fetch(`${CONFIG.API_PROXY_URL}/guests/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    await loadGuests();
+                }
+            } catch (error) {
+                console.error('Error deleting guest:', error);
+            }
+        }
+
+        function handleLogout() {
+            adminToken = null;
+            localStorage.removeItem('hostel_app_admin');
+            document.getElementById('adminDashboard').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'block';
+            document.getElementById('adminPassword').value = '';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            init();
+            document.getElementById('adminPassword').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleAdminLogin();
+            });
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

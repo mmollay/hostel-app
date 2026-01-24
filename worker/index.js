@@ -48,6 +48,27 @@ export default {
         return await checkLogin(request, env, corsHeaders);
       }
 
+      // POST /guest/login - Gast Login
+      if (path === "/guest/login" && request.method === "POST") {
+        return await checkGuestLogin(request, env, corsHeaders);
+      }
+
+      // GET /guests - Alle Gäste (Admin only)
+      if (path === "/guests" && request.method === "GET") {
+        return await getGuests(request, env, corsHeaders);
+      }
+
+      // POST /guests - Neuen Gast anlegen (Admin only)
+      if (path === "/guests" && request.method === "POST") {
+        return await createGuest(request, env, corsHeaders);
+      }
+
+      // DELETE /guests/:id - Gast löschen (Admin only)
+      if (path.startsWith("/guests/") && request.method === "DELETE") {
+        const id = path.split("/")[2];
+        return await deleteGuest(request, env, corsHeaders, id);
+      }
+
       // GET / - Shelly Daten + Einstellungen
       if (path === "/" && request.method === "GET") {
         return await getShellyData(env, corsHeaders);
@@ -163,4 +184,191 @@ async function checkLogin(request, env, corsHeaders) {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     },
   );
+}
+
+/**
+ * Gast Login prüfen (POST /guest/login)
+ */
+async function checkGuestLogin(request, env, corsHeaders) {
+  const body = await request.json();
+  const { username, password } = body;
+
+  // Gäste aus KV laden
+  const guests = await loadGuests(env);
+  const guest = guests.find(
+    (g) => g.username === username && g.password === password,
+  );
+
+  if (!guest) {
+    return new Response(
+      JSON.stringify({ success: false, error: "Ungültige Anmeldedaten" }),
+      {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+
+  // Check-in/out Datum prüfen
+  const now = new Date();
+  const checkIn = new Date(guest.checkIn);
+  const checkOut = new Date(guest.checkOut);
+
+  if (now < checkIn) {
+    return new Response(
+      JSON.stringify({ success: false, error: "Check-in noch nicht möglich" }),
+      {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+
+  if (now > checkOut) {
+    return new Response(
+      JSON.stringify({ success: false, error: "Check-out bereits erfolgt" }),
+      {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+
+  return new Response(
+    JSON.stringify({
+      success: true,
+      token: `guest_${guest.id}`,
+      guest: {
+        id: guest.id,
+        name: guest.name,
+        checkIn: guest.checkIn,
+        checkOut: guest.checkOut,
+      },
+    }),
+    {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    },
+  );
+}
+
+/**
+ * Alle Gäste abrufen (GET /guests)
+ */
+async function getGuests(request, env, corsHeaders) {
+  // Admin Auth prüfen
+  if (!(await isAdmin(request, env))) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const guests = await loadGuests(env);
+  return new Response(JSON.stringify({ guests }), {
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+/**
+ * Neuen Gast anlegen (POST /guests)
+ */
+async function createGuest(request, env, corsHeaders) {
+  // Admin Auth prüfen
+  if (!(await isAdmin(request, env))) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const body = await request.json();
+  const { name, username, password, checkIn, checkOut } = body;
+
+  // Validierung
+  if (!name || !username || !password || !checkIn || !checkOut) {
+    return new Response(
+      JSON.stringify({ error: "Alle Felder sind erforderlich" }),
+      {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+
+  const guests = await loadGuests(env);
+
+  // Username bereits vergeben?
+  if (guests.find((g) => g.username === username)) {
+    return new Response(
+      JSON.stringify({ error: "Benutzername bereits vergeben" }),
+      {
+        status: 409,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+
+  // Neuen Gast erstellen
+  const guest = {
+    id: Date.now().toString(),
+    name,
+    username,
+    password,
+    checkIn,
+    checkOut,
+    createdAt: new Date().toISOString(),
+  };
+
+  guests.push(guest);
+  await env.SETTINGS.put("guests", JSON.stringify(guests));
+
+  return new Response(JSON.stringify({ success: true, guest }), {
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+/**
+ * Gast löschen (DELETE /guests/:id)
+ */
+async function deleteGuest(request, env, corsHeaders, id) {
+  // Admin Auth prüfen
+  if (!(await isAdmin(request, env))) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const guests = await loadGuests(env);
+  const filtered = guests.filter((g) => g.id !== id);
+
+  await env.SETTINGS.put("guests", JSON.stringify(filtered));
+
+  return new Response(JSON.stringify({ success: true }), {
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+/**
+ * Gäste aus KV laden
+ */
+async function loadGuests(env) {
+  try {
+    const stored = await env.SETTINGS.get("guests", "json");
+    return stored || [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Admin-Check Hilfsfunktion
+ */
+async function isAdmin(request, env) {
+  const authHeader = request.headers.get("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return false;
+  }
+  const token = authHeader.substring(7);
+  return token === env.ADMIN_PASSWORD;
 }

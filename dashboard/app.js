@@ -1,11 +1,13 @@
 /**
- * Hostel-App Dashboard
+ * Hostel-App Dashboard - Guest Portal
  * ==========================================
- * - Phase monitoring
- * - Feed-in detection
- * - CO2 tracking
- * - Peak power
- * - Admin settings
+ * - Guest login system
+ * - Personalized greetings
+ * - Energy monitoring (for logged-in guests)
+ * - Weather widget
+ * - Local recommendations
+ * - Night mode
+ * - Easter eggs
  */
 
 // Energie-Daten Speicher
@@ -26,24 +28,43 @@ let settings = {
   co2PerKwh: 0.2,
 };
 
-// Admin-Session
-let adminToken = null;
+// Guest-Session
+let guestToken = null;
+let guestData = null;
 
 // LocalStorage Keys
 const STORAGE_KEY = "shelly_energy_data";
-const ADMIN_TOKEN_KEY = "hostel_app_admin";
+const GUEST_TOKEN_KEY = "hostel_guest_token";
+const GUEST_DATA_KEY = "hostel_guest_data";
+const NIGHT_MODE_KEY = "hostel_night_mode";
+
+// Hollenthon Koordinaten für Wetter
+const LOCATION = {
+  lat: 47.5833,
+  lon: 16.1667,
+  name: "Hollenthon",
+};
 
 /**
  * Initialisierung
  */
 function init() {
   loadStoredData();
-  loadAdminSession();
+  loadGuestSession();
+  applyNightMode();
   checkDayReset();
   fetchData();
   setInterval(fetchData, CONFIG.UPDATE_INTERVAL);
   scheduleDailyReset();
-  initAdminUI();
+  initGuestUI();
+  updateGreeting();
+  setInterval(updateGreeting, 60000); // Aktualisiere Begrüßung jede Minute
+
+  // Wetter laden
+  if (guestToken) {
+    fetchWeather();
+    setInterval(fetchWeather, 600000); // Alle 10 Minuten
+  }
 }
 
 /**
@@ -54,6 +75,12 @@ function loadStoredData() {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       const data = JSON.parse(stored);
+      // Reset wenn Werte unrealistisch hoch (alter Bug mit *1000)
+      if (data.todayEnergy > 100 || data.monthEnergy > 1000) {
+        console.log("Alte fehlerhafte Daten erkannt, wird zurückgesetzt");
+        localStorage.removeItem(STORAGE_KEY);
+        return;
+      }
       energyData = { ...energyData, ...data };
     }
   } catch (e) {
@@ -62,14 +89,19 @@ function loadStoredData() {
 }
 
 /**
- * Admin-Session laden
+ * Guest-Session laden
  */
-function loadAdminSession() {
+function loadGuestSession() {
   try {
-    adminToken = localStorage.getItem(ADMIN_TOKEN_KEY);
-    updateAdminButton();
+    guestToken = localStorage.getItem(GUEST_TOKEN_KEY);
+    const storedData = localStorage.getItem(GUEST_DATA_KEY);
+    if (guestToken && storedData) {
+      guestData = JSON.parse(storedData);
+      updateGuestUI();
+    }
   } catch (e) {
-    adminToken = null;
+    guestToken = null;
+    guestData = null;
   }
 }
 
@@ -173,7 +205,7 @@ async function fetchData() {
       b_act_power: emData.b_act_power || 0,
       c_act_power: emData.c_act_power || 0,
       total_act_power: emData.total_act_power || 0,
-      total_act_energy: (emDataEnergy.total_act || 0) * 1000, // kWh to Wh
+      total_act_energy: emDataEnergy.total_act || 0, // Shelly liefert Wh
     };
 
     updateUI(statusData);
@@ -195,12 +227,16 @@ function updateUI(status) {
 
   // Hauptanzeige
   const powerEl = document.getElementById("currentPower");
-  powerEl.textContent = formatNumber(displayPower, 0);
-  powerEl.className = `value ${isFeeding ? "feeding" : "consuming"}`;
+  if (powerEl) {
+    powerEl.textContent = formatNumber(displayPower, 0);
+    powerEl.className = `value ${isFeeding ? "feeding" : "consuming"}`;
+  }
 
   // Einspeisung-Indikator
   const feedIndicator = document.getElementById("feedIndicator");
-  feedIndicator.classList.toggle("active", isFeeding);
+  if (feedIndicator) {
+    feedIndicator.classList.toggle("active", isFeeding);
+  }
 
   // Label anpassen
   const statusEl = document.getElementById("energyStatus");
@@ -219,10 +255,10 @@ function updateUI(status) {
   if (!isFeeding && displayPower > energyData.peakPower) {
     energyData.peakPower = displayPower;
   }
-  document.getElementById("peakPower").textContent = formatNumber(
-    energyData.peakPower,
-    0,
-  );
+  const peakEl = document.getElementById("peakPower");
+  if (peakEl) {
+    peakEl.textContent = formatNumber(energyData.peakPower, 0);
+  }
 
   // Gesamtenergie vom Gerät
   const totalEnergy = (status.total_act_energy || 0) / 1000;
@@ -239,42 +275,65 @@ function updateUI(status) {
 
   // CO2 berechnen
   const co2Today = energyData.todayEnergy * settings.co2PerKwh;
-  document.getElementById("co2Today").textContent = formatNumber(co2Today, 2);
+  const co2El = document.getElementById("co2Today");
+  if (co2El) {
+    co2El.textContent = formatNumber(co2Today, 2);
+  }
 
   // Heute
-  document.getElementById("todayEnergy").textContent = formatNumber(
-    energyData.todayEnergy,
-    CONFIG.DECIMALS_ENERGY,
-  );
-  document.getElementById("todayCost").textContent = formatNumber(
-    energyData.todayEnergy * pricePerKwh,
-    CONFIG.DECIMALS_COST,
-  );
+  const todayEnergyEl = document.getElementById("todayEnergy");
+  if (todayEnergyEl) {
+    todayEnergyEl.textContent = formatNumber(
+      energyData.todayEnergy,
+      CONFIG.DECIMALS_ENERGY,
+    );
+  }
+  const todayCostEl = document.getElementById("todayCost");
+  if (todayCostEl) {
+    todayCostEl.textContent = formatNumber(
+      energyData.todayEnergy * pricePerKwh,
+      CONFIG.DECIMALS_COST,
+    );
+  }
 
   // Gestern
-  document.getElementById("yesterdayEnergy").textContent = formatNumber(
-    energyData.yesterdayEnergy,
-    CONFIG.DECIMALS_ENERGY,
-  );
-  document.getElementById("yesterdayCost").textContent = formatNumber(
-    energyData.yesterdayEnergy * pricePerKwh,
-    CONFIG.DECIMALS_COST,
-  );
+  const yesterdayEnergyEl = document.getElementById("yesterdayEnergy");
+  if (yesterdayEnergyEl) {
+    yesterdayEnergyEl.textContent = formatNumber(
+      energyData.yesterdayEnergy,
+      CONFIG.DECIMALS_ENERGY,
+    );
+  }
+  const yesterdayCostEl = document.getElementById("yesterdayCost");
+  if (yesterdayCostEl) {
+    yesterdayCostEl.textContent = formatNumber(
+      energyData.yesterdayEnergy * pricePerKwh,
+      CONFIG.DECIMALS_COST,
+    );
+  }
 
   // Monat
   const monthTotal = energyData.monthEnergy + energyData.todayEnergy;
-  document.getElementById("monthEnergy").textContent = formatNumber(
-    monthTotal,
-    CONFIG.DECIMALS_ENERGY,
-  );
-  document.getElementById("monthCost").textContent = formatNumber(
-    monthTotal * pricePerKwh,
-    CONFIG.DECIMALS_COST,
-  );
+  const monthEnergyEl = document.getElementById("monthEnergy");
+  if (monthEnergyEl) {
+    monthEnergyEl.textContent = formatNumber(
+      monthTotal,
+      CONFIG.DECIMALS_ENERGY,
+    );
+  }
+  const monthCostEl = document.getElementById("monthCost");
+  if (monthCostEl) {
+    monthCostEl.textContent = formatNumber(
+      monthTotal * pricePerKwh,
+      CONFIG.DECIMALS_COST,
+    );
+  }
 
   // Letzte Aktualisierung
-  document.getElementById("lastUpdate").textContent =
-    new Date().toLocaleTimeString("de-DE");
+  const lastUpdateEl = document.getElementById("lastUpdate");
+  if (lastUpdateEl) {
+    lastUpdateEl.textContent = new Date().toLocaleTimeString("de-DE");
+  }
 
   saveData();
 }
@@ -284,6 +343,8 @@ function updateUI(status) {
  */
 function updatePhase(elementId, power) {
   const el = document.getElementById(elementId);
+  if (!el) return;
+
   const value = Math.round(power || 0);
   el.textContent = formatNumber(Math.abs(value), 0);
 
@@ -302,7 +363,10 @@ function updatePhase(elementId, power) {
  */
 function updatePriceDisplay() {
   const cents = Math.round(settings.pricePerKwh * 100);
-  document.getElementById("priceDisplay").textContent = cents;
+  const priceEl = document.getElementById("priceDisplay");
+  if (priceEl) {
+    priceEl.textContent = cents;
+  }
 }
 
 /**
@@ -319,204 +383,526 @@ function formatNumber(num, decimals) {
  * Verbindungsstatus: OK
  */
 function showConnected() {
-  document.getElementById("errorMessage").style.display = "none";
-  document.getElementById("dashboard").style.display = "block";
-  document.getElementById("statusIndicator").classList.remove("error");
+  const errorEl = document.getElementById("errorMessage");
+  const dashboardEl = document.getElementById("dashboard");
+  const statusEl = document.getElementById("statusIndicator");
+
+  if (errorEl) errorEl.style.display = "none";
+  if (dashboardEl) dashboardEl.style.display = "block";
+  if (statusEl) statusEl.classList.remove("error");
 }
 
 /**
  * Verbindungsstatus: Fehler
  */
 function showError() {
-  document.getElementById("errorMessage").style.display = "block";
-  document.getElementById("statusIndicator").classList.add("error");
+  const errorEl = document.getElementById("errorMessage");
+  const statusEl = document.getElementById("statusIndicator");
+
+  if (errorEl) errorEl.style.display = "block";
+  if (statusEl) statusEl.classList.add("error");
 }
 
 // ==========================================
-// ADMIN FUNKTIONEN
+// GUEST FUNKTIONEN
 // ==========================================
 
 /**
- * Admin UI initialisieren
+ * Guest UI initialisieren
  */
-function initAdminUI() {
-  // Admin Button
-  document.getElementById("adminBtn").addEventListener("click", () => {
-    if (adminToken) {
-      openSettingsModal();
-    } else {
-      openLoginModal();
-    }
-  });
+function initGuestUI() {
+  // Guest Login Button
+  const guestBtn = document.getElementById("guestLoginBtn");
+  if (guestBtn) {
+    guestBtn.addEventListener("click", () => {
+      if (guestToken) {
+        openGuestMenu();
+      } else {
+        openGuestLoginModal();
+      }
+    });
+  }
 
   // Login Modal
-  document.getElementById("loginBtn").addEventListener("click", handleLogin);
-  document
-    .getElementById("closeLoginBtn")
-    .addEventListener("click", closeLoginModal);
-  document.getElementById("loginPassword").addEventListener("keypress", (e) => {
-    if (e.key === "Enter") handleLogin();
-  });
+  const loginBtn = document.getElementById("loginBtn");
+  if (loginBtn) {
+    loginBtn.addEventListener("click", handleGuestLogin);
+  }
 
-  // Settings Modal
-  document
-    .getElementById("saveSettingsBtn")
-    .addEventListener("click", handleSaveSettings);
-  document
-    .getElementById("closeSettingsBtn")
-    .addEventListener("click", closeSettingsModal);
-  document.getElementById("logoutBtn").addEventListener("click", handleLogout);
+  const closeLoginBtn = document.getElementById("closeLoginBtn");
+  if (closeLoginBtn) {
+    closeLoginBtn.addEventListener("click", closeGuestLoginModal);
+  }
+
+  const usernameInput = document.getElementById("guestUsername");
+  const passwordInput = document.getElementById("guestPassword");
+  if (usernameInput) {
+    usernameInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") handleGuestLogin();
+    });
+  }
+  if (passwordInput) {
+    passwordInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") handleGuestLogin();
+    });
+  }
+
+  // Guest Menu
+  const logoutBtn = document.getElementById("guestLogoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", handleGuestLogout);
+  }
+
+  const closeMenuBtn = document.getElementById("closeGuestMenuBtn");
+  if (closeMenuBtn) {
+    closeMenuBtn.addEventListener("click", closeGuestMenu);
+  }
+
+  // Night Mode Toggle
+  const nightModeToggle = document.getElementById("nightModeToggle");
+  if (nightModeToggle) {
+    nightModeToggle.addEventListener("click", toggleNightMode);
+  }
 
   // Modal schließen bei Klick außerhalb
-  document.getElementById("loginModal").addEventListener("click", (e) => {
-    if (e.target.id === "loginModal") closeLoginModal();
-  });
-  document.getElementById("settingsModal").addEventListener("click", (e) => {
-    if (e.target.id === "settingsModal") closeSettingsModal();
-  });
+  const loginModal = document.getElementById("guestLoginModal");
+  if (loginModal) {
+    loginModal.addEventListener("click", (e) => {
+      if (e.target.id === "guestLoginModal") closeGuestLoginModal();
+    });
+  }
+
+  const guestMenu = document.getElementById("guestMenu");
+  if (guestMenu) {
+    guestMenu.addEventListener("click", (e) => {
+      if (e.target.id === "guestMenu") closeGuestMenu();
+    });
+  }
+
+  // Easter Egg: Konami Code
+  initEasterEggs();
 }
 
 /**
- * Login Modal öffnen
+ * Guest Login Modal öffnen
  */
-function openLoginModal() {
-  document.getElementById("loginModal").classList.add("active");
-  document.getElementById("loginPassword").value = "";
-  document.getElementById("loginError").style.display = "none";
-  document.getElementById("loginPassword").focus();
+function openGuestLoginModal() {
+  const modal = document.getElementById("guestLoginModal");
+  const usernameInput = document.getElementById("guestUsername");
+  const passwordInput = document.getElementById("guestPassword");
+  const errorEl = document.getElementById("loginError");
+
+  if (modal) modal.classList.add("active");
+  if (usernameInput) usernameInput.value = "";
+  if (passwordInput) passwordInput.value = "";
+  if (errorEl) errorEl.style.display = "none";
+  if (usernameInput) usernameInput.focus();
 }
 
 /**
- * Login Modal schließen
+ * Guest Login Modal schließen
  */
-function closeLoginModal() {
-  document.getElementById("loginModal").classList.remove("active");
+function closeGuestLoginModal() {
+  const modal = document.getElementById("guestLoginModal");
+  if (modal) modal.classList.remove("active");
 }
 
 /**
- * Login durchführen
+ * Guest Login durchführen
  */
-async function handleLogin() {
-  const password = document.getElementById("loginPassword").value;
+async function handleGuestLogin() {
+  const username = document.getElementById("guestUsername").value;
+  const password = document.getElementById("guestPassword").value;
 
-  if (!password) return;
+  if (!username || !password) return;
 
   try {
-    const response = await fetch(`${CONFIG.API_PROXY_URL}/login`, {
+    const response = await fetch(`${CONFIG.API_PROXY_URL}/guest/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password }),
+      body: JSON.stringify({ username, password }),
     });
 
     const result = await response.json();
 
     if (result.success) {
-      adminToken = result.token;
-      localStorage.setItem(ADMIN_TOKEN_KEY, adminToken);
-      updateAdminButton();
-      closeLoginModal();
-      openSettingsModal();
+      guestToken = result.token;
+      guestData = result.guest;
+      localStorage.setItem(GUEST_TOKEN_KEY, guestToken);
+      localStorage.setItem(GUEST_DATA_KEY, JSON.stringify(guestData));
+
+      closeGuestLoginModal();
+      updateGuestUI();
+      updateGreeting();
+      fetchWeather();
+
+      // Willkommens-Nachricht
+      showWelcomeMessage();
     } else {
-      document.getElementById("loginError").style.display = "block";
+      const errorEl = document.getElementById("loginError");
+      if (errorEl) {
+        errorEl.textContent = result.error || "Anmeldung fehlgeschlagen";
+        errorEl.style.display = "block";
+      }
     }
   } catch (error) {
     console.error("Login error:", error);
-    document.getElementById("loginError").style.display = "block";
+    const errorEl = document.getElementById("loginError");
+    if (errorEl) {
+      errorEl.textContent = "Verbindungsfehler";
+      errorEl.style.display = "block";
+    }
   }
 }
 
 /**
- * Settings Modal öffnen
+ * Guest Menu öffnen
  */
-function openSettingsModal() {
-  document.getElementById("settingsModal").classList.add("active");
-  document.getElementById("settingsPrice").value = Math.round(
-    settings.pricePerKwh * 100,
-  );
-  document.getElementById("settingsCO2").value = settings.co2PerKwh;
-  document.getElementById("settingsError").style.display = "none";
-  document.getElementById("settingsSuccess").style.display = "none";
+function openGuestMenu() {
+  const menu = document.getElementById("guestMenu");
+  if (menu) menu.classList.add("active");
 }
 
 /**
- * Settings Modal schließen
+ * Guest Menu schließen
  */
-function closeSettingsModal() {
-  document.getElementById("settingsModal").classList.remove("active");
+function closeGuestMenu() {
+  const menu = document.getElementById("guestMenu");
+  if (menu) menu.classList.remove("active");
 }
 
 /**
- * Einstellungen speichern
+ * Guest Logout
  */
-async function handleSaveSettings() {
-  const priceCents = parseFloat(document.getElementById("settingsPrice").value);
-  const co2 = parseFloat(document.getElementById("settingsCO2").value);
+function handleGuestLogout() {
+  guestToken = null;
+  guestData = null;
+  localStorage.removeItem(GUEST_TOKEN_KEY);
+  localStorage.removeItem(GUEST_DATA_KEY);
 
-  if (isNaN(priceCents) || priceCents < 0) {
-    document.getElementById("settingsError").textContent = "Ungültiger Preis";
-    document.getElementById("settingsError").style.display = "block";
-    return;
+  updateGuestUI();
+  updateGreeting();
+  closeGuestMenu();
+}
+
+/**
+ * Guest UI Status aktualisieren
+ */
+function updateGuestUI() {
+  const btn = document.getElementById("guestLoginBtn");
+  const energyCard = document.getElementById("energyCard");
+  const weatherCard = document.getElementById("weatherCard");
+  const recommendationsCard = document.getElementById("recommendationsCard");
+  const wifiCard = document.getElementById("wifiCard");
+
+  if (btn) {
+    btn.classList.toggle("logged-in", !!guestToken);
+    const btnText = btn.querySelector("span");
+    if (btnText) {
+      btnText.textContent = guestToken ? guestData.name : "Anmelden";
+    }
   }
 
+  // Karten nur für eingeloggte Gäste anzeigen
+  if (energyCard) energyCard.style.display = guestToken ? "block" : "none";
+  if (weatherCard) weatherCard.style.display = guestToken ? "block" : "none";
+  if (recommendationsCard)
+    recommendationsCard.style.display = guestToken ? "block" : "none";
+  if (wifiCard) wifiCard.style.display = guestToken ? "block" : "none";
+}
+
+/**
+ * Personalisierte Begrüßung aktualisieren
+ */
+function updateGreeting() {
+  const greetingEl = document.getElementById("greeting");
+  const messageEl = document.getElementById("welcomeMessage");
+
+  if (!greetingEl || !messageEl) return;
+
+  const hour = new Date().getHours();
+  let timeGreeting = "Guten Tag";
+
+  if (hour >= 5 && hour < 12) {
+    timeGreeting = "Guten Morgen";
+  } else if (hour >= 12 && hour < 18) {
+    timeGreeting = "Guten Tag";
+  } else if (hour >= 18 && hour < 22) {
+    timeGreeting = "Guten Abend";
+  } else {
+    timeGreeting = "Gute Nacht";
+  }
+
+  if (guestToken && guestData) {
+    greetingEl.textContent = `${timeGreeting}, ${guestData.name}!`;
+
+    // Aufenthaltsdauer berechnen
+    const checkIn = new Date(guestData.checkIn);
+    const checkOut = new Date(guestData.checkOut);
+    const today = new Date();
+    const daysRemaining = Math.ceil((checkOut - today) / (1000 * 60 * 60 * 24));
+
+    let stayMessage =
+      "Wir wünschen Ihnen einen wunderschönen Aufenthalt in Hollenthon.";
+    if (daysRemaining === 1) {
+      stayMessage =
+        "Morgen ist Ihr letzter Tag. Wir hoffen, Sie hatten eine schöne Zeit!";
+    } else if (daysRemaining > 1) {
+      stayMessage = `Noch ${daysRemaining} Tage bis zum Check-out. Genießen Sie Ihren Aufenthalt!`;
+    }
+
+    messageEl.textContent = stayMessage;
+  } else {
+    greetingEl.textContent = `${timeGreeting}!`;
+    messageEl.textContent =
+      "Willkommen in Hollenthon. Bitte melden Sie sich an, um Ihren persönlichen Bereich zu sehen.";
+  }
+}
+
+/**
+ * Willkommens-Nachricht anzeigen
+ */
+function showWelcomeMessage() {
+  // Kleine Animation oder Toast-Nachricht
+  console.log(`Willkommen, ${guestData.name}!`);
+}
+
+/**
+ * Wetter abrufen
+ */
+async function fetchWeather() {
   try {
-    const response = await fetch(`${CONFIG.API_PROXY_URL}/settings`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${adminToken}`,
-      },
-      body: JSON.stringify({
-        pricePerKwh: priceCents / 100,
-        co2PerKwh: co2 || 0.2,
-      }),
-    });
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${LOCATION.lat}&longitude=${LOCATION.lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=Europe/Vienna`;
 
-    const result = await response.json();
+    const response = await fetch(url);
+    const data = await response.json();
 
-    if (result.success) {
-      settings = { ...settings, ...result.settings };
-      updatePriceDisplay();
-      document.getElementById("settingsSuccess").style.display = "block";
-      document.getElementById("settingsError").style.display = "none";
-
-      // Nach 2 Sekunden schließen
-      setTimeout(closeSettingsModal, 1500);
-    } else {
-      throw new Error(result.error || "Speichern fehlgeschlagen");
+    if (data.current) {
+      updateWeatherDisplay(data.current);
     }
   } catch (error) {
-    console.error("Save settings error:", error);
-    document.getElementById("settingsError").textContent = error.message;
-    document.getElementById("settingsError").style.display = "block";
+    console.error("Wetter-Fehler:", error);
+  }
+}
 
-    // Bei Auth-Fehler ausloggen
-    if (
-      error.message.includes("Unauthorized") ||
-      error.message.includes("Invalid")
-    ) {
-      handleLogout();
+/**
+ * Wetter-Anzeige aktualisieren
+ */
+function updateWeatherDisplay(current) {
+  const tempEl = document.getElementById("weatherTemp");
+  const conditionEl = document.getElementById("weatherCondition");
+  const humidityEl = document.getElementById("weatherHumidity");
+  const windEl = document.getElementById("weatherWind");
+  const iconEl = document.getElementById("weatherIcon");
+
+  if (tempEl) tempEl.textContent = Math.round(current.temperature_2m);
+  if (humidityEl) humidityEl.textContent = current.relative_humidity_2m;
+  if (windEl) windEl.textContent = Math.round(current.wind_speed_10m);
+
+  // Wetter-Bedingung übersetzen
+  const condition = getWeatherCondition(current.weather_code);
+  if (conditionEl) conditionEl.textContent = condition;
+
+  // Icon anpassen (wenn gewünscht)
+  if (iconEl) {
+    iconEl.setAttribute(
+      "data-lucide",
+      getWeatherIconName(current.weather_code),
+    );
+    lucide.createIcons();
+  }
+}
+
+/**
+ * Wetter-Code zu Text
+ */
+function getWeatherCondition(code) {
+  const conditions = {
+    0: "Klar",
+    1: "Heiter",
+    2: "Teilweise bewölkt",
+    3: "Bewölkt",
+    45: "Neblig",
+    48: "Neblig",
+    51: "Leichter Nieselregen",
+    53: "Nieselregen",
+    55: "Starker Nieselregen",
+    61: "Leichter Regen",
+    63: "Regen",
+    65: "Starker Regen",
+    71: "Leichter Schneefall",
+    73: "Schneefall",
+    75: "Starker Schneefall",
+    95: "Gewitter",
+  };
+  return conditions[code] || "Unbekannt";
+}
+
+/**
+ * Wetter-Icon Name
+ */
+function getWeatherIconName(code) {
+  if (code === 0 || code === 1) return "sun";
+  if (code === 2) return "cloud-sun";
+  if (code === 3) return "cloud";
+  if (code >= 45 && code <= 48) return "cloud-fog";
+  if (code >= 51 && code <= 65) return "cloud-rain";
+  if (code >= 71 && code <= 75) return "cloud-snow";
+  if (code >= 95) return "cloud-lightning";
+  return "cloud";
+}
+
+/**
+ * Night Mode anwenden
+ */
+function applyNightMode() {
+  const isNightMode = localStorage.getItem(NIGHT_MODE_KEY) === "true";
+  document.body.classList.toggle("night-mode", isNightMode);
+
+  const toggleBtn = document.getElementById("nightModeToggle");
+  if (toggleBtn) {
+    const icon = toggleBtn.querySelector("i");
+    if (icon) {
+      icon.setAttribute("data-lucide", isNightMode ? "sun" : "moon");
+      lucide.createIcons();
     }
   }
 }
 
 /**
- * Logout
+ * Night Mode umschalten
  */
-function handleLogout() {
-  adminToken = null;
-  localStorage.removeItem(ADMIN_TOKEN_KEY);
-  updateAdminButton();
-  closeSettingsModal();
+function toggleNightMode() {
+  const isNightMode = document.body.classList.toggle("night-mode");
+  localStorage.setItem(NIGHT_MODE_KEY, isNightMode);
+
+  const toggleBtn = document.getElementById("nightModeToggle");
+  if (toggleBtn) {
+    const icon = toggleBtn.querySelector("i");
+    if (icon) {
+      icon.setAttribute("data-lucide", isNightMode ? "sun" : "moon");
+      lucide.createIcons();
+    }
+  }
 }
 
 /**
- * Admin Button Status aktualisieren
+ * Easter Eggs initialisieren
  */
-function updateAdminButton() {
-  const btn = document.getElementById("adminBtn");
-  btn.classList.toggle("logged-in", !!adminToken);
-  btn.title = adminToken ? "Einstellungen" : "Admin Login";
+function initEasterEggs() {
+  // Konami Code: ↑ ↑ ↓ ↓ ← → ← → B A
+  const konamiCode = [
+    "ArrowUp",
+    "ArrowUp",
+    "ArrowDown",
+    "ArrowDown",
+    "ArrowLeft",
+    "ArrowRight",
+    "ArrowLeft",
+    "ArrowRight",
+    "b",
+    "a",
+  ];
+  let konamiIndex = 0;
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === konamiCode[konamiIndex]) {
+      konamiIndex++;
+      if (konamiIndex === konamiCode.length) {
+        activateEasterEgg();
+        konamiIndex = 0;
+      }
+    } else {
+      konamiIndex = 0;
+    }
+  });
+
+  // Geheime Uhrzeit-Message (23:23 Uhr)
+  setInterval(() => {
+    const now = new Date();
+    if (now.getHours() === 23 && now.getMinutes() === 23) {
+      showSecretMessage();
+    }
+  }, 60000);
 }
+
+/**
+ * Easter Egg aktivieren
+ */
+function activateEasterEgg() {
+  // Regenbogen-Animation
+  document.body.style.animation = "rainbow 3s ease-in-out";
+
+  setTimeout(() => {
+    document.body.style.animation = "";
+    alert(
+      "🎉 Glückwunsch! Sie haben das Easter Egg gefunden! 🎉\n\nVielen Dank, dass Sie hier sind. Wir wünschen Ihnen einen wunderschönen Aufenthalt!",
+    );
+  }, 3000);
+}
+
+/**
+ * Geheime Nachricht anzeigen
+ */
+function showSecretMessage() {
+  if (!document.getElementById("secretMessage")) {
+    const msg = document.createElement("div");
+    msg.id = "secretMessage";
+    msg.style.cssText =
+      "position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--sage); color: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 50px rgba(0,0,0,0.3); z-index: 9999; text-align: center; font-size: 1.2rem;";
+
+    const line1 = document.createElement("div");
+    line1.textContent = "✨ 23:23 Uhr ✨";
+    msg.appendChild(line1);
+
+    const line2 = document.createElement("div");
+    line2.textContent = "Zeit für Ruhe und Entspannung.";
+    msg.appendChild(line2);
+
+    const line3 = document.createElement("div");
+    line3.textContent = "Gute Nacht!";
+    msg.appendChild(line3);
+
+    document.body.appendChild(msg);
+
+    setTimeout(() => {
+      msg.remove();
+    }, 5000);
+  }
+}
+
+// CSS für Rainbow Animation und Night Mode
+const style = document.createElement("style");
+style.textContent = `
+@keyframes rainbow {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+body.night-mode {
+  --cream: #1a1a1a;
+  --warm-white: #2a2a2a;
+  --sand: #3a3a3a;
+  --text: #e0e0e0;
+  --text-light: #b0b0b0;
+  --text-muted: #808080;
+}
+
+body.night-mode .header {
+  background: linear-gradient(135deg, rgba(20, 30, 25, 0.9) 0%, rgba(40, 50, 45, 0.8) 100%),
+              url('header-bg.png');
+}
+
+body.night-mode .card {
+  background: var(--warm-white);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+body.night-mode .energy-card {
+  background: linear-gradient(135deg, var(--warm-white) 0%, #353535 100%);
+}
+`;
+document.head.appendChild(style);
 
 // App starten
 document.addEventListener("DOMContentLoaded", init);

@@ -6,7 +6,7 @@
     <title>Genieße dein Haus | Hollenthon</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@300;400;500;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
@@ -38,7 +38,7 @@
         }
 
         body {
-            font-family: 'Lato', sans-serif;
+            font-family: 'DM Sans', sans-serif;
             background: var(--cream);
             color: var(--text);
             line-height: 1.7;
@@ -49,7 +49,10 @@
 
         /* Header */
         .header {
-            background: linear-gradient(135deg, var(--forest) 0%, var(--sage-dark) 100%);
+            background: linear-gradient(135deg, rgba(45, 74, 62, 0.7) 0%, rgba(122, 145, 104, 0.6) 100%),
+                        url('header-bg.png');
+            background-size: cover;
+            background-position: center;
             color: white;
             padding: 60px 24px 80px;
             text-align: center;
@@ -64,8 +67,8 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-            opacity: 0.5;
+            background: transparent;
+            opacity: 0;
         }
 
         .header-content {
@@ -75,19 +78,17 @@
             margin: 0 auto;
         }
 
-        .welcome-icon {
-            margin-bottom: 16px;
-            display: block;
-        }
-
-        .welcome-icon .header-icon {
-            width: 48px;
-            height: 48px;
-            stroke-width: 1.5;
+        .header-logo {
+            width: 140px;
+            height: 140px;
+            margin-bottom: 20px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
         }
 
         .header h1 {
-            font-family: 'Cormorant', serif;
+            font-family: 'DM Sans', sans-serif;
             font-size: 2.8rem;
             font-weight: 500;
             letter-spacing: 2px;
@@ -95,35 +96,46 @@
         }
 
         .header .subtitle {
-            font-family: 'Cormorant', serif;
+            font-family: 'DM Sans', sans-serif;
             font-size: 1.2rem;
             font-weight: 400;
             opacity: 0.9;
             letter-spacing: 2px;
         }
 
-        .admin-btn {
+        .guest-login-btn {
             position: absolute;
             top: 20px;
             right: 20px;
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: rgba(255,255,255,0.6);
-            cursor: pointer;
-            padding: 10px;
-            border-radius: 50%;
-            transition: all 0.3s;
-            font-size: 1.1rem;
-            z-index: 10;
-        }
-
-        .admin-btn:hover {
             background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
             color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 30px;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 500;
         }
 
-        .admin-btn.logged-in {
-            color: var(--sage-light);
+        .guest-login-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .guest-login-btn i {
+            width: 18px;
+            height: 18px;
+        }
+
+        .guest-login-btn.logged-in {
+            background: rgba(156, 175, 136, 0.3);
+            border-color: rgba(156, 175, 136, 0.5);
         }
 
         /* Main Content */
@@ -170,7 +182,7 @@
         }
 
         .card-title {
-            font-family: 'Cormorant', serif;
+            font-family: 'DM Sans', sans-serif;
             font-size: 1.5rem;
             font-weight: 600;
             color: var(--forest);
@@ -189,7 +201,7 @@
         }
 
         .welcome-card .greeting {
-            font-family: 'Cormorant', serif;
+            font-family: 'DM Sans', sans-serif;
             font-size: 2rem;
             font-weight: 600;
             color: var(--forest);
@@ -276,7 +288,7 @@
         }
 
         .energy-value {
-            font-family: 'Cormorant', serif;
+            font-family: 'DM Sans', sans-serif;
             font-size: 3.5rem;
             font-weight: 600;
             color: var(--sage-dark);
@@ -531,7 +543,7 @@
         }
 
         .modal h2 {
-            font-family: 'Cormorant', serif;
+            font-family: 'DM Sans', sans-serif;
             color: var(--forest);
             font-size: 1.5rem;
             font-weight: 600;
@@ -678,15 +690,217 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Weather Card */
+        .weather-display {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .weather-main {
+            text-align: center;
+        }
+
+        .weather-temp-display {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .weather-temp-value {
+            font-size: 3.5rem;
+            font-weight: 600;
+            color: var(--sage-dark);
+            line-height: 1;
+        }
+
+        .weather-temp-unit {
+            font-size: 1.8rem;
+            color: var(--text-light);
+        }
+
+        .weather-condition {
+            font-size: 1.1rem;
+            color: var(--text-light);
+        }
+
+        .weather-details {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            padding-top: 16px;
+            border-top: 1px solid var(--sand);
+        }
+
+        .weather-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-light);
+        }
+
+        .weather-detail i {
+            width: 20px;
+            height: 20px;
+            color: var(--sage);
+        }
+
+        /* WiFi Card */
+        .wifi-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .wifi-qr {
+            display: flex;
+            justify-content: center;
+        }
+
+        .wifi-details {
+            text-align: center;
+            width: 100%;
+        }
+
+        .wifi-info-row {
+            padding: 12px;
+            background: var(--cream);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        /* Recommendations Card */
+        .recommendations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .recommendation-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px;
+            background: var(--cream);
+            border-radius: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .recommendation-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .recommendation-icon {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--sage-light) 0%, var(--sage) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .recommendation-icon i {
+            width: 20px;
+            height: 20px;
+        }
+
+        .recommendation-item h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--forest);
+            margin-bottom: 4px;
+        }
+
+        .recommendation-item p {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--sage);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--sage-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--sand);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: var(--earth-light);
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--sand);
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--sage);
+        }
+
+        .error-text {
+            color: var(--rose);
+            font-size: 0.9rem;
+            margin-top: 12px;
+            text-align: center;
+            display: none;
+        }
     </style>
 </head>
 <body>
     <!-- Header -->
     <header class="header">
-        <button class="admin-btn" id="adminBtn" title="Admin"><i data-lucide="settings"></i></button>
+        <button class="guest-login-btn" id="guestLoginBtn">
+            <i data-lucide="user"></i>
+            <span>Anmelden</span>
+        </button>
         <div class="header-content">
-            <span class="welcome-icon"><i data-lucide="home" class="header-icon"></i></span>
-            <h1>Genieße dein Haus</h1>
+            <img src="logo.png" alt="Logo" class="header-logo">
+            <h1 id="mainTitle">Genieße dein Haus</h1>
             <p class="subtitle">am angrenzenden Wald • Hollenthon</p>
         </div>
     </header>
@@ -701,8 +915,8 @@
         <div id="dashboard">
             <!-- Welcome Card -->
             <div class="card welcome-card">
-                <h2 class="greeting">Herzlich Willkommen!</h2>
-                <p class="message">
+                <h2 class="greeting" id="greeting">Herzlich Willkommen!</h2>
+                <p class="message" id="welcomeMessage">
                     Genießen Sie Ihren Aufenthalt in unserem bewusst minimalistisch eingerichteten Haus
                     am Waldrand. Hier finden Sie Ruhe, Erholung und alles für einen entspannten Aufenthalt.
                 </p>
@@ -836,8 +1050,8 @@
                 </div>
             </div>
 
-            <!-- Energy Card -->
-            <div class="card energy-card">
+            <!-- Energy Card (nur für Admin sichtbar) -->
+            <div class="card energy-card" id="energyCard" style="display: none;">
                 <div class="card-header">
                     <div class="card-icon"><i data-lucide="zap"></i></div>
                     <div>
@@ -882,6 +1096,113 @@
                 </div>
             </div>
 
+            <!-- Weather Card (nur für Gäste sichtbar) -->
+            <div class="card" id="weatherCard" style="display: none;">
+                <div class="card-header">
+                    <div class="card-icon"><i data-lucide="cloud-sun" id="weatherIcon"></i></div>
+                    <div>
+                        <h3 class="card-title">Wetter in Hollenthon</h3>
+                        <p class="card-subtitle">Aktuelle Bedingungen</p>
+                    </div>
+                </div>
+                <div class="weather-display">
+                    <div class="weather-main">
+                        <div class="weather-temp-display">
+                            <span class="weather-temp-value" id="weatherTemp">--</span>
+                            <span class="weather-temp-unit">°C</span>
+                        </div>
+                        <div class="weather-condition" id="weatherCondition">Wird geladen...</div>
+                    </div>
+                    <div class="weather-details">
+                        <div class="weather-detail">
+                            <i data-lucide="droplets"></i>
+                            <span><span id="weatherHumidity">--</span>% Luftfeuchtigkeit</span>
+                        </div>
+                        <div class="weather-detail">
+                            <i data-lucide="wind"></i>
+                            <span><span id="weatherWind">--</span> km/h Wind</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WiFi QR Code Card (nur für Gäste sichtbar) -->
+            <div class="card" id="wifiCard" style="display: none;">
+                <div class="card-header">
+                    <div class="card-icon"><i data-lucide="wifi"></i></div>
+                    <div>
+                        <h3 class="card-title">WLAN-Zugang</h3>
+                        <p class="card-subtitle">Schnell verbinden</p>
+                    </div>
+                </div>
+                <div class="wifi-content">
+                    <div class="wifi-qr">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=WIFI:S:Hostel Power;T:WPA;P:hostl21;;"
+                             alt="WiFi QR Code"
+                             style="width: 200px; height: 200px; border-radius: 12px;">
+                    </div>
+                    <div class="wifi-details">
+                        <div class="wifi-info-row">
+                            <strong>Netzwerk:</strong> Hostel Power
+                        </div>
+                        <div class="wifi-info-row">
+                            <strong>Passwort:</strong> hostl21
+                        </div>
+                        <p style="margin-top: 12px; color: var(--text-muted); font-size: 0.85rem;">
+                            Scannen Sie den QR-Code mit Ihrer Kamera, um sich automatisch zu verbinden.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommendations Card (nur für Gäste sichtbar) -->
+            <div class="card" id="recommendationsCard" style="display: none;">
+                <div class="card-header">
+                    <div class="card-icon"><i data-lucide="map"></i></div>
+                    <div>
+                        <h3 class="card-title">Empfehlungen in der Umgebung</h3>
+                        <p class="card-subtitle">Ausflugstipps & Lokale</p>
+                    </div>
+                </div>
+                <div class="recommendations-list">
+                    <div class="recommendation-item">
+                        <div class="recommendation-icon"><i data-lucide="mountain"></i></div>
+                        <div>
+                            <h4>Wanderungen</h4>
+                            <p>Pittental-Rundweg (5 km), Hochwechsel (1743 m)</p>
+                        </div>
+                    </div>
+                    <div class="recommendation-item">
+                        <div class="recommendation-icon"><i data-lucide="utensils"></i></div>
+                        <div>
+                            <h4>Gasthof Hollenthon</h4>
+                            <p>Traditionelle österreichische Küche, 5 Min. zu Fuß</p>
+                        </div>
+                    </div>
+                    <div class="recommendation-item">
+                        <div class="recommendation-icon"><i data-lucide="shopping-bag"></i></div>
+                        <div>
+                            <h4>Nahversorger</h4>
+                            <p>SPAR Markt in Aspang (7 km), täglich geöffnet</p>
+                        </div>
+                    </div>
+                    <div class="recommendation-item">
+                        <div class="recommendation-icon"><i data-lucide="bath"></i></div>
+                        <div>
+                            <h4>Therme Loipersdorf</h4>
+                            <p>Wellness & Entspannung, 30 km entfernt</p>
+                        </div>
+                    </div>
+                    <div class="recommendation-item">
+                        <div class="recommendation-icon"><i data-lucide="castle"></i></div>
+                        <div>
+                            <h4>Burg Seebenstein</h4>
+                            <p>Historische Burganlage, 12 km</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Contact Card -->
             <div class="card contact-card">
                 <div class="card-header">
@@ -893,17 +1214,31 @@
                 </div>
                 <div class="contact-grid">
                     <div class="contact-item">
+                        <div class="contact-icon"><i data-lucide="user"></i></div>
+                        <div>
+                            <div class="contact-label">Gastgeber</div>
+                            <div class="contact-value">Martin Mollay</div>
+                        </div>
+                    </div>
+                    <div class="contact-item">
                         <div class="contact-icon"><i data-lucide="phone"></i></div>
                         <div>
                             <div class="contact-label">Telefon</div>
-                            <div class="contact-value">+43 123 456 789</div>
+                            <div class="contact-value">+43 650 25 26 26 26</div>
                         </div>
                     </div>
                     <div class="contact-item">
                         <div class="contact-icon"><i data-lucide="mail"></i></div>
                         <div>
                             <div class="contact-label">E-Mail</div>
-                            <div class="contact-value">info@hostel.at</div>
+                            <div class="contact-value">martin@ssi.at</div>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon"><i data-lucide="map-pin"></i></div>
+                        <div>
+                            <div class="contact-label">Adresse</div>
+                            <div class="contact-value">Ausstraße 33, 2812 Hollenthon</div>
                         </div>
                     </div>
                     <div class="contact-item">
@@ -926,39 +1261,42 @@
         </div>
     </footer>
 
-    <!-- Login Modal -->
-    <div class="modal-overlay" id="loginModal">
+    <!-- Guest Login Modal -->
+    <div class="modal-overlay" id="guestLoginModal">
         <div class="modal">
-            <h2>🔐 Admin Login</h2>
+            <h2>Gast-Anmeldung</h2>
+            <p style="color: #6B6B6B; margin-bottom: 20px; text-align: center;">
+                Geben Sie Ihre Zugangsdaten ein, die Sie bei der Buchung erhalten haben.
+            </p>
+            <div class="form-group">
+                <label>Benutzername</label>
+                <input type="text" id="guestUsername" placeholder="Ihr Benutzername">
+            </div>
             <div class="form-group">
                 <label>Passwort</label>
-                <input type="password" id="loginPassword" placeholder="Passwort eingeben">
+                <input type="password" id="guestPassword" placeholder="Ihr Passwort">
             </div>
             <button class="btn btn-primary" id="loginBtn">Anmelden</button>
             <button class="btn btn-secondary" id="closeLoginBtn">Abbrechen</button>
-            <div class="error-text" id="loginError">Falsches Passwort</div>
+            <div class="error-text" id="loginError"></div>
         </div>
     </div>
 
-    <!-- Settings Modal -->
-    <div class="modal-overlay" id="settingsModal">
+    <!-- Guest Menu Modal -->
+    <div class="modal-overlay" id="guestMenu">
         <div class="modal">
-            <h2>⚙️ Einstellungen</h2>
-            <div class="form-group">
-                <label>Strompreis (Cent/kWh)</label>
-                <input type="number" id="settingsPrice" step="0.1" min="0" max="100" placeholder="29">
-                <div class="input-hint">Aktueller Durchschnitt: 29 ct/kWh</div>
+            <h2>Gast-Menü</h2>
+            <div style="margin: 24px 0;">
+                <button class="btn btn-secondary" id="nightModeToggle" style="width: 100%; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i data-lucide="moon"></i>
+                    <span>Nachtmodus umschalten</span>
+                </button>
+                <button class="btn btn-primary" id="guestLogoutBtn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i data-lucide="log-out"></i>
+                    <span>Abmelden</span>
+                </button>
             </div>
-            <div class="form-group">
-                <label>CO₂-Faktor (kg/kWh)</label>
-                <input type="number" id="settingsCO2" step="0.01" min="0" max="1" placeholder="0.2">
-                <div class="input-hint">Österreich-Mix: ~0.2 kg/kWh</div>
-            </div>
-            <button class="btn btn-primary" id="saveSettingsBtn">Speichern</button>
-            <button class="btn btn-secondary" id="closeSettingsBtn">Abbrechen</button>
-            <button class="btn btn-danger" id="logoutBtn">Abmelden</button>
-            <div class="error-text" id="settingsError">Fehler beim Speichern</div>
-            <div class="success-text" id="settingsSuccess">Gespeichert!</div>
+            <button class="btn btn-secondary" id="closeGuestMenuBtn">Schließen</button>
         </div>
     </div>
 
