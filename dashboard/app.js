@@ -1231,7 +1231,7 @@ function showSecretMessage() {
 // GOOGLE MAPS PLACES INTEGRATION
 // ==========================================
 
-let currentRadius = 20000; // 20km default (in meters)
+let currentRadius = 40000; // 40km default (in meters)
 let currentCategory = "all";
 const GOOGLE_MAPS_API_KEY = CONFIG.GOOGLE_MAPS_API_KEY || "";
 
@@ -1387,9 +1387,10 @@ async function fetchNearbyPlaces() {
     // Tatsächliche Fahrstrecke mit Distance Matrix API berechnen
     await enrichPlacesWithDrivingDistance(filteredPlaces);
 
-    // Nach tatsächlicher Fahrstrecke sortieren
+    // Nach tatsächlicher Fahrstrecke sortieren und auf definierten Umkreis begrenzen
+    const maxDistanceKm = currentRadius / 1000; // meters to km
     const sortedPlaces = filteredPlaces
-      .filter((p) => p.drivingDistance) // Nur Places mit berechneter Distanz
+      .filter((p) => p.drivingDistance && p.drivingDistance <= maxDistanceKm) // Umkreis-Filter
       .sort((a, b) => a.drivingDistance - b.drivingDistance)
       .slice(0, 10); // Top 10 nächstgelegene
 
