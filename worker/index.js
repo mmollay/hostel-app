@@ -1357,7 +1357,8 @@ async function getPlacesNearby(url, env, corsHeaders) {
   const rankby = url.searchParams.get("rankby"); // distance | prominence
   const apiKey = env.GOOGLE_MAPS_API_KEY;
 
-  if (!lat || !lon) {
+  // Lat/Lon nur bei initialer Suche erforderlich (NICHT bei pagetoken!)
+  if (!pagetoken && (!lat || !lon)) {
     return new Response(JSON.stringify({ error: "Lat/Lon required" }), {
       status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
