@@ -1451,12 +1451,23 @@ async function enrichPlacesWithDrivingDistance(places) {
  * Empfehlungen anzeigen
  */
 function displayRecommendations(places) {
+  console.log("[displayRecommendations] Called with", places.length, "places");
   const listEl = document.getElementById("recommendationsList");
-  if (!listEl) return;
+  if (!listEl) {
+    console.error(
+      "[displayRecommendations] ERROR: recommendationsList element not found!",
+    );
+    return;
+  }
 
+  console.log("[displayRecommendations] Clearing list and rendering...");
   listEl.innerHTML = "";
 
-  places.forEach((place) => {
+  places.forEach((place, index) => {
+    console.log(
+      `[displayRecommendations] Rendering place ${index + 1}/${places.length}:`,
+      place.name,
+    );
     const item = document.createElement("div");
     item.className = "recommendation-item";
 
@@ -1525,7 +1536,13 @@ function displayRecommendations(places) {
     listEl.appendChild(item);
   });
 
+  console.log(
+    "[displayRecommendations] Finished rendering. Total items:",
+    listEl.children.length,
+  );
+  console.log("[displayRecommendations] Creating Lucide icons...");
   lucide.createIcons();
+  console.log("[displayRecommendations] DONE!");
 }
 
 /**
