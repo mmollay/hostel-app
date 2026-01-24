@@ -1314,30 +1314,25 @@ async function fetchNearbyPlaces() {
     // Nur gute Bewertungen filtern (oder Orte ohne Rating behalten)
     let filteredPlaces = allPlaces.filter((p) => !p.rating || p.rating >= 3.5);
 
-    // SPEZIALFILTER für Thermen: Nur echte Thermal-Bäder, keine Massage/Kosmetik Studios
+    // SPEZIALFILTER für Thermen: NUR echte Thermal-Bäder mit Heilwasser!
     if (currentCategory === "spa") {
       const thermalKeywords = [
-        "therme",
-        "thermal",
-        "thermalbad",
-        "heilbad",
-        "kurbad",
-        "wellnesshotel",
-        "kurhotel",
-        "gesundheitszentrum",
-        "erholungszentrum",
-        "freibad", // Freibäder auch OK
+        "therme", // Therme Linsberg, Therme Wien, etc.
+        "thermal", // Thermal Resort, Thermalbad
+        "thermalbad", // explizit Thermalbad
+        "heilbad", // Bad mit Heilwasser
+        "kurbad", // Kurbad
       ];
 
-      // Zusätzlich: Hotels/Grandhotels die "spa" im Namen haben
-      const hotelSpaPattern = /(hotel|grandhotel).*spa|spa.*(hotel|grandhotel)/;
+      // Hotels mit "Therme" oder "Thermal" oder "Spa" im Namen
+      const hotelThermalPattern = /(hotel|grandhotel).*(therme|thermal|spa)/;
 
       filteredPlaces = filteredPlaces.filter((p) => {
         const name = p.name.toLowerCase();
-        // Prüfe Keywords ODER Hotel+Spa Kombination
+        // NUR: Therme/Thermal Keywords ODER Hotel mit Therme/Thermal/Spa
         return (
           thermalKeywords.some((keyword) => name.includes(keyword)) ||
-          hotelSpaPattern.test(name)
+          hotelThermalPattern.test(name)
         );
       });
     }
