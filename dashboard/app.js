@@ -1333,16 +1333,10 @@ async function fetchNearbyPlaces() {
 
   try {
     // Google Places API (New) - Nearby Search mit Pagination
-    let types;
-    if (currentCategory === "all") {
-      types = ["tourist_attraction", "restaurant", "spa", "museum", "park"];
-    } else if (currentCategory === "restaurant") {
-      // WICHTIG: Auch "food" abfragen, um Hybrid-Orte zu finden
-      // (z.B. Hotels mit Restaurant wie Krumbacherhof - primär "lodging", sekundär "restaurant")
-      types = ["restaurant", "food"];
-    } else {
-      types = [currentCategory];
-    }
+    const types =
+      currentCategory === "all"
+        ? ["tourist_attraction", "restaurant", "spa", "museum", "park"]
+        : [currentCategory];
 
     // Für jeden Type ALLE Seiten holen (nicht nur erste 20!)
     const placesPromises = types.map((type) => fetchAllPagesForType(type));
