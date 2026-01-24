@@ -3,13 +3,16 @@
  * Ermöglicht Offline-Funktionalität
  */
 
-const CACHE_NAME = "hostel-hollenthon-v6";
+const CACHE_NAME = "hostel-hollenthon-v7";
 const urlsToCache = [
   "/",
   "/index.html",
   "/admin.html",
   "/app.js",
   "/config.js",
+  "/i18n.js",
+  "/i18n/de.json",
+  "/i18n/en.json",
   "/inline-editor.js",
   "/logo-neu.png",
   "/favicon-32x32.png",
