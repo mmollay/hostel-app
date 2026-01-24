@@ -1270,6 +1270,43 @@ function initRecommendations() {
 }
 
 /**
+ * Hilfsfunktion: Holt ALLE Seiten für einen Place-Type (nicht nur die ersten 20)
+ * Google Places API gibt max 60 Ergebnisse zurück (3 Seiten à 20)
+ */
+async function fetchAllPagesForType(type) {
+  const allResults = [];
+  let nextPageToken = null;
+  let pageCount = 0;
+  const maxPages = 3; // Google limitiert auf 3 Seiten
+
+  do {
+    let url;
+    if (nextPageToken) {
+      // Nachfolge-Seite mit pagetoken
+      url = `${CONFIG.API_PROXY_URL}/places/nearby?pagetoken=${nextPageToken}`;
+      // WICHTIG: Google braucht ~2 Sekunden Wartezeit zwischen Requests!
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    } else {
+      // Erste Seite mit location/radius/type
+      url = `${CONFIG.API_PROXY_URL}/places/nearby?lat=${LOCATION.lat}&lon=${LOCATION.lon}&radius=${currentRadius}&type=${type}`;
+    }
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.results && data.results.length > 0) {
+      allResults.push(...data.results);
+    }
+
+    nextPageToken = data.next_page_token || null;
+    pageCount++;
+  } while (nextPageToken && pageCount < maxPages);
+
+  console.log(`${type}: ${allResults.length} Ergebnisse (${pageCount} Seiten)`);
+  return allResults;
+}
+
+/**
  * Google Places Nearby Search
  */
 async function fetchNearbyPlaces() {
@@ -1293,23 +1330,18 @@ async function fetchNearbyPlaces() {
   lucide.createIcons();
 
   try {
-    // Google Places API (New) - Nearby Search
+    // Google Places API (New) - Nearby Search mit Pagination
     const types =
       currentCategory === "all"
         ? ["tourist_attraction", "restaurant", "spa", "museum", "park"]
         : [currentCategory];
 
-    // Worker-Proxy verwenden (um CORS zu vermeiden)
-    const placesPromises = types.map((type) =>
-      fetch(
-        `${CONFIG.API_PROXY_URL}/places/nearby?lat=${LOCATION.lat}&lon=${LOCATION.lon}&radius=${currentRadius}&type=${type}`,
-      ).then((res) => res.json()),
-    );
-
+    // Für jeden Type ALLE Seiten holen (nicht nur erste 20!)
+    const placesPromises = types.map((type) => fetchAllPagesForType(type));
     const results = await Promise.all(placesPromises);
 
     // Alle Results zusammenführen
-    const allPlaces = results.flatMap((r) => r.results || []);
+    const allPlaces = results.flat();
 
     // Nur gute Bewertungen filtern (oder Orte ohne Rating behalten)
     let filteredPlaces = allPlaces.filter((p) => !p.rating || p.rating >= 3.5);

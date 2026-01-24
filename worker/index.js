@@ -1353,6 +1353,7 @@ async function getPlacesNearby(url, env, corsHeaders) {
   const lon = url.searchParams.get("lon");
   const radius = url.searchParams.get("radius") || "20000";
   const type = url.searchParams.get("type") || "tourist_attraction";
+  const pagetoken = url.searchParams.get("pagetoken"); // Pagination Support
   const apiKey = env.GOOGLE_MAPS_API_KEY;
 
   if (!lat || !lon) {
@@ -1373,8 +1374,15 @@ async function getPlacesNearby(url, env, corsHeaders) {
   }
 
   try {
-    // Google Maps API aufrufen
-    const googleUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lon}&radius=${radius}&type=${type}&key=${apiKey}`;
+    // Google Maps API aufrufen - mit Pagination Support
+    let googleUrl;
+    if (pagetoken) {
+      // Wenn pagetoken vorhanden, nur diesen verwenden (NICHT lat/lon/radius!)
+      googleUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?pagetoken=${pagetoken}&key=${apiKey}`;
+    } else {
+      // Initiale Suche mit location/radius/type
+      googleUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lon}&radius=${radius}&type=${type}&key=${apiKey}`;
+    }
 
     const response = await fetch(googleUrl);
     const data = await response.json();
