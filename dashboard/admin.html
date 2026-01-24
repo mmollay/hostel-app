@@ -1180,11 +1180,6 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>Standort</label>
-                <input type="text" id="apartmentLocation" placeholder="z.B. Hollenthon am Waldrand">
-            </div>
-
             <button class="btn btn-primary" style="width: 100%;" onclick="saveApartmentFromModal()">
                 <span id="apartmentSaveText">Apartment anlegen</span>
             </button>
@@ -1416,11 +1411,6 @@
             <div class="form-group">
                 <label>Name</label>
                 <input type="text" id="hostelName" placeholder="z.B. Gast auf Erden">
-            </div>
-
-            <div class="form-group">
-                <label>Standort</label>
-                <input type="text" id="hostelLocation" placeholder="z.B. Hollenthon am Waldrand">
             </div>
 
             <h4 style="margin-top: 32px; margin-bottom: 16px; color: var(--forest);">Kontaktdaten</h4>
@@ -2265,7 +2255,6 @@
 
                     // Basic Info
                     if (s.name) document.getElementById('hostelName').value = s.name;
-                    if (s.location) document.getElementById('hostelLocation').value = s.location;
 
                     // Contact
                     if (s.phone) document.getElementById('hostelPhone').value = s.phone;
@@ -2304,7 +2293,6 @@
 
             const settings = {
                 name: document.getElementById('hostelName').value,
-                location: document.getElementById('hostelLocation').value,
                 phone: document.getElementById('hostelPhone').value,
                 email: document.getElementById('hostelEmail').value,
                 address: document.getElementById('hostelAddress').value,
@@ -2441,7 +2429,6 @@
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
                         <div>
                             <h3 style="margin: 0 0 8px 0; color: var(--forest);">${apt.name}</h3>
-                            <p style="margin: 0; color: #666; font-size: 0.9rem;">${apt.location || 'Kein Standort'}</p>
                         </div>
                         <div style="display: flex; gap: 8px;">
                             <button class="btn btn-secondary" onclick="editApartment(${apt.id})" style="padding: 8px 16px;">
@@ -2507,7 +2494,6 @@
             document.getElementById('apartmentSaveText').textContent = 'Apartment anlegen';
             document.getElementById('apartmentName').value = '';
             document.getElementById('apartmentSlug').value = '';
-            document.getElementById('apartmentLocation').value = '';
             document.getElementById('apartmentError').textContent = '';
             document.getElementById('apartmentSuccess').textContent = '';
             document.getElementById('apartmentModal').classList.add('active');
@@ -2533,7 +2519,6 @@
             document.getElementById('apartmentName').value = apt.name;
             document.getElementById('apartmentSlug').value = apt.slug;
             document.getElementById('apartmentSlug').disabled = true; // Slug nicht änderbar
-            document.getElementById('apartmentLocation').value = apt.location || '';
             document.getElementById('apartmentError').textContent = '';
             document.getElementById('apartmentSuccess').textContent = '';
             document.getElementById('apartmentModal').classList.add('active');
@@ -2550,7 +2535,6 @@
         async function saveApartmentFromModal() {
             const name = document.getElementById('apartmentName').value;
             const slug = document.getElementById('apartmentSlug').value;
-            const location = document.getElementById('apartmentLocation').value;
             const errorEl = document.getElementById('apartmentError');
             const successEl = document.getElementById('apartmentSuccess');
 
@@ -2578,7 +2562,7 @@
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${authToken}`
                         },
-                        body: JSON.stringify({ name, location })
+                        body: JSON.stringify({ name })
                     });
                 } else {
                     // Create
@@ -2588,7 +2572,7 @@
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${authToken}`
                         },
-                        body: JSON.stringify({ name, slug, location })
+                        body: JSON.stringify({ name, slug })
                     });
                 }
 
