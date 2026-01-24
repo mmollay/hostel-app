@@ -788,7 +788,29 @@ function updateGreeting() {
   }
 
   if (guestToken && guestData) {
-    greetingEl.innerHTML = `<i data-lucide="${greetingIcon}" style="vertical-align: middle; margin-right: 12px;"></i>${timeGreeting}, ${guestData.name}!`;
+    // Personalisierte Anrede mit Titel und Gender
+    let salutation = "";
+    if (guestData.gender === "weiblich") {
+      salutation = "liebe";
+    } else if (guestData.gender === "männlich") {
+      salutation = "lieber";
+    }
+
+    const title = guestData.title ? `${guestData.title} ` : "";
+    const name = `${title}${guestData.name}`;
+    const greeting = salutation
+      ? `${timeGreeting}, ${salutation} ${name}`
+      : `${timeGreeting}, ${name}`;
+
+    // Sicher: Icon via DOM, Text via textContent
+    greetingEl.innerHTML = "";
+    const icon = document.createElement("i");
+    icon.setAttribute("data-lucide", greetingIcon);
+    icon.style.verticalAlign = "middle";
+    icon.style.marginRight = "12px";
+    greetingEl.appendChild(icon);
+    const textNode = document.createTextNode(`${greeting}!`);
+    greetingEl.appendChild(textNode);
     lucide.createIcons();
 
     // Aufenthaltsdauer berechnen
@@ -805,7 +827,15 @@ function updateGreeting() {
 
     messageEl.textContent = stayMessage;
   } else {
-    greetingEl.innerHTML = `<i data-lucide="${greetingIcon}" style="vertical-align: middle; margin-right: 12px;"></i>${timeGreeting}!`;
+    // Nicht eingeloggt
+    greetingEl.innerHTML = "";
+    const icon = document.createElement("i");
+    icon.setAttribute("data-lucide", greetingIcon);
+    icon.style.verticalAlign = "middle";
+    icon.style.marginRight = "12px";
+    greetingEl.appendChild(icon);
+    const textNode = document.createTextNode(`${timeGreeting}!`);
+    greetingEl.appendChild(textNode);
     lucide.createIcons();
     messageEl.textContent = TEXT_VARIANTS.welcome[formalAddress];
   }

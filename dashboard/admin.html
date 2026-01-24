@@ -1101,6 +1101,21 @@
             <h2 id="guestModalTitle">Neuen Gast anlegen</h2>
 
             <div class="form-group">
+                <label>Titel (optional)</label>
+                <input type="text" id="guestTitle" placeholder="z.B. Dr., Prof.">
+            </div>
+
+            <div class="form-group">
+                <label>Geschlecht</label>
+                <select id="guestGender">
+                    <option value="neutral">Keine Angabe</option>
+                    <option value="weiblich">Weiblich</option>
+                    <option value="männlich">Männlich</option>
+                </select>
+                <div class="form-hint">Für personalisierte Anrede (liebe/lieber)</div>
+            </div>
+
+            <div class="form-group">
                 <label>Name</label>
                 <input type="text" id="guestName" placeholder="z.B. Max Mustermann">
             </div>
@@ -1712,6 +1727,8 @@
 
         // Create Guest
         async function createGuest() {
+            const title = document.getElementById('guestTitle').value;
+            const gender = document.getElementById('guestGender').value;
             const name = document.getElementById('guestName').value;
             const username = document.getElementById('guestUsername').value;
             const password = document.getElementById('guestPassword').value;
@@ -1739,7 +1756,7 @@
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${authToken}`
                     },
-                    body: JSON.stringify({ name, username, password, checkIn, checkOut, numberOfPersons, apartmentId })
+                    body: JSON.stringify({ title, gender, name, username, password, checkIn, checkOut, numberOfPersons, apartmentId })
                 });
 
                 const data = await response.json();
@@ -1772,6 +1789,8 @@
 
         // Update Guest
         async function updateGuest() {
+            const title = document.getElementById('guestTitle').value;
+            const gender = document.getElementById('guestGender').value;
             const name = document.getElementById('guestName').value;
             const username = document.getElementById('guestUsername').value;
             const password = document.getElementById('guestPassword').value;
@@ -1794,6 +1813,8 @@
 
             try {
                 const requestBody = {
+                    title,
+                    gender,
                     name,
                     username,
                     checkIn,
@@ -1875,6 +1896,8 @@
             document.getElementById('guestModal').classList.remove('active');
             editingGuestId = null;
             // Clear form
+            document.getElementById('guestTitle').value = '';
+            document.getElementById('guestGender').value = 'neutral';
             document.getElementById('guestName').value = '';
             document.getElementById('guestUsername').value = '';
             document.getElementById('guestPassword').value = '';
@@ -1915,6 +1938,8 @@
                 ).join('');
 
                 // Fill form with guest data
+                document.getElementById('guestTitle').value = guest.title || '';
+                document.getElementById('guestGender').value = guest.gender || 'neutral';
                 document.getElementById('guestName').value = guest.name;
                 document.getElementById('guestUsername').value = guest.username;
                 document.getElementById('guestPassword').value = ''; // Leave empty for security

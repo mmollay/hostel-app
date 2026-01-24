@@ -466,6 +466,8 @@ async function createGuest(request, env, corsHeaders) {
     checkOut,
     numberOfPersons,
     apartmentId,
+    title,
+    gender,
   } = body;
 
   // Validierung
@@ -502,6 +504,8 @@ async function createGuest(request, env, corsHeaders) {
     checkOut,
     numberOfPersons: numberOfPersons || 1,
     apartmentId: apartmentId || 1, // Default Apartment
+    title: title || "", // Titel (Dr., Prof., etc.)
+    gender: gender || "neutral", // weiblich, männlich, neutral
     createdAt: new Date().toISOString(),
   };
 
@@ -534,6 +538,8 @@ async function updateGuest(request, env, corsHeaders, id) {
     checkOut,
     numberOfPersons,
     apartmentId,
+    title,
+    gender,
   } = body;
 
   // Validierung (ohne Passwort, da optional)
@@ -582,6 +588,9 @@ async function updateGuest(request, env, corsHeaders, id) {
     checkOut,
     numberOfPersons: numberOfPersons || 1,
     apartmentId: apartmentId || 1,
+    title: title !== undefined ? title : guests[guestIndex].title || "",
+    gender:
+      gender !== undefined ? gender : guests[guestIndex].gender || "neutral",
     updatedAt: new Date().toISOString(),
   };
 
