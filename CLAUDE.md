@@ -27,6 +27,30 @@ Guest Portal für Hostel/Airbnb mit integriertem Energiemonitoring.
 | Dashboard | https://hostel.ssi.at |
 | API Worker | https://hostel-app-api.office-509.workers.dev |
 
+## Environment Variables (.env)
+
+**Zentrale Secrets-Verwaltung:** `.env` im Root-Verzeichnis
+
+| Variable | Zweck |
+|----------|-------|
+| `ADMIN_PASSWORD` | Admin-Login im Dashboard |
+| `SHELLY_AUTH_KEY` | Shelly Cloud API Authentication |
+| `SHELLY_DEVICE_ID` | Shelly Pro 3EM Device ID |
+| `SHELLY_CLOUD_SERVER` | Shelly Cloud Server URL |
+
+**WICHTIG:**
+- `.env` ist in `.gitignore` und wird NICHT committet
+- Template: `.env.example` (kann committet werden)
+- Für Claude: Secrets aus `.env` verwenden, NIEMALS hardcoden!
+
+**Worker Secrets aktualisieren:**
+```bash
+cd worker
+npx wrangler secret put ADMIN_PASSWORD
+npx wrangler secret put SHELLY_AUTH_KEY
+npx wrangler secret put SHELLY_DEVICE_ID
+```
+
 ## Häufige Aufgaben
 
 ### Dashboard deployen (Cloudflare Pages)

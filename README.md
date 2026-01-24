@@ -48,6 +48,37 @@ hostel-app/
 └── CLAUDE.md               # Projektanweisungen für Claude
 ```
 
+## Setup
+
+### 1. Environment Variables
+
+Alle sensiblen Daten werden in einer `.env`-Datei verwaltet:
+
+```bash
+# .env Datei aus Template erstellen
+cp .env.example .env
+
+# Erforderliche Werte eintragen:
+# - ADMIN_PASSWORD (für Admin-Login)
+# - SHELLY_AUTH_KEY (Shelly Cloud API)
+# - SHELLY_DEVICE_ID (Shelly Gerät)
+```
+
+**Wichtig:** Die `.env`-Datei ist in `.gitignore` und wird NICHT committet!
+
+### 2. Worker Secrets setzen
+
+Nach dem Ausfüllen der `.env`-Datei müssen die Secrets zum Cloudflare Worker hochgeladen werden:
+
+```bash
+cd worker
+
+# Secrets setzen (interaktiv)
+npx wrangler secret put ADMIN_PASSWORD
+npx wrangler secret put SHELLY_AUTH_KEY
+npx wrangler secret put SHELLY_DEVICE_ID
+```
+
 ## Deployment
 
 ### Dashboard (Cloudflare Pages)

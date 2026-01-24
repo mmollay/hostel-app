@@ -8,5 +8,10 @@ firebase-debug.log
 # OS files
 .DS_Store
 
+# Environment variables mit Secrets
+.env
+.env.local
+key
+
 # Local development secrets (falls jemand eine lokale config mit echten Keys hat)
 # config.local.js
