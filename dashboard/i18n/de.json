@@ -161,11 +161,12 @@
     }
   },
   "contact": {
-    "title": "Kontakt",
+    "title": "Kontakt & Hilfe",
     "subtitle": {
       "du": "Wir sind für dich da",
       "sie": "Wir sind für Sie da"
     },
+    "host": "Gastgeber",
     "phone": "Telefon",
     "email": "E-Mail",
     "address": "Adresse",

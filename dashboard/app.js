@@ -467,7 +467,8 @@ function updateUI(status) {
   // Letzte Aktualisierung
   const lastUpdateEl = document.getElementById("lastUpdate");
   if (lastUpdateEl) {
-    lastUpdateEl.textContent = new Date().toLocaleTimeString("de-DE");
+    const locale = (typeof I18N !== 'undefined' && I18N.currentLang === 'en') ? 'en-GB' : 'de-DE';
+    lastUpdateEl.textContent = new Date().toLocaleTimeString(locale);
   }
 
   saveData();
@@ -797,20 +798,22 @@ function updateGreeting() {
   if (!greetingEl || !messageEl) return;
 
   const hour = new Date().getHours();
-  let timeGreeting = "Guten Tag";
-  let greetingIcon = "sun"; // Default icon
+  let timeGreeting, greetingIcon;
+
+  // Use i18n if available, otherwise fallback to German
+  const useI18n = typeof I18N !== 'undefined' && I18N.translations?.welcome?.greeting;
 
   if (hour >= 5 && hour < 12) {
-    timeGreeting = "Guten Morgen";
+    timeGreeting = useI18n ? I18N.t('welcome.greeting.morning') : "Guten Morgen";
     greetingIcon = "sunrise";
   } else if (hour >= 12 && hour < 18) {
-    timeGreeting = "Guten Tag";
+    timeGreeting = useI18n ? I18N.t('welcome.greeting.day') : "Guten Tag";
     greetingIcon = "sun";
   } else if (hour >= 18 && hour < 22) {
-    timeGreeting = "Guten Abend";
+    timeGreeting = useI18n ? I18N.t('welcome.greeting.evening') : "Guten Abend";
     greetingIcon = "sunset";
   } else {
-    timeGreeting = "Gute Nacht";
+    timeGreeting = useI18n ? I18N.t('welcome.greeting.night') : "Gute Nacht";
     greetingIcon = "moon";
   }
 
@@ -870,6 +873,7 @@ function updateGreeting() {
 
 /**
  * Aktualisiert alle Du/Sie-Texte basierend auf formalAddress
+ * Uses i18n when available, otherwise falls back to TEXT_VARIANTS
  */
 function updateFormalAddressTexts() {
   const elements = {
@@ -882,7 +886,17 @@ function updateFormalAddressTexts() {
     loginInstruction: document.getElementById("loginInstruction"),
   };
 
-  // Aktualisiere alle Texte basierend auf formalAddress
+  // If i18n is available and loaded, let it handle the translations
+  // Only use TEXT_VARIANTS as fallback for German or when i18n is not available
+  const useI18n = typeof I18N !== 'undefined' && I18N.translations && Object.keys(I18N.translations).length > 0;
+  
+  if (useI18n) {
+    // i18n handles these via data-i18n attributes, so just trigger a re-apply
+    I18N.applyTranslations();
+    return;
+  }
+
+  // Fallback: Aktualisiere alle Texte basierend auf formalAddress
   Object.keys(elements).forEach((key) => {
     if (elements[key] && TEXT_VARIANTS[key]) {
       elements[key].textContent = TEXT_VARIANTS[key][formalAddress];

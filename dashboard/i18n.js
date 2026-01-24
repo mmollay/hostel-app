@@ -39,14 +39,19 @@ const I18N = {
   },
 
   /**
-   * Detect language from URL path
+   * Detect language from URL path or query parameter
    * /en/ → English
+   * ?lang=en → English
    * / → German (default)
    */
   detectLanguage() {
     const path = window.location.pathname;
+    const params = new URLSearchParams(window.location.search);
+    const langParam = params.get('lang');
     
-    if (path.startsWith('/en/') || path === '/en') {
+    if (langParam && this.languages.includes(langParam)) {
+      this.currentLang = langParam;
+    } else if (path.startsWith('/en/') || path === '/en') {
       this.currentLang = 'en';
     } else {
       this.currentLang = 'de';
@@ -65,9 +70,8 @@ const I18N = {
    */
   async loadTranslations() {
     try {
-      // Determine base path (handle /en/ subfolder)
-      const basePath = this.currentLang === 'en' ? '..' : '.';
-      const response = await fetch(`${basePath}/i18n/${this.currentLang}.json`);
+      // Always use absolute path for consistency
+      const response = await fetch(`/i18n/${this.currentLang}.json`);
       
       if (!response.ok) {
         throw new Error(`Failed to load ${this.currentLang}.json`);
