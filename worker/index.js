@@ -990,14 +990,14 @@ async function updateHostelSettings(request, env, corsHeaders) {
 
   const body = await request.json();
 
-  // Name und Location separat extrahieren
+  // Name separat extrahieren
   const name = body.name || "Hostel Hollenthon";
-  const location = body.location || "Hollenthon am Waldrand";
 
-  // Restliche Settings als JSON
+  // Settings als JSON (inkl. Adresse)
   const settingsObj = {
     phone: body.phone || "",
     email: body.email || "",
+    address: body.address || "",
     checkInTime: body.checkInTime || "15:00",
     checkOutTime: body.checkOutTime || "11:00",
     formalAddress: body.formalAddress || "du",
@@ -1011,13 +1011,13 @@ async function updateHostelSettings(request, env, corsHeaders) {
 
   const settings_json = JSON.stringify(settingsObj);
 
-  // Update in DB
+  // Update in DB (location Spalte wird nicht mehr verwendet)
   await env.DB.prepare(
     `UPDATE hostels
-     SET name = ?, location = ?, settings_json = ?
+     SET name = ?, settings_json = ?
      WHERE id = ?`,
   )
-    .bind(name, location, settings_json, HOSTEL_ID)
+    .bind(name, settings_json, HOSTEL_ID)
     .run();
 
   return new Response(JSON.stringify({ success: true }), {
