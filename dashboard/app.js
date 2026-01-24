@@ -1312,9 +1312,35 @@ async function fetchNearbyPlaces() {
     const allPlaces = results.flatMap((r) => r.results || []);
 
     // Nur gute Bewertungen filtern (oder Orte ohne Rating behalten)
-    const filteredPlaces = allPlaces.filter(
-      (p) => !p.rating || p.rating >= 3.5,
-    );
+    let filteredPlaces = allPlaces.filter((p) => !p.rating || p.rating >= 3.5);
+
+    // SPEZIALFILTER für Thermen: Nur echte Thermal-Bäder, keine Massage/Kosmetik Studios
+    if (currentCategory === "spa") {
+      const thermalKeywords = [
+        "therme",
+        "thermal",
+        "thermalbad",
+        "heilbad",
+        "kurbad",
+        "wellnesshotel",
+        "kurhotel",
+        "gesundheitszentrum",
+        "erholungszentrum",
+        "freibad", // Freibäder auch OK
+      ];
+
+      // Zusätzlich: Hotels/Grandhotels die "spa" im Namen haben
+      const hotelSpaPattern = /(hotel|grandhotel).*spa|spa.*(hotel|grandhotel)/;
+
+      filteredPlaces = filteredPlaces.filter((p) => {
+        const name = p.name.toLowerCase();
+        // Prüfe Keywords ODER Hotel+Spa Kombination
+        return (
+          thermalKeywords.some((keyword) => name.includes(keyword)) ||
+          hotelSpaPattern.test(name)
+        );
+      });
+    }
 
     if (filteredPlaces.length === 0) {
       showRecommendationsError(
