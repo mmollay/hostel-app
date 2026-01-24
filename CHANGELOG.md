@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-01-24
+
+### Added
+- **WYSIWYG Inline-Editor**: Edit content directly on the page after admin login
+  - Modal-based editors with structured input fields
+  - Security-first: DOM methods only, no innerHTML, XSS-sanitized
+  - SSI footer protected from editing
+  - Content blocks stored in `page_content` database table
+- **Auto-Refresh**: Energy data refreshes automatically every 5 minutes
+- **Real-time Data**: Force `cache: no-store` on all API requests - always fresh data
+- **Version Display**: Version number (v0.3.0) visible in footer and admin header
+- **Admin Navigation**: Back button ("Zurück zu Gast auf Erden") in admin area
+  - Green button top-left, logout button top-right
+- **Database Schema**:
+  - `apartments` table (multi-apartment support)
+  - `page_content` table (inline editor storage)
+
+### Fixed
+- **Service Worker**: Prevented POST request caching errors
+- **Google Recommendations**: Show places without rating to fix "Keine Empfehlungen" issue
+- **Admin Buttons**: Fixed CSS conflicts causing button overlap
+- **Cache Issues**: Added cache-busting headers for accurate energy readings
+
+### Changed
+- **"In Entstehung" hidden**: Coming Soon section temporarily disabled for clean rollout
+- **Service Worker**: Updated cache version to v5, added inline-editor.js to cache
+
+### Technical
+- Content Management API: GET/POST/PUT/DELETE `/content/:hostelId/:blockKey`
+- XSS sanitization in Worker before database storage
+- Hybrid rendering: DB content + hardcoded HTML fallback
+- Zero-downtime migration strategy
+
 ## [0.2.0] - 2026-01-24
 
 ### Added
