@@ -88,6 +88,9 @@ async function init() {
   updateGreeting();
   setInterval(updateGreeting, 60000); // Aktualisiere Begrüßung jede Minute
 
+  // Auto-Refresh: Daten alle 5 Minuten komplett neu laden (gegen Cache)
+  startAutoRefresh();
+
   // Hostel-Info laden (Kontakt, Bankdaten)
   if (guestToken) {
     await loadHostelInfo();
@@ -111,8 +114,20 @@ async function init() {
  */
 async function loadEnergyFromDB() {
   try {
+    // WICHTIG: cache: 'no-store' = IMMER frische Daten vom Server!
+    const fetchOptions = {
+      cache: "no-store",
+      headers: {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+      },
+    };
+
     // Heutige Daten
-    const todayRes = await fetch(`${CONFIG.API_PROXY_URL}/energy/today`);
+    const todayRes = await fetch(
+      `${CONFIG.API_PROXY_URL}/energy/today`,
+      fetchOptions,
+    );
     const todayData = await todayRes.json();
     if (todayData.success) {
       energyData.todayEnergy = todayData.data.energy_kwh || 0;
@@ -123,6 +138,7 @@ async function loadEnergyFromDB() {
     // Gestrige Daten
     const yesterdayRes = await fetch(
       `${CONFIG.API_PROXY_URL}/energy/yesterday`,
+      fetchOptions,
     );
     const yesterdayData = await yesterdayRes.json();
     if (yesterdayData.success) {
@@ -130,7 +146,10 @@ async function loadEnergyFromDB() {
     }
 
     // Monatsdaten
-    const monthRes = await fetch(`${CONFIG.API_PROXY_URL}/energy/month`);
+    const monthRes = await fetch(
+      `${CONFIG.API_PROXY_URL}/energy/month`,
+      fetchOptions,
+    );
     const monthData = await monthRes.json();
     if (monthData.success) {
       // Sicherstellen dass es eine Zahl ist, nicht null/undefined
@@ -141,6 +160,30 @@ async function loadEnergyFromDB() {
   } catch (e) {
     console.error("Fehler beim Laden aus DB:", e);
   }
+}
+
+/**
+ * Auto-Refresh: Daten alle 5 Minuten neu laden
+ */
+function startAutoRefresh() {
+  // Alle 5 Minuten (300000ms) Daten neu laden
+  setInterval(async () => {
+    console.log("[Auto-Refresh] Lade Energiedaten neu...");
+
+    try {
+      // Hauptdaten neu laden
+      await fetchData();
+
+      // DB-Daten neu laden (Heute, Gestern, Monat)
+      await loadEnergyFromDB();
+
+      console.log("[Auto-Refresh] Daten erfolgreich aktualisiert");
+    } catch (error) {
+      console.error("[Auto-Refresh] Fehler beim Aktualisieren:", error);
+    }
+  }, 300000); // 5 Minuten = 300000ms
+
+  console.log("[Auto-Refresh] Aktiviert (alle 5 Minuten)");
 }
 
 /**
@@ -228,7 +271,14 @@ function scheduleDailyReset() {
  */
 async function fetchData() {
   try {
-    const response = await fetch(CONFIG.API_PROXY_URL);
+    // WICHTIG: Immer frische Daten vom Server (kein Cache!)
+    const response = await fetch(CONFIG.API_PROXY_URL, {
+      cache: "no-store",
+      headers: {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+      },
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
