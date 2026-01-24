@@ -12,6 +12,10 @@ firebase-debug.log
 .env
 .env.local
 key
+worker/.dev.vars
+
+# Backup files
+*.backup
 
 # Local development secrets (falls jemand eine lokale config mit echten Keys hat)
 # config.local.js
