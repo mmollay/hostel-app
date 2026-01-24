@@ -1332,8 +1332,16 @@ async function fetchNearbyPlaces() {
     );
 
     if (filteredPlaces.length === 0) {
+      const categoryName =
+        currentCategory === "spa"
+          ? "Thermen"
+          : currentCategory === "restaurant"
+            ? "Restaurants"
+            : currentCategory === "tourist_attraction"
+              ? "Sehenswürdigkeiten"
+              : "Empfehlungen";
       showRecommendationsError(
-        "Keine Empfehlungen gefunden. Versuche einen größeren Umkreis.",
+        `Keine ${categoryName} mit guter Bewertung gefunden. API lieferte ${allPlaces.length} Ergebnisse, Rating-Filter entfernte ${allPlaces.length - filteredPlaces.length}.`,
       );
       return;
     }
@@ -1355,8 +1363,16 @@ async function fetchNearbyPlaces() {
     console.log("[Recommendations] Final sorted places:", sortedPlaces.length);
 
     if (sortedPlaces.length === 0) {
+      const categoryName =
+        currentCategory === "spa"
+          ? "Thermen"
+          : currentCategory === "restaurant"
+            ? "Restaurants"
+            : currentCategory === "tourist_attraction"
+              ? "Sehenswürdigkeiten"
+              : "Empfehlungen";
       showRecommendationsError(
-        "Keine Empfehlungen gefunden. Versuche einen größeren Umkreis.",
+        `${filteredPlaces.length} ${categoryName} gefunden, aber KEINE Distanz berechnet! Prüfe Console-Log (F12) für Details. Dies ist ein BUG.`,
       );
       return;
     }
