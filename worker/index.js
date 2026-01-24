@@ -1060,6 +1060,7 @@ async function getPublicHostelInfo(env, corsHeaders) {
     location: hostel.location,
     phone: settings.phone || "",
     email: settings.email || "",
+    address: settings.address || "",
     checkInTime: settings.checkInTime || "15:00",
     checkOutTime: settings.checkOutTime || "11:00",
     formalAddress: settings.formalAddress || "du",
