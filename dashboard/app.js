@@ -863,6 +863,16 @@ function updateGreeting() {
       stayMessage = TEXT_VARIANTS.daysRemaining[formalAddress](daysRemaining);
     }
 
+    // Use i18n for stay messages if available
+    if (useI18n) {
+      if (daysRemaining === 1) {
+        stayMessage = I18N.t('welcome.lastDay');
+      } else if (daysRemaining > 1) {
+        stayMessage = I18N.t('welcome.daysRemaining', { days: daysRemaining });
+      } else {
+        stayMessage = I18N.t('welcome.stay');
+      }
+    }
     messageEl.textContent = stayMessage;
   } else {
     // Nicht eingeloggt
@@ -875,7 +885,10 @@ function updateGreeting() {
     const textNode = document.createTextNode(`${timeGreeting}!`);
     greetingEl.appendChild(textNode);
     lucide.createIcons();
-    messageEl.textContent = TEXT_VARIANTS.welcome[formalAddress];
+    
+    // Use i18n for welcome message if available
+    const welcomeMessage = useI18n ? I18N.t('welcome.message') : TEXT_VARIANTS.welcome[formalAddress];
+    messageEl.textContent = welcomeMessage;
   }
 }
 

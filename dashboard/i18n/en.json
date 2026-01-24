@@ -32,10 +32,12 @@
   "about": {
     "title": "About This Place",
     "subtitle": "Where magic and nature unite",
+    "intro": "Here, at the edge of the forest, a special place has unfolded – a place to pause, to recharge, and to find yourself again. The ancient trees whisper their stories, the fire pit invites you to quiet moments under the starry sky.",
     "fireplace": "🔥 The Fire Pit",
-    "fireplaceText": "Here you can find peace, share stories, and listen to the crackling of the fire.",
+    "fireplaceText": "Here you can find peace, watch the flames, and simply be. A place of warmth and comfort.",
     "forest": "🌲 The Forest",
-    "forestText": "Right next to us, nature stretches out in its purest form – ideal for walks, meditation, or quiet observation.",
+    "forestText": "Right next to us, nature stretches out in all its power. Let yourself be invited to walks that clear the mind and open the heart.",
+    "outro": "This place is more than just a place to stay – it's an invitation to reconnect with yourself and nature.",
     "welcome": "Welcome, Guest on Earth."
   },
   "info": {
