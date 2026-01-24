@@ -1788,7 +1788,6 @@ async function loadHostelInfo() {
 
     if (data.success && data.info) {
       const info = data.info;
-      console.log('[HostelInfo] Loaded:', JSON.stringify({website: info.website, tagline: info.tagline, name: info.name, hostName: info.hostName}));
 
       // Website/Domain im Title anzeigen
       if (info.website) {
@@ -1799,14 +1798,12 @@ async function loadHostelInfo() {
       // Tagline/Subtitle anzeigen (i18n-aware)
       const currentLang = (typeof I18N !== 'undefined' && I18N.currentLang) || 'de';
       const tagline = currentLang === 'en' && info.tagline_en ? info.tagline_en : info.tagline;
-      console.log('[HostelInfo] Tagline:', tagline, 'Name:', info.name);
       if (tagline) {
         const subtitleEl = document.querySelector(".subtitle");
         if (subtitleEl) {
-          // Format: "Tagline • Location"
+          // Format: "Tagline • Name"
           const locationPart = info.name || 'Hollenthon';
           subtitleEl.textContent = `${tagline} • ${locationPart}`;
-          console.log('[HostelInfo] Subtitle set to:', subtitleEl.textContent);
         }
       }
 
