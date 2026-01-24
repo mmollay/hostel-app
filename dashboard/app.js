@@ -1172,8 +1172,12 @@ async function fetchNearbyPlaces() {
     // Alle Results zusammenführen
     const allPlaces = results.flatMap((r) => r.results || []);
 
-    // Nur gute Bewertungen filtern
-    const filteredPlaces = allPlaces.filter((p) => p.rating >= 3.5);
+    console.log("[Recommendations] API returned", allPlaces.length, "places");
+
+    // Nur gute Bewertungen filtern (oder Orte ohne Rating behalten)
+    const filteredPlaces = allPlaces.filter(
+      (p) => !p.rating || p.rating >= 3.5,
+    );
 
     if (filteredPlaces.length === 0) {
       showRecommendationsError(
