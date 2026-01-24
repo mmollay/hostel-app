@@ -1800,39 +1800,52 @@
         // Load Energy Data
         async function loadEnergyData() {
             try {
-                const response = await fetch(`${API_URL}/`, {
+                // Get current power from Shelly API
+                const shellyResponse = await fetch(`${API_URL}/`, {
                     cache: 'no-store',
                     headers: {
                         'Cache-Control': 'no-cache, no-store, must-revalidate',
                         'Pragma': 'no-cache'
                     }
                 });
-                const data = await response.json();
+                const shellyData = await shellyResponse.json();
 
-                if (data.data && data.data.device_status && data.data.device_status["em:0"]) {
-                    const status = data.data.device_status["em:0"];
-                    const settings = data.settings || {};
+                // Get 24h consumption from D1 Database
+                const dbResponse = await fetch(`${API_URL}/energy/today`, {
+                    cache: 'no-store',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache'
+                    }
+                });
+                const dbData = await dbResponse.json();
 
-                    // Current Power - FIXED: Access em:0 object
+                // Current Power from Shelly
+                if (shellyData.data && shellyData.data.device_status && shellyData.data.device_status["em:0"]) {
+                    const status = shellyData.data.device_status["em:0"];
                     const totalPower = status.total_act_power || 0;
                     document.getElementById('currentPower').textContent = Math.abs(Math.round(totalPower));
+                }
 
-                    // 24h Energy - FIXED: Access em:0 object
-                    const energy24h = (status.total_act || 0) / 1000;
+                // 24h Energy from D1 Database
+                if (dbData.energy !== undefined) {
+                    const energy24h = dbData.energy / 1000; // Wh → kWh
                     document.getElementById('energy24h').textContent = energy24h.toFixed(2);
 
                     // 24h Cost
+                    const settings = shellyData.settings || {};
                     const pricePerKwh = settings.pricePerKwh || 0.29;
                     const cost24h = energy24h * pricePerKwh;
                     document.getElementById('cost24h').textContent = cost24h.toFixed(2);
 
                     console.log('[Admin] Energy data loaded:', {
-                        power: totalPower,
+                        power: shellyData.data?.device_status?.["em:0"]?.total_act_power || 0,
                         energy24h: energy24h,
-                        cost24h: cost24h
+                        cost24h: cost24h,
+                        source: 'D1 Database'
                     });
                 } else {
-                    console.error('[Admin] Invalid API response structure:', data);
+                    console.error('[Admin] No energy data in D1:', dbData);
                 }
             } catch (error) {
                 console.error('[Admin] Error loading energy data:', error);
