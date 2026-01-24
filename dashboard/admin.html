@@ -1162,7 +1162,7 @@
         <div class="header-content">
             <img src="logo-neu.png" alt="Logo" class="header-logo">
             <h1>Admin-Bereich</h1>
-            <p class="subtitle">Gast auf Erden</p>
+            <p class="subtitle">Gast auf Erden <span style="opacity: 0.6; font-size: 0.9rem;" id="adminVersion">• v1.0.0</span></p>
         </div>
     </header>
 
@@ -1455,8 +1455,15 @@
 
     </main>
 
+    <script src="config.js"></script>
     <script>
-        const API_URL = 'https://hostel-app-api.office-509.workers.dev';
+        const API_URL = CONFIG.API_PROXY_URL || 'https://hostel-app-api.office-509.workers.dev';
+
+        // Display version from config
+        if (CONFIG.VERSION) {
+            const versionEl = document.getElementById('adminVersion');
+            if (versionEl) versionEl.textContent = '• ' + CONFIG.VERSION;
+        }
         const KURTAXE_PER_PERSON_DAY = 2.50;
         const ADMIN_TOKEN_KEY = 'hostel_admin_token';
         let authToken = null;
