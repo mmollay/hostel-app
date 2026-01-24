@@ -1,0 +1,220 @@
+{
+  "meta": {
+    "title": "Gast auf Erden | Spiritueller Rückzugsort am Waldrand",
+    "description": "Ein magischer Ort zum Sein. Tiny Haus mit Höhle, Feuerstelle, Wald – Spiritueller Rückzugsort für Lebenstraining und tiefe Entspannung."
+  },
+  "header": {
+    "title": "gastauferden.at",
+    "subtitle": "Ein magischer Ort zum Sein • Hollenthon",
+    "login": "Anmelden",
+    "logout": "Abmelden",
+    "offline": "Offline",
+    "online": "Online",
+    "weather": "Wetter",
+    "recommendations": "Empfehlungen",
+    "energy": "Energie",
+    "wifi": "WiFi"
+  },
+  "welcome": {
+    "greeting": {
+      "morning": "Guten Morgen",
+      "day": "Guten Tag",
+      "evening": "Guten Abend",
+      "night": "Gute Nacht"
+    },
+    "default": "Herzlich Willkommen!",
+    "message": {
+      "du": "Willkommen an diesem magischen Ort. Bitte melde dich an, um deine persönliche Reise zu beginnen.",
+      "sie": "Willkommen an diesem magischen Ort. Bitte melden Sie sich an, um Ihre persönliche Reise zu beginnen."
+    },
+    "enjoy": {
+      "du": "Genieße jeden Moment!",
+      "sie": "Genießen Sie jeden Moment!"
+    },
+    "daysRemaining": {
+      "du": "Noch {days} Tag(e) bis zum Abschied. Lass dich verzaubern!",
+      "sie": "Noch {days} Tag(e) bis zum Abschied. Lassen Sie sich verzaubern!"
+    },
+    "lastDay": {
+      "du": "Morgen beginnt ein neuer Weg. Wir hoffen, dieser Ort hat dich berührt.",
+      "sie": "Morgen beginnt ein neuer Weg. Wir hoffen, dieser Ort hat Sie berührt."
+    },
+    "stay": {
+      "du": "Möge dieser Ort Kraft geben und Ruhe schenken.",
+      "sie": "Möge dieser Ort Kraft geben und Ruhe schenken."
+    }
+  },
+  "about": {
+    "title": "Über diesen Ort",
+    "subtitle": "Wo Magie und Natur sich vereinen",
+    "fireplace": "🔥 Die Feuerstelle",
+    "fireplaceText": "Hier kannst du zur Ruhe kommen, Geschichten teilen und dem Knistern des Feuers lauschen.",
+    "forest": "🌲 Der Wald",
+    "forestText": "Direkt neben uns erstreckt sich die Natur in ihrer reinsten Form – ideal für Spaziergänge, Meditation oder stilles Beobachten.",
+    "welcome": "Willkommen, Gast auf Erden."
+  },
+  "info": {
+    "title": "Wichtige Infos",
+    "subtitle": "Alles auf einen Blick",
+    "checkIn": "Check-in",
+    "checkInTime": "ab 15:00",
+    "checkOut": "Check-out",
+    "checkOutTime": "bis 11:00",
+    "wifi": "WLAN",
+    "wifiCode": "WLAN-Code",
+    "keys": "Schlüssel",
+    "keysValue": "Schlüsselbox",
+    "pets": "Haustiere",
+    "petsValue": "Erlaubt",
+    "smoking": "Rauchen",
+    "smokingValue": "Verboten",
+    "parking": "Parken",
+    "parkingValue": "Kostenlos"
+  },
+  "amenities": {
+    "title": "Annehmlichkeiten",
+    "subtitle": {
+      "du": "Für deinen Komfort",
+      "sie": "Für Ihren Komfort"
+    }
+  },
+  "comingSoon": {
+    "title": "In Entstehung",
+    "subtitle": "Zauberhafte Projekte erwachen zum Leben",
+    "tinyHouse": {
+      "title": "Tiny Haus mit Höhle",
+      "description": "Ein magischer Rückzugsort in der Natur – derzeit im Bau. Hier verbinden sich Geborgenheit und Erdverbundenheit.",
+      "status": "🔨 Im Bau"
+    },
+    "sauna": {
+      "title": "Sauna",
+      "description": {
+        "du": "Tiefe Entspannung und Reinigung für Körper und Seele. Bald kannst du hier zur Ruhe kommen.",
+        "sie": "Tiefe Entspannung und Reinigung für Körper und Seele. Bald können Sie hier zur Ruhe kommen."
+      },
+      "status": "✨ Coming Soon"
+    },
+    "hotTub": {
+      "title": "Hot Tub",
+      "description": "Unter freiem Himmel im warmen Wasser verweilen und die Sterne beobachten – pure Magie.",
+      "status": "✨ Coming Soon"
+    },
+    "lifeTraining": {
+      "title": "Lebenstraining",
+      "description": "Persönliche Begleitung auf deinem Weg. Finde zu dir selbst, gewinne Klarheit und innere Stärke.",
+      "status": "🌟 Verfügbar"
+    }
+  },
+  "energy": {
+    "title": "Energieverbrauch",
+    "subtitle": "Live-Anzeige",
+    "current": "Aktueller Verbrauch",
+    "feeding": "Einspeisung ins Netz",
+    "today": "Heute",
+    "yesterday": "Gestern",
+    "thisMonth": "Dieser Monat",
+    "watt": "Watt",
+    "kwh": "kWh"
+  },
+  "weather": {
+    "title": "Wetter in Hollenthon",
+    "subtitle": "Aktuelle Bedingungen",
+    "loading": "Wird geladen...",
+    "humidity": "Luftfeuchtigkeit",
+    "wind": "Wind",
+    "forecast": "5-Tage Vorhersage",
+    "days": {
+      "mo": "Mo",
+      "di": "Di",
+      "mi": "Mi",
+      "do": "Do",
+      "fr": "Fr",
+      "sa": "Sa",
+      "so": "So"
+    }
+  },
+  "wifi": {
+    "title": "WLAN-Verbindung",
+    "subtitle": "Schnell & einfach verbinden",
+    "scanQr": {
+      "du": "Scanne den QR-Code mit deiner Kamera, um dich automatisch zu verbinden.",
+      "sie": "Scannen Sie den QR-Code mit Ihrer Kamera, um sich automatisch zu verbinden."
+    },
+    "network": "Netzwerk",
+    "password": "Passwort"
+  },
+  "recommendations": {
+    "title": "Empfehlungen",
+    "subtitle": "In der Umgebung",
+    "radius": "Umkreis",
+    "km": "km",
+    "open": "Geöffnet",
+    "closed": "Geschlossen",
+    "openMaps": "In Maps öffnen",
+    "call": "Anrufen",
+    "categories": {
+      "restaurant": "Restaurants",
+      "supermarket": "Supermärkte",
+      "pharmacy": "Apotheken",
+      "gasStation": "Tankstellen",
+      "hiking": "Wanderwege"
+    }
+  },
+  "contact": {
+    "title": "Kontakt",
+    "subtitle": {
+      "du": "Wir sind für dich da",
+      "sie": "Wir sind für Sie da"
+    },
+    "phone": "Telefon",
+    "email": "E-Mail",
+    "address": "Adresse",
+    "emergency": "Notfall"
+  },
+  "transparency": {
+    "title": "Transparenz",
+    "subtitle": {
+      "du": "Für deine Unterlagen",
+      "sie": "Für Ihre Unterlagen"
+    },
+    "text": {
+      "du": "Im Rahmen deines Aufenthalts können Kurtaxe und Energiekosten anfallen. Für deine Unterlagen und vollständige Transparenz findest du hier die Kontodaten:",
+      "sie": "Im Rahmen Ihres Aufenthalts können Kurtaxe und Energiekosten anfallen. Für Ihre Unterlagen und vollständige Transparenz finden Sie hier die Kontodaten:"
+    },
+    "bankDetails": "Bankverbindung",
+    "iban": "IBAN",
+    "bic": "BIC",
+    "accountHolder": "Kontoinhaber",
+    "reference": "Verwendungszweck",
+    "copy": "Kopieren",
+    "copied": "Kopiert!"
+  },
+  "login": {
+    "title": "Gast-Login",
+    "instruction": {
+      "du": "Gib deine Zugangsdaten ein, die du bei der Buchung erhalten hast.",
+      "sie": "Geben Sie Ihre Zugangsdaten ein, die Sie bei der Buchung erhalten haben."
+    },
+    "code": "Zugangscode",
+    "codePlaceholder": "z.B. GAST-2024-001",
+    "submit": "Anmelden",
+    "cancel": "Abbrechen",
+    "error": "Ungültiger Zugangscode",
+    "success": "Erfolgreich angemeldet!"
+  },
+  "footer": {
+    "madeWith": "Made with",
+    "imprint": "Impressum",
+    "privacy": "Datenschutz",
+    "contact": "Kontakt"
+  },
+  "common": {
+    "loading": "Laden...",
+    "error": "Fehler",
+    "close": "Schließen",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "yes": "Ja",
+    "no": "Nein"
+  }
+}

@@ -1519,6 +1519,36 @@
         [data-ssi-protected]::after {
             display: none !important;
         }
+
+        /* Language Switcher */
+        .language-switcher {
+            display: flex;
+            gap: 4px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            padding: 4px;
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            opacity: 0.7;
+        }
+
+        .lang-btn:hover {
+            opacity: 1;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .lang-btn.active {
+            opacity: 1;
+            background: rgba(255,255,255,0.25);
+        }
     </style>
 </head>
 <body>
@@ -1527,36 +1557,36 @@
         <div class="header-actions">
             <button class="status-btn offline" id="statusBtn" title="Verbindungsstatus">
                 <span class="status-dot error"></span>
-                <span id="statusText">Offline</span>
+                <span id="statusText" data-i18n="header.offline">Offline</span>
             </button>
             <button class="guest-login-btn" id="guestLoginBtn">
                 <i data-lucide="user"></i>
-                <span>Anmelden</span>
+                <span data-i18n="header.login">Anmelden</span>
             </button>
         </div>
         <div class="header-content">
             <img src="logo-neu.png" alt="Logo" class="header-logo">
-            <h1 id="mainTitle">gastauferden.at</h1>
-            <p class="subtitle">Ein magischer Ort zum Sein • Hollenthon</p>
+            <h1 id="mainTitle" data-i18n="header.title">gastauferden.at</h1>
+            <p class="subtitle" data-i18n="header.subtitle">Ein magischer Ort zum Sein • Hollenthon</p>
         </div>
 
         <!-- Quick Navigation (nur für eingeloggte Gäste) -->
         <div class="quick-nav" id="quickNav" style="display: none;">
             <button class="quick-nav-btn" onclick="scrollToSection('weatherCard')" title="Zum Wetter">
                 <i data-lucide="cloud-sun"></i>
-                <span>Wetter</span>
+                <span data-i18n="header.weather">Wetter</span>
             </button>
             <button class="quick-nav-btn" onclick="scrollToSection('recommendationsCard')" title="Zu Empfehlungen">
                 <i data-lucide="map-pin"></i>
-                <span>Empfehlungen</span>
+                <span data-i18n="header.recommendations">Empfehlungen</span>
             </button>
             <button class="quick-nav-btn" onclick="scrollToSection('energyCard')" title="Zur Energie">
                 <i data-lucide="zap"></i>
-                <span>Energie</span>
+                <span data-i18n="header.energy">Energie</span>
             </button>
             <button class="quick-nav-btn" onclick="scrollToSection('wifiCard')" title="Zum WiFi">
                 <i data-lucide="wifi"></i>
-                <span>WiFi</span>
+                <span data-i18n="header.wifi">WiFi</span>
             </button>
         </div>
     </header>
@@ -1566,7 +1596,7 @@
         <div id="dashboard">
             <!-- Welcome Card -->
             <div class="card welcome-card" data-editable="welcome-main">
-                <h2 class="greeting" id="greeting">Herzlich Willkommen!</h2>
+                <h2 class="greeting" id="greeting" data-i18n="welcome.default">Herzlich Willkommen!</h2>
                 <p class="message" id="welcomeMessage">
                     An diesem magischen Ort, wo Wald und Himmel sich berühren, laden wir dich ein,
                     Ruhe zu finden und bei dir anzukommen. Nimm dir Zeit zum Sein.
@@ -1614,50 +1644,50 @@
                 <div class="card-header">
                     <div class="card-icon"><i data-lucide="info"></i></div>
                     <div>
-                        <h3 class="card-title">Wichtige Infos</h3>
-                        <p class="card-subtitle">Alles auf einen Blick</p>
+                        <h3 class="card-title" data-i18n="info.title">Wichtige Infos</h3>
+                        <p class="card-subtitle" data-i18n="info.subtitle">Alles auf einen Blick</p>
                     </div>
                 </div>
                 <div class="info-grid">
                     <div class="info-item">
                         <span class="icon"><i data-lucide="log-in"></i></span>
-                        <div class="label">Check-in</div>
-                        <div class="value">ab 15:00</div>
+                        <div class="label" data-i18n="info.checkIn">Check-in</div>
+                        <div class="value" data-i18n="info.checkInTime">ab 15:00</div>
                     </div>
                     <div class="info-item">
                         <span class="icon"><i data-lucide="log-out"></i></span>
-                        <div class="label">Check-out</div>
-                        <div class="value">bis 11:00</div>
+                        <div class="label" data-i18n="info.checkOut">Check-out</div>
+                        <div class="value" data-i18n="info.checkOutTime">bis 11:00</div>
                     </div>
                     <div class="info-item" id="wifiInfoName" style="display: none;">
                         <span class="icon"><i data-lucide="wifi"></i></span>
-                        <div class="label">WLAN</div>
+                        <div class="label" data-i18n="info.wifi">WLAN</div>
                         <div class="value">Hostel Power</div>
                     </div>
                     <div class="info-item" id="wifiInfoPassword" style="display: none;">
                         <span class="icon"><i data-lucide="lock"></i></span>
-                        <div class="label">WLAN-Code</div>
+                        <div class="label" data-i18n="info.wifiCode">WLAN-Code</div>
                         <div class="value">hostl21</div>
                     </div>
                     <div class="info-item">
                         <span class="icon"><i data-lucide="key"></i></span>
-                        <div class="label">Schlüssel</div>
-                        <div class="value">Schlüsselbox</div>
+                        <div class="label" data-i18n="info.keys">Schlüssel</div>
+                        <div class="value" data-i18n="info.keysValue">Schlüsselbox</div>
                     </div>
                     <div class="info-item">
                         <span class="icon"><i data-lucide="heart"></i></span>
-                        <div class="label">Haustiere</div>
-                        <div class="value">Erlaubt</div>
+                        <div class="label" data-i18n="info.pets">Haustiere</div>
+                        <div class="value" data-i18n="info.petsValue">Erlaubt</div>
                     </div>
                     <div class="info-item">
                         <span class="icon"><i data-lucide="cigarette-off"></i></span>
-                        <div class="label">Rauchen</div>
-                        <div class="value">Verboten</div>
+                        <div class="label" data-i18n="info.smoking">Rauchen</div>
+                        <div class="value" data-i18n="info.smokingValue">Verboten</div>
                     </div>
                     <div class="info-item">
                         <span class="icon"><i data-lucide="car"></i></span>
-                        <div class="label">Parken</div>
-                        <div class="value">Kostenlos</div>
+                        <div class="label" data-i18n="info.parking">Parken</div>
+                        <div class="value" data-i18n="info.parkingValue">Kostenlos</div>
                     </div>
                 </div>
             </div>
@@ -1667,8 +1697,8 @@
                 <div class="card-header">
                     <div class="card-icon"><i data-lucide="sparkles"></i></div>
                     <div>
-                        <h3 class="card-title">Annehmlichkeiten</h3>
-                        <p class="card-subtitle" id="amenitiesSubtitle">Für Ihren Komfort</p>
+                        <h3 class="card-title" data-i18n="amenities.title">Annehmlichkeiten</h3>
+                        <p class="card-subtitle" id="amenitiesSubtitle" data-i18n="amenities.subtitle">Für Ihren Komfort</p>
                     </div>
                 </div>
                 <div class="amenities-grid">
@@ -1749,41 +1779,41 @@
                 <div class="card-header">
                     <div class="card-icon"><i data-lucide="zap"></i></div>
                     <div>
-                        <h3 class="card-title">Energieverbrauch</h3>
-                        <p class="card-subtitle">Live-Anzeige</p>
+                        <h3 class="card-title" data-i18n="energy.title">Energieverbrauch</h3>
+                        <p class="card-subtitle" data-i18n="energy.subtitle">Live-Anzeige</p>
                     </div>
                 </div>
 
                 <div class="energy-center">
                     <div class="energy-display">
                         <span class="energy-value" id="currentPower">--</span>
-                        <span class="energy-unit">Watt</span>
+                        <span class="energy-unit" data-i18n="energy.watt">Watt</span>
                     </div>
-                    <div class="energy-status" id="energyStatus">Aktueller Verbrauch</div>
+                    <div class="energy-status" id="energyStatus" data-i18n="energy.current">Aktueller Verbrauch</div>
                 </div>
 
                 <div class="energy-stats">
                     <div class="energy-stat">
-                        <div class="stat-label">Heute</div>
+                        <div class="stat-label" data-i18n="energy.today">Heute</div>
                         <div>
                             <span class="stat-value" id="todayEnergy">--</span>
-                            <span class="stat-unit">kWh</span>
+                            <span class="stat-unit" data-i18n="energy.kwh">kWh</span>
                         </div>
                         <div class="stat-cost"><span id="todayCost">--</span> €</div>
                     </div>
                     <div class="energy-stat">
-                        <div class="stat-label">Gestern</div>
+                        <div class="stat-label" data-i18n="energy.yesterday">Gestern</div>
                         <div>
                             <span class="stat-value" id="yesterdayEnergy">--</span>
-                            <span class="stat-unit">kWh</span>
+                            <span class="stat-unit" data-i18n="energy.kwh">kWh</span>
                         </div>
                         <div class="stat-cost"><span id="yesterdayCost">--</span> €</div>
                     </div>
                     <div class="energy-stat">
-                        <div class="stat-label">Dieser Monat</div>
+                        <div class="stat-label" data-i18n="energy.thisMonth">Dieser Monat</div>
                         <div>
                             <span class="stat-value" id="monthEnergy">--</span>
-                            <span class="stat-unit">kWh</span>
+                            <span class="stat-unit" data-i18n="energy.kwh">kWh</span>
                         </div>
                         <div class="stat-cost"><span id="monthCost">--</span> €</div>
                     </div>
@@ -1795,8 +1825,8 @@
                 <div class="card-header">
                     <div class="card-icon"><i data-lucide="cloud-sun" id="weatherIcon"></i></div>
                     <div>
-                        <h3 class="card-title">Wetter in Hollenthon</h3>
-                        <p class="card-subtitle">Aktuelle Bedingungen</p>
+                        <h3 class="card-title" data-i18n="weather.title">Wetter in Hollenthon</h3>
+                        <p class="card-subtitle" data-i18n="weather.subtitle">Aktuelle Bedingungen</p>
                     </div>
                 </div>
                 <div class="weather-display">
@@ -1805,16 +1835,16 @@
                             <span class="weather-temp-value" id="weatherTemp">--</span>
                             <span class="weather-temp-unit">°C</span>
                         </div>
-                        <div class="weather-condition" id="weatherCondition">Wird geladen...</div>
+                        <div class="weather-condition" id="weatherCondition" data-i18n="weather.loading">Wird geladen...</div>
                     </div>
                     <div class="weather-details">
                         <div class="weather-detail">
                             <i data-lucide="droplets"></i>
-                            <span><span id="weatherHumidity">--</span>% Luftfeuchtigkeit</span>
+                            <span><span id="weatherHumidity">--</span>% <span data-i18n="weather.humidity">Luftfeuchtigkeit</span></span>
                         </div>
                         <div class="weather-detail">
                             <i data-lucide="wind"></i>
-                            <span><span id="weatherWind">--</span> km/h Wind</span>
+                            <span><span id="weatherWind">--</span> km/h <span data-i18n="weather.wind">Wind</span></span>
                         </div>
                     </div>
                 </div>
@@ -2017,11 +2047,11 @@
 
         <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(0,0,0,0.1); text-align: center;">
             <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-bottom: 16px; font-size: 0.85rem;">
-                <a href="impressum.html" style="color: var(--text-muted); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--forest)'" onmouseout="this.style.color='var(--text-muted)'">Impressum</a>
+                <a href="impressum.html" style="color: var(--text-muted); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--forest)'" onmouseout="this.style.color='var(--text-muted)'" data-i18n="footer.imprint">Impressum</a>
                 <span style="color: var(--text-muted);">•</span>
-                <a href="datenschutz.html" style="color: var(--text-muted); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--forest)'" onmouseout="this.style.color='var(--text-muted)'">Datenschutz</a>
+                <a href="datenschutz.html" style="color: var(--text-muted); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--forest)'" onmouseout="this.style.color='var(--text-muted)'" data-i18n="footer.privacy">Datenschutz</a>
                 <span style="color: var(--text-muted);">•</span>
-                <a href="kontakt.html" style="color: var(--text-muted); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--forest)'" onmouseout="this.style.color='var(--text-muted)'">Kontakt</a>
+                <a href="kontakt.html" style="color: var(--text-muted); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--forest)'" onmouseout="this.style.color='var(--text-muted)'" data-i18n="footer.contact">Kontakt</a>
                 <span style="color: var(--text-muted);">•</span>
                 <a href="admin.html" style="color: var(--text-muted); text-decoration: none; transition: color 0.2s; opacity: 0.5;" onmouseover="this.style.color='var(--forest)'; this.style.opacity='1'" onmouseout="this.style.color='var(--text-muted)'; this.style.opacity='0.5'" title="Admin">Admin</a>
             </div>
@@ -2036,20 +2066,20 @@
     <!-- Guest Login Modal -->
     <div class="modal-overlay" id="guestLoginModal">
         <div class="modal">
-            <h2>Gast-Anmeldung</h2>
-            <p id="loginInstruction" style="color: #6B6B6B; margin-bottom: 20px; text-align: center;">
+            <h2 data-i18n="login.title">Gast-Anmeldung</h2>
+            <p id="loginInstruction" style="color: #6B6B6B; margin-bottom: 20px; text-align: center;" data-i18n="login.instruction">
                 Geben Sie Ihre Zugangsdaten ein, die Sie bei der Buchung erhalten haben.
             </p>
             <div class="form-group">
-                <label>Benutzername</label>
-                <input type="text" id="guestUsername" placeholder="Ihr Benutzername">
+                <label data-i18n="login.code">Zugangscode</label>
+                <input type="text" id="guestUsername" data-i18n-placeholder="login.codePlaceholder" placeholder="z.B. GAST-2024-001">
             </div>
             <div class="form-group">
                 <label>Passwort</label>
                 <input type="password" id="guestPassword" placeholder="Ihr Passwort">
             </div>
-            <button class="btn btn-primary" id="loginBtn">Anmelden</button>
-            <button class="btn btn-secondary" id="closeLoginBtn">Abbrechen</button>
+            <button class="btn btn-primary" id="loginBtn" data-i18n="login.submit">Anmelden</button>
+            <button class="btn btn-secondary" id="closeLoginBtn" data-i18n="login.cancel">Abbrechen</button>
             <div class="error-text" id="loginError"></div>
         </div>
     </div>
@@ -2083,6 +2113,7 @@
         <span id="feedIndicator"></span>
     </div>
 
+    <script src="i18n.js"></script>
     <script src="config.js"></script>
     <script src="app.js"></script>
     <script src="inline-editor.js"></script>
@@ -2098,16 +2129,19 @@
             const now = new Date();
             const timeEl = document.getElementById('currentTime');
             const dateEl = document.getElementById('currentDate');
+            
+            // Use i18n locale if available
+            const locale = (window.I18N && window.I18N.currentLang === 'en') ? 'en-GB' : 'de-DE';
 
             if (timeEl) {
-                timeEl.textContent = now.toLocaleTimeString('de-DE', {
+                timeEl.textContent = now.toLocaleTimeString(locale, {
                     hour: '2-digit',
                     minute: '2-digit'
                 });
             }
 
             if (dateEl) {
-                dateEl.textContent = now.toLocaleDateString('de-DE', {
+                dateEl.textContent = now.toLocaleDateString(locale, {
                     weekday: 'long',
                     day: 'numeric',
                     month: 'long',
@@ -2135,7 +2169,7 @@
             });
         }
 
-        // Update energy status text
+        // Update energy status text with i18n
         const originalUpdateUI = window.updateUI;
         if (originalUpdateUI) {
             window.updateUI = function(status) {
@@ -2147,7 +2181,10 @@
                 const powerEl = document.getElementById('currentPower');
 
                 if (statusEl) {
-                    statusEl.textContent = isFeeding ? '↑ Einspeisung ins Netz' : 'Aktueller Verbrauch';
+                    // Use i18n if available
+                    const feedingText = window.I18N ? window.I18N.t('energy.feeding') : '↑ Einspeisung ins Netz';
+                    const currentText = window.I18N ? window.I18N.t('energy.current') : 'Aktueller Verbrauch';
+                    statusEl.textContent = isFeeding ? ('↑ ' + feedingText) : currentText;
                     statusEl.classList.toggle('feeding', isFeeding);
                 }
 

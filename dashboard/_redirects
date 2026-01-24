@@ -1,0 +1,14 @@
+# Cloudflare Pages Redirects
+# https://developers.cloudflare.com/pages/configuration/redirects/
+
+# English language - serve same index.html, i18n.js detects /en/ path
+/en/   /index.html   200
+/en    /index.html   200
+
+# English subpages (if needed later)
+/en/datenschutz   /datenschutz.html   200
+/en/privacy       /datenschutz.html   200
+/en/impressum     /impressum.html     200
+/en/imprint       /impressum.html     200
+/en/kontakt       /kontakt.html       200
+/en/contact       /kontakt.html       200

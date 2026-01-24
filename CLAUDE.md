@@ -103,6 +103,11 @@ cd worker && npx wrangler deploy
 
 ## Features
 
+- **Internationalization (i18n)** - Zweisprachig: Deutsch & Englisch
+  - Deutsch (Standard): `/`
+  - Englisch: `/en/`
+  - Sprachumschalter mit Flags (🇩🇪/🇬🇧) im Header
+  - JSON-Übersetzungsdateien: `i18n/de.json`, `i18n/en.json`
 - **Multi-Apartment Verwaltung** - Mehrere Unterkünfte über einen Admin verwalten
   - Auto-Single-Mode: 1 Apartment → automatisch laden
   - Übersichtsseite: 2+ Apartments → Auswahl anzeigen
@@ -113,6 +118,61 @@ cd worker && npx wrangler deploy
 - **Gastportal** - Check-in/out, Energiedaten, Kurtaxe-Berechnung
 - **Rechtliche Seiten** - Impressum, Datenschutz, Kontakt (DSGVO-konform)
 
+## Internationalization (i18n)
+
+### Struktur
+
+```
+dashboard/
+├── i18n/
+│   ├── de.json         # Deutsche Übersetzungen
+│   └── en.json         # English translations
+├── i18n.js             # i18n-Modul (Laden, Erkennung, Switching)
+└── _redirects          # Cloudflare Pages URL-Rewriting
+```
+
+### Verwendung
+
+**HTML-Elemente mit data-i18n:**
+```html
+<h3 data-i18n="info.title">Wichtige Infos</h3>
+<input data-i18n-placeholder="login.codePlaceholder" placeholder="z.B. GAST-2024-001">
+```
+
+**JavaScript:**
+```javascript
+// Übersetzung abrufen
+const text = I18N.t('welcome.greeting.morning');
+
+// Mit Parametern
+const text = I18N.t('welcome.daysRemaining', { days: 3 });
+
+// Sprache prüfen
+if (I18N.isEnglish()) { ... }
+
+// Auf Sprachwechsel reagieren
+I18N.onChange((lang) => console.log('Sprache:', lang));
+```
+
+### Neue Übersetzungen hinzufügen
+
+1. Text in `i18n/de.json` und `i18n/en.json` ergänzen
+2. HTML-Element mit `data-i18n="key.path"` versehen
+3. Für dynamische Texte: `I18N.t('key.path')` verwenden
+
+### Du/Sie-Integration
+
+Übersetzungen können Du/Sie-Varianten enthalten:
+```json
+{
+  "welcome.message": {
+    "du": "Willkommen! Bitte melde dich an.",
+    "sie": "Willkommen! Bitte melden Sie sich an."
+  }
+}
+```
+`I18N.t()` wählt automatisch basierend auf `formalAddress`.
+
 ## Offene Punkte / TODOs
 
 - [x] Dashboard auf Cloudflare Pages
@@ -122,5 +182,7 @@ cd worker && npx wrangler deploy
 - [x] Du/Sie-Form umschaltbar
 - [x] UID-Verwaltung
 - [x] Rechtliche Seiten (Impressum, Datenschutz, Kontakt)
+- [x] Internationalization (i18n) - DE/EN
+- [ ] Admin-Bereich zweisprachig (Phase 2)
 - [ ] Optional: Weitere Airbnb-Daten integrieren
 - [ ] Domain gastauferden.at konfigurieren (Cloudflare Pages Custom Domain)

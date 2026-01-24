@@ -1,0 +1,220 @@
+{
+  "meta": {
+    "title": "Guest on Earth | Spiritual Retreat at the Forest's Edge",
+    "description": "A magical place to be. Tiny house with cave, fire pit, forest – A spiritual retreat for life coaching and deep relaxation."
+  },
+  "header": {
+    "title": "gastauferden.at",
+    "subtitle": "A magical place to be • Hollenthon",
+    "login": "Login",
+    "logout": "Logout",
+    "offline": "Offline",
+    "online": "Online",
+    "weather": "Weather",
+    "recommendations": "Tips",
+    "energy": "Energy",
+    "wifi": "WiFi"
+  },
+  "welcome": {
+    "greeting": {
+      "morning": "Good Morning",
+      "day": "Good Day",
+      "evening": "Good Evening",
+      "night": "Good Night"
+    },
+    "default": "Welcome!",
+    "message": {
+      "du": "Welcome to this magical place. Please log in to begin your personal journey.",
+      "sie": "Welcome to this magical place. Please log in to begin your personal journey."
+    },
+    "enjoy": {
+      "du": "Enjoy every moment!",
+      "sie": "Enjoy every moment!"
+    },
+    "daysRemaining": {
+      "du": "{days} day(s) left until departure. Let yourself be enchanted!",
+      "sie": "{days} day(s) left until departure. Let yourself be enchanted!"
+    },
+    "lastDay": {
+      "du": "Tomorrow begins a new path. We hope this place has touched your heart.",
+      "sie": "Tomorrow begins a new path. We hope this place has touched your heart."
+    },
+    "stay": {
+      "du": "May this place give you strength and grant you peace.",
+      "sie": "May this place give you strength and grant you peace."
+    }
+  },
+  "about": {
+    "title": "About This Place",
+    "subtitle": "Where magic and nature unite",
+    "fireplace": "🔥 The Fire Pit",
+    "fireplaceText": "Here you can find peace, share stories, and listen to the crackling of the fire.",
+    "forest": "🌲 The Forest",
+    "forestText": "Right next to us, nature stretches out in its purest form – ideal for walks, meditation, or quiet observation.",
+    "welcome": "Welcome, Guest on Earth."
+  },
+  "info": {
+    "title": "Important Information",
+    "subtitle": "Everything at a glance",
+    "checkIn": "Check-in",
+    "checkInTime": "from 3:00 PM",
+    "checkOut": "Check-out",
+    "checkOutTime": "by 11:00 AM",
+    "wifi": "WiFi",
+    "wifiCode": "WiFi Code",
+    "keys": "Keys",
+    "keysValue": "Key box",
+    "pets": "Pets",
+    "petsValue": "Allowed",
+    "smoking": "Smoking",
+    "smokingValue": "Prohibited",
+    "parking": "Parking",
+    "parkingValue": "Free"
+  },
+  "amenities": {
+    "title": "Amenities",
+    "subtitle": {
+      "du": "For your comfort",
+      "sie": "For your comfort"
+    }
+  },
+  "comingSoon": {
+    "title": "In Progress",
+    "subtitle": "Magical projects coming to life",
+    "tinyHouse": {
+      "title": "Tiny House with Cave",
+      "description": "A magical retreat in nature – currently under construction. Here, comfort and earthiness come together.",
+      "status": "🔨 Under Construction"
+    },
+    "sauna": {
+      "title": "Sauna",
+      "description": {
+        "du": "Deep relaxation and purification for body and soul. Soon you can find peace here.",
+        "sie": "Deep relaxation and purification for body and soul. Soon you can find peace here."
+      },
+      "status": "✨ Coming Soon"
+    },
+    "hotTub": {
+      "title": "Hot Tub",
+      "description": "Relax in warm water under the open sky and watch the stars – pure magic.",
+      "status": "✨ Coming Soon"
+    },
+    "lifeTraining": {
+      "title": "Life Coaching",
+      "description": "Personal guidance on your journey. Find yourself, gain clarity and inner strength.",
+      "status": "🌟 Available"
+    }
+  },
+  "energy": {
+    "title": "Energy Consumption",
+    "subtitle": "Live Display",
+    "current": "Current consumption",
+    "feeding": "Feeding to grid",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "thisMonth": "This Month",
+    "watt": "Watt",
+    "kwh": "kWh"
+  },
+  "weather": {
+    "title": "Weather in Hollenthon",
+    "subtitle": "Current conditions",
+    "loading": "Loading...",
+    "humidity": "Humidity",
+    "wind": "Wind",
+    "forecast": "5-Day Forecast",
+    "days": {
+      "mo": "Mon",
+      "di": "Tue",
+      "mi": "Wed",
+      "do": "Thu",
+      "fr": "Fri",
+      "sa": "Sat",
+      "so": "Sun"
+    }
+  },
+  "wifi": {
+    "title": "WiFi Connection",
+    "subtitle": "Quick & easy connection",
+    "scanQr": {
+      "du": "Scan the QR code with your camera to connect automatically.",
+      "sie": "Scan the QR code with your camera to connect automatically."
+    },
+    "network": "Network",
+    "password": "Password"
+  },
+  "recommendations": {
+    "title": "Recommendations",
+    "subtitle": "In the area",
+    "radius": "Radius",
+    "km": "km",
+    "open": "Open",
+    "closed": "Closed",
+    "openMaps": "Open in Maps",
+    "call": "Call",
+    "categories": {
+      "restaurant": "Restaurants",
+      "supermarket": "Supermarkets",
+      "pharmacy": "Pharmacies",
+      "gasStation": "Gas Stations",
+      "hiking": "Hiking Trails"
+    }
+  },
+  "contact": {
+    "title": "Contact",
+    "subtitle": {
+      "du": "We're here for you",
+      "sie": "We're here for you"
+    },
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address",
+    "emergency": "Emergency"
+  },
+  "transparency": {
+    "title": "Transparency",
+    "subtitle": {
+      "du": "For your records",
+      "sie": "For your records"
+    },
+    "text": {
+      "du": "During your stay, tourist tax and energy costs may apply. For your records and complete transparency, here are the bank details:",
+      "sie": "During your stay, tourist tax and energy costs may apply. For your records and complete transparency, here are the bank details:"
+    },
+    "bankDetails": "Bank Details",
+    "iban": "IBAN",
+    "bic": "BIC",
+    "accountHolder": "Account Holder",
+    "reference": "Reference",
+    "copy": "Copy",
+    "copied": "Copied!"
+  },
+  "login": {
+    "title": "Guest Login",
+    "instruction": {
+      "du": "Enter the access code you received with your booking.",
+      "sie": "Enter the access code you received with your booking."
+    },
+    "code": "Access Code",
+    "codePlaceholder": "e.g. GUEST-2024-001",
+    "submit": "Login",
+    "cancel": "Cancel",
+    "error": "Invalid access code",
+    "success": "Successfully logged in!"
+  },
+  "footer": {
+    "madeWith": "Made with",
+    "imprint": "Imprint",
+    "privacy": "Privacy Policy",
+    "contact": "Contact"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel",
+    "yes": "Yes",
+    "no": "No"
+  }
+}

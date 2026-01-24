@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-01-24
+
+### Added
+- **Internationalization (i18n)**: Full bilingual support (German/English)
+  - German default at `/`
+  - English version at `/en/`
+  - Language switcher with flag buttons (🇩🇪/🇬🇧) in header
+  - JSON translation files: `i18n/de.json`, `i18n/en.json`
+  - Supports Du/Sie formal address variants per language
+  - Locale-aware date/time formatting
+  - Cloudflare Pages URL rewriting via `_redirects`
+
+### Technical
+- `i18n.js` module for language detection and translation
+- `data-i18n` attributes for static text replacement
+- Dynamic translations via `I18N.t('key.path')` function
+- Browser language detection with URL-based override
+- localStorage preference for persistent language choice
+
+---
+
 ## [0.3.0] - 2026-01-24
 
 ### Added
