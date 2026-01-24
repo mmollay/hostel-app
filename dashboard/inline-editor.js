@@ -25,8 +25,8 @@ const InlineEditor = {
    */
   init() {
     // Check if user is admin (has token in localStorage or sessionStorage)
-    const adminToken = localStorage.getItem('hostel_admin_token_v1') || 
-                       sessionStorage.getItem('hostel_admin_token_v1');
+    const adminToken = localStorage.getItem('hostel_admin_token') || 
+                       sessionStorage.getItem('hostel_admin_token');
     
     if (!adminToken) {
       console.log('[InlineEditor] No admin token, editor disabled');
@@ -367,8 +367,8 @@ const InlineEditor = {
     console.log(`[InlineEditor] Saving: ${key}`);
 
     try {
-      const token = localStorage.getItem('hostel_admin_token_v1') || 
-                    sessionStorage.getItem('hostel_admin_token_v1');
+      const token = localStorage.getItem('hostel_admin_token') || 
+                    sessionStorage.getItem('hostel_admin_token');
 
       const response = await fetch(`${window.CONFIG?.API_URL || ''}/content/${key}`, {
         method: 'PUT',
