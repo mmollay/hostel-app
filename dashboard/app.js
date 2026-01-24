@@ -85,6 +85,7 @@ async function init() {
   setInterval(fetchData, CONFIG.UPDATE_INTERVAL);
   scheduleDailyReset();
   initGuestUI();
+  updateGuestUI(); // CRITICAL: Hide guest-only cards on page load
   updateGreeting();
   setInterval(updateGreeting, 60000); // Aktualisiere Begrüßung jede Minute
 
