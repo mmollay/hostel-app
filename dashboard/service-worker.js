@@ -3,13 +3,14 @@
  * Ermöglicht Offline-Funktionalität
  */
 
-const CACHE_NAME = "hostel-hollenthon-v4";
+const CACHE_NAME = "hostel-hollenthon-v5";
 const urlsToCache = [
   "/",
   "/index.html",
   "/admin.html",
   "/app.js",
   "/config.js",
+  "/inline-editor.js",
   "/logo-neu.png",
   "/favicon-32x32.png",
   "/favicon-16x16.png",
@@ -47,12 +48,18 @@ self.addEventListener("activate", (event) => {
 
 // Fetch - Network First, dann Cache
 self.addEventListener("fetch", (event) => {
+  // CRITICAL: Nur GET requests cachen, niemals POST/PUT/DELETE
+  if (event.request.method !== "GET") {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
   // Nur lokale Requests cachen, keine externen APIs
   const url = new URL(event.request.url);
   const isLocal = url.origin === self.location.origin;
 
-  if (!isLocal || event.request.method !== "GET") {
-    // Externe Requests oder nicht-GET: Direkt durchreichen
+  if (!isLocal) {
+    // Externe Requests: Direkt durchreichen (kein Cache)
     event.respondWith(fetch(event.request));
     return;
   }
@@ -61,13 +68,17 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        const responseToCache = response.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
-        });
+        // Nur erfolgreiche Responses cachen
+        if (response.ok) {
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+        }
         return response;
       })
       .catch(() => {
+        // Fallback auf Cache bei Netzwerkfehler
         return caches.match(event.request);
       }),
   );
