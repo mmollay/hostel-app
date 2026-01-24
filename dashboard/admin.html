@@ -1149,12 +1149,17 @@
 
     <!-- Header -->
     <header class="header">
-        <div style="position: absolute; top: 20px; left: 20px; display: flex; gap: 12px; z-index: 10;">
-            <a href="/" style="position: static; display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: var(--sage); border: 1px solid var(--sage); color: white; border-radius: 12px; font-size: 0.9rem; font-weight: 500; text-decoration: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <!-- Zurück Button - Links -->
+        <div style="position: absolute; top: 20px; left: 20px; z-index: 10;">
+            <a href="/" style="display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: var(--sage); border: 1px solid var(--sage); color: white; border-radius: 12px; font-size: 0.9rem; font-weight: 500; text-decoration: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                 <i data-lucide="arrow-left" style="width: 18px; height: 18px;"></i>
                 <span>Zurück</span>
             </a>
-            <button onclick="logout()" style="position: static; display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 12px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        </div>
+
+        <!-- Abmelden Button - Rechts -->
+        <div style="position: absolute; top: 20px; right: 20px; z-index: 10;">
+            <button onclick="logout()" style="display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 12px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                 <i data-lucide="log-out" style="width: 18px; height: 18px;"></i>
                 <span>Abmelden</span>
             </button>
