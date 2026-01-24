@@ -24,7 +24,7 @@ Guest Portal für Hostel/Airbnb mit integriertem Energiemonitoring.
 
 | Service | URL |
 |---------|-----|
-| Dashboard | https://hostel.ssi.at |
+| Dashboard | https://gastauferden.at |
 | API Worker | https://hostel-app-api.office-509.workers.dev |
 
 ## Environment Variables (.env)
@@ -101,10 +101,26 @@ cd worker && npx wrangler deploy
 ./adb push dashboard/* /sdcard/hostel-dashboard/
 ```
 
+## Features
+
+- **Multi-Apartment Verwaltung** - Mehrere Unterkünfte über einen Admin verwalten
+  - Auto-Single-Mode: 1 Apartment → automatisch laden
+  - Übersichtsseite: 2+ Apartments → Auswahl anzeigen
+  - Apartment-spezifische URLs: `/?apt=slug`
+- **Du/Sie-Form** - Admin kann Förmlichkeitsform global einstellen
+- **UID-Verwaltung** - Umsatzsteuer-ID editierbar, wird dynamisch im Impressum angezeigt
+- **Energiemonitoring** - Live-Verbrauch via Shelly Pro 3EM
+- **Gastportal** - Check-in/out, Energiedaten, Kurtaxe-Berechnung
+- **Rechtliche Seiten** - Impressum, Datenschutz, Kontakt (DSGVO-konform)
+
 ## Offene Punkte / TODOs
 
 - [x] Dashboard auf Cloudflare Pages
 - [x] Worker für API Proxy
 - [x] Admin-Bereich für Einstellungen
-- [ ] Kontaktdaten updaten (Telefon, Email)
+- [x] Multi-Apartment Verwaltung
+- [x] Du/Sie-Form umschaltbar
+- [x] UID-Verwaltung
+- [x] Rechtliche Seiten (Impressum, Datenschutz, Kontakt)
 - [ ] Optional: Weitere Airbnb-Daten integrieren
+- [ ] Domain gastauferden.at konfigurieren (Cloudflare Pages Custom Domain)

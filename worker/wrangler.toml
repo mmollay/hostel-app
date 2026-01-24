@@ -16,3 +16,9 @@ SHELLY_CLOUD_SERVER = "https://shelly-237-eu.shelly.cloud"
 [[kv_namespaces]]
 binding = "SETTINGS"
 id = "58c3a9f2bb9448608271ddef91c4752f"
+
+# D1 Database für Energie-Daten & Gäste
+[[d1_databases]]
+binding = "DB"
+database_name = "hostel-app-db"
+database_id = "a0c42bc6-ace1-4254-a0ae-9515ac51532a"

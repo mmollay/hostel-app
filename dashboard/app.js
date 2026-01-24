@@ -32,6 +32,35 @@ let settings = {
 let guestToken = null;
 let guestData = null;
 
+// Förmlichkeitsform (wird von API geladen)
+let formalAddress = "du"; // "du" oder "sie"
+
+// Text-Mapping für Du/Sie-Form
+const TEXT_VARIANTS = {
+  welcome: {
+    du: "Willkommen an diesem magischen Ort. Bitte melde dich an, um deine persönliche Reise zu beginnen.",
+    sie: "Willkommen an diesem magischen Ort. Bitte melden Sie sich an, um Ihre persönliche Reise zu beginnen.",
+  },
+  enjoy: {
+    du: "Genieße jeden Moment!",
+    sie: "Genießen Sie jeden Moment!",
+  },
+  daysRemaining: {
+    du: (days) =>
+      `Noch ${days} Tag${days > 1 ? "e" : ""} bis zum Abschied. Lass dich verzaubern!`,
+    sie: (days) =>
+      `Noch ${days} Tag${days > 1 ? "e" : ""} bis zum Abschied. Lassen Sie sich verzaubern!`,
+  },
+  lastDay: {
+    du: "Morgen beginnt ein neuer Weg. Wir hoffen, dieser Ort hat dich berührt.",
+    sie: "Morgen beginnt ein neuer Weg. Wir hoffen, dieser Ort hat Sie berührt.",
+  },
+  stay: {
+    du: "Möge dieser Ort Kraft geben und Ruhe schenken.",
+    sie: "Möge dieser Ort Kraft geben und Ruhe schenken.",
+  },
+};
+
 // LocalStorage Keys
 const STORAGE_KEY = "shelly_energy_data";
 const GUEST_TOKEN_KEY = "hostel_guest_token";
@@ -48,43 +77,69 @@ const LOCATION = {
 /**
  * Initialisierung
  */
-function init() {
-  loadStoredData();
+async function init() {
   loadGuestSession();
   applyNightMode();
-  checkDayReset();
-  fetchData();
+  await loadEnergyFromDB(); // Energie-Daten aus D1 laden
+  await fetchData(); // Shelly-Daten abrufen
   setInterval(fetchData, CONFIG.UPDATE_INTERVAL);
   scheduleDailyReset();
   initGuestUI();
   updateGreeting();
   setInterval(updateGreeting, 60000); // Aktualisiere Begrüßung jede Minute
 
+  // Hostel-Info laden (Kontakt, Bankdaten)
+  if (guestToken) {
+    await loadHostelInfo();
+  }
+
   // Wetter laden
   if (guestToken) {
     fetchWeather();
     setInterval(fetchWeather, 600000); // Alle 10 Minuten
   }
+
+  // Empfehlungen initialisieren
+  initRecommendations();
+
+  // Annehmlichkeiten laden
+  loadAmenities();
 }
 
 /**
- * Gespeicherte Daten laden
+ * Energie-Daten aus D1 Database laden
  */
-function loadStoredData() {
+async function loadEnergyFromDB() {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const data = JSON.parse(stored);
-      // Reset wenn Werte unrealistisch hoch (alter Bug mit *1000)
-      if (data.todayEnergy > 100 || data.monthEnergy > 1000) {
-        console.log("Alte fehlerhafte Daten erkannt, wird zurückgesetzt");
-        localStorage.removeItem(STORAGE_KEY);
-        return;
-      }
-      energyData = { ...energyData, ...data };
+    // Heutige Daten
+    const todayRes = await fetch(`${CONFIG.API_PROXY_URL}/energy/today`);
+    const todayData = await todayRes.json();
+    if (todayData.success) {
+      energyData.todayEnergy = todayData.data.energy_kwh || 0;
+      energyData.peakPower = todayData.data.peak_power || 0;
+      energyData.todayStart = todayData.data.shelly_total_start;
     }
+
+    // Gestrige Daten
+    const yesterdayRes = await fetch(
+      `${CONFIG.API_PROXY_URL}/energy/yesterday`,
+    );
+    const yesterdayData = await yesterdayRes.json();
+    if (yesterdayData.success) {
+      energyData.yesterdayEnergy = yesterdayData.data.energy_kwh || 0;
+    }
+
+    // Monatsdaten
+    const monthRes = await fetch(`${CONFIG.API_PROXY_URL}/energy/month`);
+    const monthData = await monthRes.json();
+    if (monthData.success) {
+      // Sicherstellen dass es eine Zahl ist, nicht null/undefined
+      energyData.monthEnergy = parseFloat(monthData.data.energy_kwh) || 0;
+    }
+
+    energyData.lastReset = new Date().toDateString();
   } catch (e) {
-    console.error("Fehler beim Laden der Daten:", e);
+    console.error("Fehler beim Laden aus DB:", e);
   }
 }
 
@@ -106,47 +161,48 @@ function loadGuestSession() {
 }
 
 /**
- * Daten speichern
+ * Daten in D1 Database speichern
  */
-function saveData() {
+async function saveData() {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(energyData));
+    const today = getDateString(new Date());
+    const pricePerKwh = settings.pricePerKwh;
+
+    await fetch(`${CONFIG.API_PROXY_URL}/energy/save`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        date: today,
+        energy_kwh: energyData.todayEnergy,
+        cost: energyData.todayEnergy * pricePerKwh,
+        peak_power: energyData.peakPower,
+        shelly_total_start: energyData.todayStart,
+      }),
+    });
   } catch (e) {
-    console.error("Fehler beim Speichern:", e);
+    console.error("Fehler beim Speichern in DB:", e);
   }
+}
+
+/**
+ * Datum als String YYYY-MM-DD
+ */
+function getDateString(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 /**
  * Prüfen ob ein neuer Tag begonnen hat
  */
-function checkDayReset() {
+async function checkDayReset() {
   const today = new Date().toDateString();
 
   if (energyData.lastReset !== today) {
-    // Gestern speichern
-    if (energyData.lastReset) {
-      energyData.yesterdayEnergy = energyData.todayEnergy;
-      // Monatsenergie akkumulieren
-      energyData.monthEnergy += energyData.todayEnergy;
-    }
-
-    // Neuen Monat prüfen
-    const lastDate = energyData.lastReset
-      ? new Date(energyData.lastReset)
-      : null;
-    const now = new Date();
-
-    if (!lastDate || lastDate.getMonth() !== now.getMonth()) {
-      energyData.monthEnergy = 0;
-    }
-
-    // Heute zurücksetzen
-    energyData.todayStart = null;
-    energyData.todayEnergy = 0;
-    energyData.peakPower = 0;
-    energyData.peakPowerDate = today;
-    energyData.lastReset = today;
-    saveData();
+    // Daten aus DB neu laden (neuer Tag)
+    await loadEnergyFromDB();
   }
 }
 
@@ -161,8 +217,8 @@ function scheduleDailyReset() {
 
   const msUntilMidnight = tomorrow - now;
 
-  setTimeout(() => {
-    checkDayReset();
+  setTimeout(async () => {
+    await checkDayReset();
     scheduleDailyReset();
   }, msUntilMidnight);
 }
@@ -313,7 +369,8 @@ function updateUI(status) {
   }
 
   // Monat
-  const monthTotal = energyData.monthEnergy + energyData.todayEnergy;
+  const monthTotal =
+    (energyData.monthEnergy || 0) + (energyData.todayEnergy || 0);
   const monthEnergyEl = document.getElementById("monthEnergy");
   if (monthEnergyEl) {
     monthEnergyEl.textContent = formatNumber(
@@ -386,10 +443,25 @@ function showConnected() {
   const errorEl = document.getElementById("errorMessage");
   const dashboardEl = document.getElementById("dashboard");
   const statusEl = document.getElementById("statusIndicator");
+  const statusBtn = document.getElementById("statusBtn");
+  const statusText = document.getElementById("statusText");
+  const statusDot = statusBtn?.querySelector(".status-dot");
 
   if (errorEl) errorEl.style.display = "none";
   if (dashboardEl) dashboardEl.style.display = "block";
   if (statusEl) statusEl.classList.remove("error");
+
+  // Status-Button aktualisieren
+  if (statusBtn) {
+    statusBtn.classList.remove("offline");
+    statusBtn.classList.add("online");
+  }
+  if (statusText) {
+    statusText.textContent = "Online";
+  }
+  if (statusDot) {
+    statusDot.classList.remove("error");
+  }
 }
 
 /**
@@ -398,9 +470,24 @@ function showConnected() {
 function showError() {
   const errorEl = document.getElementById("errorMessage");
   const statusEl = document.getElementById("statusIndicator");
+  const statusBtn = document.getElementById("statusBtn");
+  const statusText = document.getElementById("statusText");
+  const statusDot = statusBtn?.querySelector(".status-dot");
 
   if (errorEl) errorEl.style.display = "block";
   if (statusEl) statusEl.classList.add("error");
+
+  // Status-Button aktualisieren
+  if (statusBtn) {
+    statusBtn.classList.remove("online");
+    statusBtn.classList.add("offline");
+  }
+  if (statusText) {
+    statusText.textContent = "Offline";
+  }
+  if (statusDot) {
+    statusDot.classList.add("error");
+  }
 }
 
 // ==========================================
@@ -594,6 +681,7 @@ function updateGuestUI() {
   const weatherCard = document.getElementById("weatherCard");
   const recommendationsCard = document.getElementById("recommendationsCard");
   const wifiCard = document.getElementById("wifiCard");
+  const quickNav = document.getElementById("quickNav");
 
   if (btn) {
     btn.classList.toggle("logged-in", !!guestToken);
@@ -609,6 +697,9 @@ function updateGuestUI() {
   if (recommendationsCard)
     recommendationsCard.style.display = guestToken ? "block" : "none";
   if (wifiCard) wifiCard.style.display = guestToken ? "block" : "none";
+
+  // Quick Navigation nur für eingeloggte Gäste anzeigen
+  if (quickNav) quickNav.style.display = guestToken ? "flex" : "none";
 }
 
 /**
@@ -622,40 +713,43 @@ function updateGreeting() {
 
   const hour = new Date().getHours();
   let timeGreeting = "Guten Tag";
+  let greetingIcon = "sun"; // Default icon
 
   if (hour >= 5 && hour < 12) {
     timeGreeting = "Guten Morgen";
+    greetingIcon = "sunrise";
   } else if (hour >= 12 && hour < 18) {
     timeGreeting = "Guten Tag";
+    greetingIcon = "sun";
   } else if (hour >= 18 && hour < 22) {
     timeGreeting = "Guten Abend";
+    greetingIcon = "sunset";
   } else {
     timeGreeting = "Gute Nacht";
+    greetingIcon = "moon";
   }
 
   if (guestToken && guestData) {
-    greetingEl.textContent = `${timeGreeting}, ${guestData.name}!`;
+    greetingEl.innerHTML = `<i data-lucide="${greetingIcon}" style="vertical-align: middle; margin-right: 12px;"></i>${timeGreeting}, ${guestData.name}!`;
+    lucide.createIcons();
 
     // Aufenthaltsdauer berechnen
-    const checkIn = new Date(guestData.checkIn);
     const checkOut = new Date(guestData.checkOut);
     const today = new Date();
     const daysRemaining = Math.ceil((checkOut - today) / (1000 * 60 * 60 * 24));
 
-    let stayMessage =
-      "Wir wünschen Ihnen einen wunderschönen Aufenthalt in Hollenthon.";
+    let stayMessage = TEXT_VARIANTS.stay[formalAddress];
     if (daysRemaining === 1) {
-      stayMessage =
-        "Morgen ist Ihr letzter Tag. Wir hoffen, Sie hatten eine schöne Zeit!";
+      stayMessage = TEXT_VARIANTS.lastDay[formalAddress];
     } else if (daysRemaining > 1) {
-      stayMessage = `Noch ${daysRemaining} Tage bis zum Check-out. Genießen Sie Ihren Aufenthalt!`;
+      stayMessage = TEXT_VARIANTS.daysRemaining[formalAddress](daysRemaining);
     }
 
     messageEl.textContent = stayMessage;
   } else {
-    greetingEl.textContent = `${timeGreeting}!`;
-    messageEl.textContent =
-      "Willkommen in Hollenthon. Bitte melden Sie sich an, um Ihren persönlichen Bereich zu sehen.";
+    greetingEl.innerHTML = `<i data-lucide="${greetingIcon}" style="vertical-align: middle; margin-right: 12px;"></i>${timeGreeting}!`;
+    lucide.createIcons();
+    messageEl.textContent = TEXT_VARIANTS.welcome[formalAddress];
   }
 }
 
@@ -668,17 +762,33 @@ function showWelcomeMessage() {
 }
 
 /**
- * Wetter abrufen
+ * Wetter abrufen (OpenWeatherMap)
  */
 async function fetchWeather() {
-  try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${LOCATION.lat}&longitude=${LOCATION.lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=Europe/Vienna`;
+  const apiKey = CONFIG.OPENWEATHER_API_KEY;
 
-    const response = await fetch(url);
+  if (!apiKey) {
+    console.log("OpenWeatherMap API Key fehlt");
+    return;
+  }
+
+  try {
+    // Aktuelles Wetter + 5-Tage-Vorhersage
+    const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${LOCATION.lat}&lon=${LOCATION.lon}&units=metric&lang=de&appid=${apiKey}`;
+
+    const response = await fetch(forecastUrl);
     const data = await response.json();
 
-    if (data.current) {
-      updateWeatherDisplay(data.current);
+    if (data.list && data.list.length > 0) {
+      // Aktuelles Wetter (erste Eintrag)
+      const current = data.list[0];
+      updateWeatherDisplay(current);
+
+      // 5-Tage-Vorhersage
+      updateWeatherForecast(data.list);
+
+      // Empfehlungen basierend auf Wetter anpassen
+      updateRecommendationsByWeather(current);
     }
   } catch (error) {
     console.error("Wetter-Fehler:", error);
@@ -686,7 +796,7 @@ async function fetchWeather() {
 }
 
 /**
- * Wetter-Anzeige aktualisieren
+ * Wetter-Anzeige aktualisieren (OpenWeatherMap Format)
  */
 function updateWeatherDisplay(current) {
   const tempEl = document.getElementById("weatherTemp");
@@ -695,22 +805,90 @@ function updateWeatherDisplay(current) {
   const windEl = document.getElementById("weatherWind");
   const iconEl = document.getElementById("weatherIcon");
 
-  if (tempEl) tempEl.textContent = Math.round(current.temperature_2m);
-  if (humidityEl) humidityEl.textContent = current.relative_humidity_2m;
-  if (windEl) windEl.textContent = Math.round(current.wind_speed_10m);
+  if (tempEl) tempEl.textContent = Math.round(current.main.temp);
+  if (humidityEl) humidityEl.textContent = current.main.humidity;
+  if (windEl) windEl.textContent = Math.round(current.wind.speed * 3.6); // m/s → km/h
 
-  // Wetter-Bedingung übersetzen
-  const condition = getWeatherCondition(current.weather_code);
-  if (conditionEl) conditionEl.textContent = condition;
+  // Wetter-Beschreibung (bereits auf Deutsch)
+  if (conditionEl && current.weather[0]) {
+    conditionEl.textContent =
+      current.weather[0].description.charAt(0).toUpperCase() +
+      current.weather[0].description.slice(1);
+  }
 
-  // Icon anpassen (wenn gewünscht)
-  if (iconEl) {
-    iconEl.setAttribute(
-      "data-lucide",
-      getWeatherIconName(current.weather_code),
-    );
+  // Icon anpassen
+  if (iconEl && current.weather[0]) {
+    const iconName = getWeatherIconFromOpenWeather(current.weather[0].icon);
+    iconEl.setAttribute("data-lucide", iconName);
     lucide.createIcons();
   }
+}
+
+/**
+ * 5-Tage-Wettervorhersage anzeigen
+ */
+function updateWeatherForecast(forecastList) {
+  const forecastEl = document.getElementById("weatherForecast");
+  if (!forecastEl) return;
+
+  // Tägliche Vorhersagen gruppieren (Mittags 12:00)
+  const dailyForecasts = [];
+  const seenDates = new Set();
+
+  forecastList.forEach((item) => {
+    const date = new Date(item.dt * 1000);
+    const dateStr = date.toDateString();
+    const hour = date.getHours();
+
+    // Nur ein Eintrag pro Tag, bevorzugt 12:00
+    if (!seenDates.has(dateStr) && (hour === 12 || dailyForecasts.length < 5)) {
+      dailyForecasts.push(item);
+      seenDates.add(dateStr);
+    }
+  });
+
+  // Ersten 5 Tage anzeigen
+  forecastEl.innerHTML = dailyForecasts
+    .slice(0, 5)
+    .map((day) => {
+      const date = new Date(day.dt * 1000);
+      const dayName = date.toLocaleDateString("de-DE", { weekday: "short" });
+      const temp = Math.round(day.main.temp);
+      const icon = getWeatherIconFromOpenWeather(day.weather[0].icon);
+
+      return `
+      <div class="forecast-day">
+        <div class="forecast-day-name">${dayName}</div>
+        <i data-lucide="${icon}" style="width: 24px; height: 24px; color: var(--sage);"></i>
+        <div class="forecast-temp">${temp}°</div>
+      </div>
+    `;
+    })
+    .join("");
+
+  lucide.createIcons();
+}
+
+/**
+ * OpenWeatherMap Icon zu Lucide Icon
+ */
+function getWeatherIconFromOpenWeather(iconCode) {
+  // OpenWeatherMap Icons: https://openweathermap.org/weather-conditions
+  const code = iconCode.slice(0, 2); // z.B. "01d" → "01"
+
+  const iconMap = {
+    "01": "sun", // Clear sky
+    "02": "cloud-sun", // Few clouds
+    "03": "cloud", // Scattered clouds
+    "04": "cloud", // Broken clouds
+    "09": "cloud-rain", // Shower rain
+    10: "cloud-rain", // Rain
+    11: "cloud-lightning", // Thunderstorm
+    13: "cloud-snow", // Snow
+    50: "cloud-fog", // Mist
+  };
+
+  return iconMap[code] || "cloud";
 }
 
 /**
@@ -750,6 +928,45 @@ function getWeatherIconName(code) {
   if (code >= 71 && code <= 75) return "cloud-snow";
   if (code >= 95) return "cloud-lightning";
   return "cloud";
+}
+
+/**
+ * Empfehlungen basierend auf Wetter anpassen
+ */
+function updateRecommendationsByWeather(currentWeather) {
+  if (
+    !currentWeather ||
+    !currentWeather.weather ||
+    !currentWeather.weather[0]
+  ) {
+    return;
+  }
+
+  const weatherId = currentWeather.weather[0].id;
+  const temp = currentWeather.main.temp;
+
+  // Wetter-Bedingungen kategorisieren
+  const isBadWeather = weatherId >= 200 && weatherId < 600; // Thunderstorm, Drizzle, Rain
+  const isSnow = weatherId >= 600 && weatherId < 700;
+  const isCold = temp < 10;
+
+  // Kategorie basierend auf Wetter anpassen
+  if (isBadWeather || isSnow || isCold) {
+    // Schlechtes/Kaltes Wetter → Indoor-Aktivitäten
+    currentCategory = "spa"; // Thermen bevorzugen
+    console.log(
+      "☔ Schlechtes Wetter erkannt → Thermen & Indoor-Aktivitäten empfehlen",
+    );
+  } else if (temp >= 20) {
+    // Gutes Wetter → Outdoor-Aktivitäten
+    currentCategory = "tourist_attraction"; // Sehenswürdigkeiten bevorzugen
+    console.log("☀️ Gutes Wetter erkannt → Outdoor-Aktivitäten empfehlen");
+  }
+
+  // Empfehlungen neu laden mit angepasster Kategorie
+  if (guestToken && CONFIG.GOOGLE_MAPS_API_KEY) {
+    fetchNearbyPlaces();
+  }
 }
 
 /**
@@ -871,6 +1088,357 @@ function showSecretMessage() {
   }
 }
 
+// ==========================================
+// GOOGLE MAPS PLACES INTEGRATION
+// ==========================================
+
+let currentRadius = 20000; // 20km default (in meters)
+let currentCategory = "all";
+const GOOGLE_MAPS_API_KEY = CONFIG.GOOGLE_MAPS_API_KEY || "";
+
+/**
+ * Empfehlungen initialisieren
+ */
+function initRecommendations() {
+  // Radius-Slider
+  const radiusSlider = document.getElementById("radiusSlider");
+  const radiusValue = document.getElementById("radiusValue");
+
+  if (radiusSlider) {
+    radiusSlider.addEventListener("input", (e) => {
+      const value = e.target.value;
+      currentRadius = value * 1000; // km to meters
+      if (radiusValue) radiusValue.textContent = value;
+      fetchNearbyPlaces();
+    });
+  }
+
+  // Kategorie-Buttons
+  const categoryBtns = document.querySelectorAll(".category-btn");
+  categoryBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      categoryBtns.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentCategory = btn.dataset.category;
+      fetchNearbyPlaces();
+    });
+  });
+
+  // Initial laden
+  if (guestToken && GOOGLE_MAPS_API_KEY) {
+    fetchNearbyPlaces();
+  }
+}
+
+/**
+ * Google Places Nearby Search
+ */
+async function fetchNearbyPlaces() {
+  if (!GOOGLE_MAPS_API_KEY) {
+    showRecommendationsError(
+      "Google Maps API Key fehlt. Bitte in .env hinzufügen.",
+    );
+    return;
+  }
+
+  const listEl = document.getElementById("recommendationsList");
+  if (!listEl) return;
+
+  // Loading anzeigen
+  listEl.innerHTML = `
+    <div class="loading-state">
+      <i data-lucide="loader" style="animation: spin 1s linear infinite;"></i>
+      <p>Lade Empfehlungen...</p>
+    </div>
+  `;
+  lucide.createIcons();
+
+  try {
+    // Google Places API (New) - Nearby Search
+    const types =
+      currentCategory === "all"
+        ? ["tourist_attraction", "restaurant", "spa", "museum", "park"]
+        : [currentCategory];
+
+    // Worker-Proxy verwenden (um CORS zu vermeiden)
+    const placesPromises = types.map((type) =>
+      fetch(
+        `${CONFIG.API_PROXY_URL}/places/nearby?lat=${LOCATION.lat}&lon=${LOCATION.lon}&radius=${currentRadius}&type=${type}`,
+      ).then((res) => res.json()),
+    );
+
+    const results = await Promise.all(placesPromises);
+
+    // Alle Results zusammenführen
+    const allPlaces = results.flatMap((r) => r.results || []);
+
+    // Nur gute Bewertungen filtern
+    const filteredPlaces = allPlaces.filter((p) => p.rating >= 3.5);
+
+    if (filteredPlaces.length === 0) {
+      showRecommendationsError(
+        "Keine Empfehlungen gefunden. Versuche einen größeren Umkreis.",
+      );
+      return;
+    }
+
+    // Tatsächliche Fahrstrecke mit Distance Matrix API berechnen
+    await enrichPlacesWithDrivingDistance(filteredPlaces);
+
+    // Nach tatsächlicher Fahrstrecke sortieren
+    const sortedPlaces = filteredPlaces
+      .filter((p) => p.drivingDistance) // Nur Places mit berechneter Distanz
+      .sort((a, b) => a.drivingDistance - b.drivingDistance)
+      .slice(0, 10); // Top 10 nächstgelegene
+
+    if (sortedPlaces.length === 0) {
+      showRecommendationsError(
+        "Keine Empfehlungen gefunden. Versuche einen größeren Umkreis.",
+      );
+      return;
+    }
+
+    displayRecommendations(sortedPlaces);
+  } catch (error) {
+    console.error("Places API Error:", error);
+    showRecommendationsError(
+      "Fehler beim Laden der Empfehlungen. Bitte versuche es später erneut.",
+    );
+  }
+}
+
+/**
+ * Places mit tatsächlicher Fahrstrecke anreichern (Distance Matrix API)
+ */
+async function enrichPlacesWithDrivingDistance(places) {
+  if (places.length === 0) return;
+
+  // Hostel-Position als Origin
+  const origin = `${LOCATION.lat},${LOCATION.lon}`;
+
+  // Alle Place-Positionen als Destinations (max 25 pro Request)
+  const destinations = places
+    .map((p) => `${p.geometry.location.lat},${p.geometry.location.lng}`)
+    .join("|");
+
+  try {
+    const response = await fetch(
+      `${CONFIG.API_PROXY_URL}/places/distance?origins=${encodeURIComponent(origin)}&destinations=${encodeURIComponent(destinations)}`,
+    );
+    const data = await response.json();
+
+    if (data.status === "OK" && data.rows && data.rows[0]) {
+      const elements = data.rows[0].elements;
+
+      elements.forEach((element, index) => {
+        if (element.status === "OK" && element.distance) {
+          // Fahrstrecke in km speichern
+          places[index].drivingDistance = element.distance.value / 1000; // meters to km
+          places[index].drivingDistanceText = element.distance.text;
+          places[index].drivingDuration = element.duration.text;
+        }
+      });
+    }
+  } catch (error) {
+    console.error("Distance Matrix Error:", error);
+    // Fallback: Luftlinie verwenden
+    places.forEach((place) => {
+      if (!place.drivingDistance) {
+        place.drivingDistance = calculateDistance(
+          LOCATION.lat,
+          LOCATION.lon,
+          place.geometry.location.lat,
+          place.geometry.location.lng,
+        );
+      }
+    });
+  }
+}
+
+/**
+ * Empfehlungen anzeigen
+ */
+function displayRecommendations(places) {
+  const listEl = document.getElementById("recommendationsList");
+  if (!listEl) return;
+
+  listEl.innerHTML = "";
+
+  places.forEach((place) => {
+    const item = document.createElement("div");
+    item.className = "recommendation-item";
+
+    // Icon basierend auf Typ
+    const icon = getPlaceIcon(place.types);
+
+    // Fahrstrecke verwenden (falls vorhanden), sonst Luftlinie
+    const distance =
+      place.drivingDistance ||
+      calculateDistance(
+        LOCATION.lat,
+        LOCATION.lon,
+        place.geometry.location.lat,
+        place.geometry.location.lng,
+      );
+
+    // Öffnungsstatus
+    const openNow = place.opening_hours?.open_now;
+    const openStatus =
+      openNow !== undefined
+        ? openNow
+          ? '<span class="open-status open">Jetzt geöffnet</span>'
+          : '<span class="open-status closed">Geschlossen</span>'
+        : "";
+
+    // Google Maps Navigations-Link
+    const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${LOCATION.lat},${LOCATION.lon}&destination=${place.geometry.location.lat},${place.geometry.location.lng}&travelmode=driving`;
+
+    item.innerHTML = `
+      <div class="recommendation-icon">
+        <i data-lucide="${icon}"></i>
+      </div>
+      <div class="recommendation-content">
+        <h4>${place.name}</h4>
+        <p class="recommendation-address">${place.vicinity || ""}</p>
+        <div class="recommendation-meta">
+          <div class="rating">
+            <i data-lucide="star" style="width: 14px; height: 14px; fill: currentColor;"></i>
+            ${place.rating || "—"} ${place.user_ratings_total ? `(${place.user_ratings_total})` : ""}
+          </div>
+          ${openStatus}
+        </div>
+        <div class="recommendation-distance">
+          <i data-lucide="navigation" style="width: 14px; height: 14px;"></i>
+          ${distance.toFixed(1)} km ${place.drivingDuration ? `(~${place.drivingDuration})` : ""}
+        </div>
+        <div class="recommendation-actions">
+          <a href="${mapsUrl}" target="_blank" class="btn-maps">
+            <i data-lucide="map" style="width: 16px; height: 16px;"></i>
+            Navigation starten
+          </a>
+          ${
+            place.formatted_phone_number
+              ? `
+            <a href="tel:${place.formatted_phone_number}" class="btn-phone">
+              <i data-lucide="phone" style="width: 16px; height: 16px;"></i>
+              Anrufen
+            </a>
+          `
+              : ""
+          }
+        </div>
+      </div>
+    `;
+
+    listEl.appendChild(item);
+  });
+
+  lucide.createIcons();
+}
+
+/**
+ * Icon für Typ ermitteln
+ */
+function getPlaceIcon(types) {
+  if (types.includes("spa")) return "bath";
+  if (types.includes("restaurant")) return "utensils";
+  if (types.includes("cafe")) return "coffee";
+  if (types.includes("museum")) return "landmark";
+  if (types.includes("park")) return "trees";
+  if (types.includes("tourist_attraction")) return "castle";
+  if (types.includes("shopping_mall")) return "shopping-bag";
+  return "map-pin";
+}
+
+/**
+ * Entfernung berechnen (Haversine)
+ */
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Earth radius in km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+/**
+ * Fehler anzeigen
+ */
+function showRecommendationsError(message) {
+  const listEl = document.getElementById("recommendationsList");
+  if (!listEl) return;
+
+  listEl.innerHTML = `
+    <div class="loading-state">
+      <i data-lucide="alert-circle" style="color: var(--rose);"></i>
+      <p>${message}</p>
+    </div>
+  `;
+  lucide.createIcons();
+}
+
+// ============================================
+// ANNEHMLICHKEITEN (AMENITIES)
+// ============================================
+
+/**
+ * Annehmlichkeiten von API laden
+ */
+async function loadAmenities() {
+  try {
+    const response = await fetch(`${CONFIG.API_PROXY_URL}/amenities`);
+    const data = await response.json();
+
+    if (data.success && data.amenities) {
+      displayAmenities(data.amenities);
+    } else {
+      console.warn("Keine Annehmlichkeiten gefunden");
+    }
+  } catch (error) {
+    console.error("Fehler beim Laden der Annehmlichkeiten:", error);
+  }
+}
+
+/**
+ * Annehmlichkeiten darstellen
+ */
+function displayAmenities(amenities) {
+  const gridEl = document.querySelector(".amenities-grid");
+  if (!gridEl) return;
+
+  if (amenities.length === 0) {
+    gridEl.innerHTML = `
+      <p style="text-align: center; color: var(--text-muted); padding: 32px; grid-column: 1 / -1;">
+        Keine Annehmlichkeiten verfügbar
+      </p>
+    `;
+    return;
+  }
+
+  gridEl.innerHTML = amenities
+    .map(
+      (amenity) => `
+    <div class="amenity">
+      <div class="amenity-icon"><i data-lucide="${amenity.icon}"></i></div>
+      <div class="amenity-text">
+        <h4>${amenity.title}</h4>
+        <p>${amenity.description}</p>
+      </div>
+    </div>
+  `,
+    )
+    .join("");
+
+  // Icons neu initialisieren
+  lucide.createIcons();
+}
+
 // CSS für Rainbow Animation und Night Mode
 const style = document.createElement("style");
 style.textContent = `
@@ -903,6 +1471,250 @@ body.night-mode .energy-card {
 }
 `;
 document.head.appendChild(style);
+
+// ==========================================
+// HOSTEL INFO & BANKDATEN
+// ==========================================
+
+/**
+ * Hostel-Info laden (Kontakt, Bankdaten)
+ */
+async function loadHostelInfo() {
+  try {
+    // Check for apartment URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const apartmentSlug = urlParams.get("apt");
+
+    let url = `${CONFIG.API_PROXY_URL}/hostel/info`;
+
+    // Wenn kein Apartment-Parameter, prüfe Anzahl der Apartments
+    if (!apartmentSlug) {
+      const apartmentsResponse = await fetch(
+        `${CONFIG.API_PROXY_URL}/apartments/public/list`,
+      );
+      const apartmentsData = await apartmentsResponse.json();
+
+      if (apartmentsData.success && apartmentsData.apartments) {
+        const apartments = apartmentsData.apartments;
+
+        if (apartments.length === 1) {
+          // Nur 1 Apartment → Automatisch laden
+          url = `${CONFIG.API_PROXY_URL}/apartments/${apartments[0].slug}/info`;
+        } else if (apartments.length > 1) {
+          // Mehrere Apartments → Übersichtsseite anzeigen
+          showApartmentOverview(apartments);
+          return;
+        }
+        // Wenn 0 Apartments, nutze Standard hostel/info
+      }
+    } else {
+      // Load apartment-specific info
+      url = `${CONFIG.API_PROXY_URL}/apartments/${apartmentSlug}/info`;
+    }
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.success && data.info) {
+      const info = data.info;
+
+      // Apartment-Namen im Title anzeigen
+      if (info.name && apartmentSlug) {
+        document.getElementById("mainTitle").textContent = info.name;
+        if (info.location) {
+          document.querySelector(".subtitle").textContent = info.location;
+        }
+      }
+
+      // Förmlichkeitsform laden
+      if (info.formalAddress) {
+        formalAddress = info.formalAddress;
+        // Begrüßung neu generieren mit korrekter Anrede
+        updateGreeting();
+      }
+
+      // Kontaktdaten aktualisieren
+      if (info.phone) {
+        const phoneEl = document.getElementById("hostelPhoneDisplay");
+        if (phoneEl) phoneEl.textContent = info.phone;
+      }
+
+      if (info.email) {
+        const emailEl = document.getElementById("hostelEmailDisplay");
+        if (emailEl) emailEl.textContent = info.email;
+      }
+
+      // Bankdaten anzeigen (nur wenn vorhanden)
+      if (info.iban || info.bic || info.accountHolder) {
+        const paymentCard = document.getElementById("paymentInfoCard");
+        if (paymentCard) {
+          if (info.iban) {
+            const ibanEl = document.getElementById("displayIban");
+            if (ibanEl) ibanEl.textContent = info.iban;
+          }
+          if (info.bic) {
+            const bicEl = document.getElementById("displayBic");
+            if (bicEl) bicEl.textContent = info.bic;
+          }
+          if (info.accountHolder) {
+            const holderEl = document.getElementById("displayAccountHolder");
+            if (holderEl) holderEl.textContent = info.accountHolder;
+          }
+          paymentCard.style.display = "block";
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Fehler beim Laden der Hostel-Info:", error);
+  }
+}
+
+/**
+ * Bankdaten kopieren
+ */
+function copyBankDetail(elementId) {
+  const element = document.getElementById(elementId);
+  if (!element) return;
+
+  const text = element.textContent;
+
+  // Copy to clipboard
+  navigator.clipboard
+    .writeText(text)
+    .then(() => {
+      // Visual feedback
+      const button = element.nextElementSibling;
+      if (button && button.classList.contains("copy-btn-inline")) {
+        const originalHTML = button.innerHTML;
+        button.innerHTML =
+          '<i data-lucide="check" style="width: 14px; height: 14px;"></i>';
+        lucide.createIcons();
+        setTimeout(() => {
+          button.innerHTML = originalHTML;
+          lucide.createIcons();
+        }, 1500);
+      }
+    })
+    .catch((err) => {
+      console.error("Fehler beim Kopieren:", err);
+    });
+}
+
+/**
+ * Apartment-Übersichtsseite anzeigen (wenn mehrere Apartments vorhanden)
+ */
+function showApartmentOverview(apartments) {
+  // Verstecke normalen Content
+  const mainContent = document.querySelector("main");
+  if (mainContent) mainContent.style.display = "none";
+
+  const header = document.querySelector(".header");
+  if (header) header.style.display = "none";
+
+  // Erstelle Übersichtsseite
+  const overviewContainer = document.createElement("div");
+  overviewContainer.id = "apartmentOverview";
+  overviewContainer.innerHTML = `
+    <style>
+      #apartmentOverview {
+        min-height: 100vh;
+        background: var(--cream);
+        padding: 60px 24px;
+      }
+      .overview-header {
+        text-align: center;
+        margin-bottom: 60px;
+      }
+      .overview-header h1 {
+        font-size: 2.5rem;
+        color: var(--forest);
+        margin-bottom: 16px;
+      }
+      .overview-header p {
+        font-size: 1.1rem;
+        color: var(--text-light);
+      }
+      .apartments-grid {
+        max-width: 1000px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 24px;
+      }
+      .apartment-card {
+        background: white;
+        border-radius: 24px;
+        padding: 32px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+      }
+      .apartment-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+      }
+      .apartment-name {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: var(--forest);
+        margin-bottom: 12px;
+      }
+      .apartment-location {
+        font-size: 1rem;
+        color: var(--text-light);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+    </style>
+
+    <div class="overview-header">
+      <h1>Wähle deine Unterkunft</h1>
+      <p>Mehrere Apartments verfügbar</p>
+    </div>
+
+    <div class="apartments-grid">
+      ${apartments
+        .map(
+          (apt) => `
+        <a href="?apt=${apt.slug}" class="apartment-card">
+          <div class="apartment-name">${apt.name}</div>
+          <div class="apartment-location">
+            <i data-lucide="map-pin" style="width: 16px; height: 16px;"></i>
+            <span>${apt.location || "Standort nicht angegeben"}</span>
+          </div>
+        </a>
+      `,
+        )
+        .join("")}
+    </div>
+  `;
+
+  document.body.appendChild(overviewContainer);
+  lucide.createIcons();
+}
+
+/**
+ * Scroll zu einer Sektion
+ */
+function scrollToSection(sectionId) {
+  const element = document.getElementById(sectionId);
+  if (!element) {
+    console.warn(`Element mit ID "${sectionId}" nicht gefunden`);
+    return;
+  }
+
+  element.scrollIntoView({
+    behavior: "smooth",
+    block: "start",
+  });
+}
+
+// Funktion global verfügbar machen
+window.scrollToSection = scrollToSection;
 
 // App starten
 document.addEventListener("DOMContentLoaded", init);

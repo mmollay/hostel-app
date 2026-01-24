@@ -22,4 +22,13 @@ const CONFIG = {
   DECIMALS_POWER: 0,
   DECIMALS_ENERGY: 2,
   DECIMALS_COST: 2,
+
+  // Google Maps API Key (für Empfehlungen in der Umgebung)
+  // Kostenlos erstellen: https://console.cloud.google.com/
+  // APIs aktivieren: Places API (New) + Maps JavaScript API
+  GOOGLE_MAPS_API_KEY: "AIzaSyD96KZTjSABxmBHZGwmSLZdJI94Za0lHtA",
+
+  // OpenWeatherMap API Key (für Wettervorhersage)
+  // Kostenlos: https://openweathermap.org/api (1000 calls/Tag gratis)
+  OPENWEATHER_API_KEY: "00e7bb28c3877b28d2bbd88dfed06278",
 };

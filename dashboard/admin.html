@@ -2,469 +2,2407 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Hostel Hollenthon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Admin - Gast auf Erden</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#9CAF88">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
+        :root {
+            /* Color Palette - Matching Main Page */
+            --cream: #FAF8F5;
+            --warm-white: #FFFEFB;
+            --sand: #E8E2D9;
+            --sage: #9CAF88;
+            --sage-light: #B8C9A9;
+            --sage-dark: #7A9168;
+            --forest: #2D4A3E;
+            --earth: #8B7355;
+            --earth-light: #A69076;
+            --rose: #D4A5A5;
+            --rose-light: #E8C4C4;
+            --sky: #A7C5D4;
+            --text: #3D3D3D;
+            --text-light: #6B6B6B;
+            --text-muted: #9A9A9A;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: #FAF8F5;
-            color: #3D3D3D;
-            min-height: 100vh;
-            padding: 20px;
+        html {
+            scroll-behavior: smooth;
         }
 
-        .container {
-            max-width: 1200px;
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--cream);
+            color: var(--text);
+            line-height: 1.7;
+            min-height: 100vh;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            /* Safe Area for iPhone X+ */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, rgba(45, 74, 62, 0.7) 0%, rgba(122, 145, 104, 0.6) 100%),
+                        url('header-bg.png');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 60px 24px 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: transparent;
+            opacity: 0;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+            max-width: 600px;
             margin: 0 auto;
         }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-            margin-bottom: 30px;
+        .header-logo {
+            width: 140px;
+            height: 140px;
+            margin-bottom: 20px;
+            border-radius: 50%;
+            object-fit: contain;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
         }
 
         .header h1 {
-            font-size: 2rem;
-            color: #2D4A3E;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 500;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        .header .subtitle {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 400;
+            opacity: 0.9;
+            letter-spacing: 2px;
         }
 
         .logout-btn {
-            padding: 10px 20px;
-            background: #D4A5A5;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
             color: white;
-            border: none;
-            border-radius: 8px;
             cursor: pointer;
-            font-family: inherit;
+            padding: 10px 20px;
+            border-radius: 30px;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 500;
         }
 
         .logout-btn:hover {
-            background: #C49595;
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
         }
 
+        /* Main Content */
+        .main {
+            max-width: 1200px;
+            margin: -40px auto 40px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Cards */
         .card {
-            background: white;
+            background: var(--warm-white);
+            border-radius: 24px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--sage-light) 0%, var(--sage) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .card-icon svg {
+            width: 22px;
+            height: 22px;
+            stroke-width: 1.5;
+        }
+
+        .card-title {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--forest);
+            letter-spacing: 0.5px;
+        }
+
+        .card-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--warm-white);
             border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid rgba(0,0,0,0.06);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
 
-        .card h2 {
-            margin-bottom: 20px;
-            color: #2D4A3E;
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            border-color: var(--sage-light);
         }
 
-        .btn {
-            padding: 10px 20px;
-            background: #9CAF88;
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .stat-icon {
+            color: var(--sage);
+        }
+
+        .stat-icon svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--forest);
+        }
+
+        .stat-unit {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-left: 4px;
+        }
+
+        /* Kurtaxe Card */
+        .kurtaxe-card {
+            background: linear-gradient(135deg, var(--warm-white) 0%, #F5F8F3 100%);
+            border-radius: 24px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .kurtaxe-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .kurtaxe-header h3 {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--forest);
+            letter-spacing: 0.5px;
+        }
+
+        .kurtaxe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .kurtaxe-item {
+            text-align: center;
+            padding: 16px;
+            background: var(--warm-white);
+            border-radius: 16px;
+        }
+
+        .kurtaxe-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .kurtaxe-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--earth);
+        }
+
+        .bank-info {
+            background: var(--cream);
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .bank-info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--sand);
+        }
+
+        .bank-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .bank-info-item strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .bank-info-item span {
+            color: var(--text-light);
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, var(--sage) 0%, var(--sage-dark) 100%);
             color: white;
             border: none;
-            border-radius: 8px;
+            padding: 6px 16px;
+            border-radius: 20px;
             cursor: pointer;
+            font-size: 0.85rem;
             font-family: inherit;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(156, 175, 136, 0.4);
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 14px 18px;
+            background: var(--cream);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            color: var(--text);
             font-size: 1rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
         }
 
-        .btn:hover {
-            background: #8B9E77;
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--sage);
+            background: var(--warm-white);
         }
 
+        .form-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--sage) 0%, var(--sage-dark) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(156, 175, 136, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--sand);
+            color: var(--text-light);
+        }
+
+        .btn-secondary:hover {
+            background: var(--cream);
+        }
+
+        .btn-danger {
+            background: var(--rose-light);
+            color: var(--text);
+        }
+
+        .btn-danger:hover {
+            background: var(--rose);
+        }
+
+        /* Search Box */
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 14px 18px 14px 48px;
+            background: var(--cream);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 1rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--sage);
+            background: var(--warm-white);
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .search-icon svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 1.5;
+        }
+
+        /* Guest List */
         .guest-list {
-            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .guest-item {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 16px;
             padding: 16px;
-            border-bottom: 1px solid #E8E2D9;
+            background: var(--cream);
+            border-radius: 14px;
+            transition: background 0.2s, transform 0.2s;
         }
 
-        .guest-item:last-child {
-            border-bottom: none;
+        .guest-item:hover {
+            background: var(--sand);
+            transform: translateX(4px);
+        }
+
+        .guest-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--sage-light) 0%, var(--sage) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .guest-info {
+            flex: 1;
         }
 
         .guest-info h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text);
             margin-bottom: 4px;
         }
 
-        .guest-info p {
-            color: #6B6B6B;
-            font-size: 0.9rem;
+        .guest-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 0.85rem;
+            color: var(--text-light);
         }
 
-        .delete-btn {
-            padding: 8px 16px;
-            background: #D4A5A5;
-            color: white;
+        .guest-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .guest-meta i {
+            width: 14px;
+            height: 14px;
+            color: var(--sage-dark);
+        }
+
+        .guest-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
             border: none;
-            border-radius: 6px;
+            background: var(--warm-white);
+            color: var(--text-light);
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
         }
 
-        .delete-btn:hover {
-            background: #C49595;
+        .icon-btn:hover {
+            background: var(--sage-light);
+            color: white;
         }
 
-        .modal {
+        .icon-btn.delete:hover {
+            background: var(--rose);
+            color: white;
+        }
+
+        .icon-btn svg {
+            width: 18px;
+            height: 18px;
+            stroke-width: 2;
+        }
+
+        /* Amenities */
+        .amenity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px;
+            background: var(--cream);
+            border-radius: 14px;
+            transition: background 0.2s;
+        }
+
+        .amenity-item.editing {
+            background: var(--warm-white);
+            border: 2px solid var(--sage-light);
+        }
+
+        .amenity-item.hidden {
+            opacity: 0.5;
+        }
+
+        .amenity-icon-preview {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--sage-light) 0%, var(--sage) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .amenity-icon-preview svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .amenity-content {
+            flex: 1;
+        }
+
+        .amenity-title-display {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .amenity-desc-display {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .amenity-edit-form {
             display: none;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .amenity-edit-form.active {
+            display: flex;
+        }
+
+        .amenity-edit-form input {
+            padding: 10px 14px;
+            background: var(--warm-white);
+            border: 2px solid var(--sand);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.95rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .amenity-edit-form input:focus {
+            border-color: var(--sage);
+        }
+
+        .amenity-edit-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .amenity-edit-actions button {
+            padding: 6px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .amenity-edit-actions .save-btn {
+            background: var(--sage);
+            color: white;
+        }
+
+        .amenity-edit-actions .save-btn:hover {
+            background: var(--sage-dark);
+        }
+
+        .amenity-edit-actions .cancel-btn {
+            background: var(--sand);
+            color: var(--text-light);
+        }
+
+        .amenity-edit-actions .cancel-btn:hover {
+            background: var(--earth-light);
+        }
+
+        .amenity-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .toggle-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: var(--warm-white);
+            color: var(--text-light);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn:hover {
+            background: var(--sage-light);
+            color: white;
+        }
+
+        .toggle-btn.hidden-state {
+            background: var(--rose-light);
+            color: var(--text);
+        }
+
+        .toggle-btn.hidden-state:hover {
+            background: var(--rose);
+            color: white;
+        }
+
+        /* Kurtaxe Preview */
+        .kurtaxe-preview {
+            background: var(--sage-light);
+            background: linear-gradient(135deg, var(--sage-light) 0%, var(--sage) 100%);
+            color: white;
+            padding: 16px 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .kurtaxe-preview h4 {
+            font-size: 0.9rem;
+            font-weight: 500;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .kurtaxe-preview .amount {
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        /* Modal */
+        .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(45, 74, 62, 0.8);
+            backdrop-filter: blur(4px);
+            display: none;
             align-items: center;
             justify-content: center;
             z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
         }
 
-        .modal.active {
+        .modal-overlay.active {
             display: flex;
         }
 
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            padding: 32px;
+        .modal {
+            background: var(--warm-white);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
             max-width: 500px;
-            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .modal h2 {
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            color: #6B6B6B;
-            font-size: 0.9rem;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #E8E2D9;
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 1rem;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #9CAF88;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .btn-secondary {
-            background: #E8E2D9;
-            color: #3D3D3D;
-        }
-
-        .btn-secondary:hover {
-            background: #D8D2C9;
-        }
-
-        .login-container {
-            max-width: 400px;
-            margin: 100px auto;
-        }
-
-        .empty-state {
+            font-family: 'DM Sans', sans-serif;
+            color: var(--forest);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 24px;
             text-align: center;
-            padding: 40px;
-            color: #9A9A9A;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--cream);
+            color: var(--text);
+        }
+
+        .modal-close svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .error-text {
+            color: var(--rose);
+            font-size: 0.85rem;
+            text-align: center;
+            margin-top: 12px;
+            display: none;
+        }
+
+        .success-text {
+            color: var(--sage-dark);
+            font-size: 0.85rem;
+            text-align: center;
+            margin-top: 12px;
+            display: none;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            background: var(--warm-white);
+            border-radius: 24px;
+            padding: 8px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            border: 1px solid rgba(0,0,0,0.03);
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 14px 20px;
+            background: transparent;
+            border: none;
+            border-radius: 16px;
+            color: var(--text-light);
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            background: var(--cream);
+            color: var(--text);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--sage) 0%, var(--sage-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(156, 175, 136, 0.3);
+        }
+
+        .tab-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 48px 20px 70px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .main {
+                margin-top: -30px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .kurtaxe-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .guest-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .guest-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .tabs-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .tab-btn {
+                min-width: 100px;
+                padding: 12px 16px;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .toast {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 24px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .toast.toast-success {
+            border-left: 4px solid #4caf50;
+        }
+
+        .toast.toast-error {
+            border-left: 4px solid #f44336;
+        }
+
+        .toast.toast-info {
+            border-left: 4px solid #2196f3;
+        }
+
+        .toast-icon {
+            flex-shrink: 0;
+        }
+
+        .toast-icon.success {
+            color: #4caf50;
+        }
+
+        .toast-icon.error {
+            color: #f44336;
+        }
+
+        .toast-icon.info {
+            color: #2196f3;
+        }
+
+        .toast-message {
+            flex: 1;
+            font-size: 0.95rem;
+            color: #333;
+        }
+
+        .toast.hiding {
+            animation: slideOut 0.3s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .toast-container {
+                right: 12px;
+                left: 12px;
+                top: 12px;
+            }
+
+            .toast {
+                min-width: auto;
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Login Screen -->
-    <div id="loginScreen" class="login-container">
-        <div class="card">
-            <h2 style="text-align: center; margin-bottom: 24px;">Admin Login</h2>
+    <!-- Login Modal -->
+    <div class="modal-overlay active" id="loginModal">
+        <div class="modal">
+            <h2>Admin-Anmeldung</h2>
             <div class="form-group">
                 <label>Passwort</label>
-                <input type="password" id="adminPassword" placeholder="Passwort eingeben">
+                <input type="password" id="loginPassword" placeholder="Admin-Passwort">
             </div>
-            <button class="btn" style="width: 100%;" onclick="handleAdminLogin()">Anmelden</button>
-            <p id="loginError" style="color: #D4A5A5; text-align: center; margin-top: 10px; display: none;">Falsches Passwort</p>
+            <button class="btn btn-primary" style="width: 100%;" onclick="login()">Anmelden</button>
+            <div class="error-text" id="loginError"></div>
         </div>
     </div>
 
-    <!-- Admin Dashboard -->
-    <div id="adminDashboard" style="display: none;">
-        <div class="container">
-            <div class="header">
-                <h1>Gästeverwaltung</h1>
-                <button class="logout-btn" onclick="handleLogout()">Abmelden</button>
-            </div>
+    <!-- Guest Modal -->
+    <div class="modal-overlay" id="guestModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeGuestModal()">
+                <i data-lucide="x"></i>
+            </button>
+            <h2>Neuen Gast anlegen</h2>
 
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2 style="margin: 0;">Gäste</h2>
-                    <button class="btn" onclick="openAddGuestModal()">+ Neuer Gast</button>
-                </div>
-
-                <ul class="guest-list" id="guestList">
-                    <li class="empty-state">Keine Gäste vorhanden</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Guest Modal -->
-    <div id="addGuestModal" class="modal">
-        <div class="modal-content">
-            <h2>Neuer Gast</h2>
             <div class="form-group">
                 <label>Name</label>
-                <input type="text" id="guestName" placeholder="Max Mustermann">
+                <input type="text" id="guestName" placeholder="z.B. Max Mustermann">
             </div>
+
             <div class="form-group">
-                <label>Benutzername</label>
-                <input type="text" id="guestUsername" placeholder="max123">
+                <label>Benutzername (für Login)</label>
+                <input type="text" id="guestUsername" placeholder="max.mustermann">
             </div>
+
             <div class="form-group">
-                <label>Passwort</label>
-                <input type="text" id="guestPassword" placeholder="Temporäres Passwort">
+                <label>Passwort (für Gast-Login)</label>
+                <input type="text" id="guestPassword" placeholder="z.B. Hollenthon2024">
             </div>
+
             <div class="form-group">
                 <label>Check-in Datum</label>
                 <input type="date" id="guestCheckIn">
             </div>
+
             <div class="form-group">
                 <label>Check-out Datum</label>
                 <input type="date" id="guestCheckOut">
             </div>
-            <div class="btn-group">
-                <button class="btn" onclick="createGuest()">Erstellen</button>
-                <button class="btn btn-secondary" onclick="closeAddGuestModal()">Abbrechen</button>
+
+            <div class="form-group">
+                <label>Anzahl Personen</label>
+                <input type="number" id="guestPersons" min="1" value="1">
             </div>
-            <p id="createError" style="color: #D4A5A5; margin-top: 10px; display: none;"></p>
+
+            <div class="form-group">
+                <label>Apartment</label>
+                <select id="guestApartment">
+                    <option value="1">Gast auf Erden (Standard)</option>
+                </select>
+                <div class="form-hint">Link wird automatisch mit dem Apartment verknüpft</div>
+            </div>
+
+            <button class="btn btn-primary" style="width: 100%;" onclick="createGuestFromModal()">Gast anlegen</button>
+            <div class="error-text" id="guestError"></div>
+            <div class="success-text" id="guestSuccess"></div>
         </div>
     </div>
 
-    <script src="config.js"></script>
+    <!-- Apartment Modal -->
+    <div class="modal-overlay" id="apartmentModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeApartmentModal()">
+                <i data-lucide="x"></i>
+            </button>
+            <h2 id="apartmentModalTitle">Neues Apartment</h2>
+
+            <div class="form-group">
+                <label>Apartment-Name *</label>
+                <input type="text" id="apartmentName" placeholder="z.B. Tiny Haus mit Höhle">
+            </div>
+
+            <div class="form-group">
+                <label>URL-Slug * <span style="font-size: 0.85rem; color: #666;">(nur lowercase, zahlen, bindestriche)</span></label>
+                <input type="text" id="apartmentSlug" placeholder="z.B. hollenthon">
+                <div class="form-hint">
+                    Gäste-URL: <strong id="apartmentUrlPreview">https://gastauferden.at/?apt=hollenthon</strong>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Standort</label>
+                <input type="text" id="apartmentLocation" placeholder="z.B. Hollenthon am Waldrand">
+            </div>
+
+            <button class="btn btn-primary" style="width: 100%;" onclick="saveApartmentFromModal()">
+                <span id="apartmentSaveText">Apartment anlegen</span>
+            </button>
+            <div class="error-text" id="apartmentError"></div>
+            <div class="success-text" id="apartmentSuccess"></div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div style="position: absolute; top: 20px; left: 20px; display: flex; gap: 12px; z-index: 10;">
+            <a href="index.html" class="logout-btn" style="text-decoration: none;">
+                <i data-lucide="eye"></i>
+                <span>Gäste-Portal</span>
+            </a>
+            <button class="logout-btn" onclick="logout()">
+                <i data-lucide="log-out"></i>
+                <span>Abmelden</span>
+            </button>
+        </div>
+        <div class="header-content">
+            <img src="logo-neu.png" alt="Logo" class="header-logo">
+            <h1>Admin-Bereich</h1>
+            <p class="subtitle">Gast auf Erden</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main" id="adminContent" style="display: none;">
+        <!-- Tab Navigation -->
+        <div class="tabs-container">
+            <button class="tab-btn active" onclick="switchTab('dashboard')">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Dashboard</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('guests')">
+                <i data-lucide="users"></i>
+                <span>Gäste</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('apartments')">
+                <i data-lucide="building"></i>
+                <span>Apartments</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('amenities')">
+                <i data-lucide="sparkles"></i>
+                <span>Annehmlichkeiten</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('settings')">
+                <i data-lucide="settings"></i>
+                <span>Einstellungen</span>
+            </button>
+        </div>
+
+        <!-- Tab: Dashboard -->
+        <div class="tab-content active" id="tab-dashboard">
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Aktive Gäste</span>
+                    <span class="stat-icon"><i data-lucide="users"></i></span>
+                </div>
+                <div class="stat-value" id="activeGuests">0</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Verbrauch 24h</span>
+                    <span class="stat-icon"><i data-lucide="zap"></i></span>
+                </div>
+                <div>
+                    <span class="stat-value" id="energy24h">--</span>
+                    <span class="stat-unit">kWh</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Kosten 24h</span>
+                    <span class="stat-icon"><i data-lucide="euro"></i></span>
+                </div>
+                <div>
+                    <span class="stat-value" id="cost24h">--</span>
+                    <span class="stat-unit">€</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Aktuelle Leistung</span>
+                    <span class="stat-icon"><i data-lucide="activity"></i></span>
+                </div>
+                <div>
+                    <span class="stat-value" id="currentPower">--</span>
+                    <span class="stat-unit">W</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Gesamt Kurtaxe</span>
+                    <span class="stat-icon"><i data-lucide="banknote"></i></span>
+                </div>
+                <div>
+                    <span class="stat-value" id="totalKurtaxe">0,00</span>
+                    <span class="stat-unit">€</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kurtaxe Info Card -->
+        <div class="kurtaxe-card">
+            <div class="kurtaxe-header">
+                <h3>Kurtaxe & Zahlungsinformationen</h3>
+            </div>
+
+            <div class="kurtaxe-grid">
+                <div class="kurtaxe-item">
+                    <div class="kurtaxe-label">Tarif pro Person/Tag</div>
+                    <div class="kurtaxe-value">€2,50</div>
+                </div>
+                <div class="kurtaxe-item">
+                    <div class="kurtaxe-label">Berechnung</div>
+                    <div class="kurtaxe-value" style="font-size: 1rem;">Tage × Personen × €2,50</div>
+                </div>
+            </div>
+
+            <div class="bank-info">
+                <div class="bank-info-item">
+                    <span><strong>IBAN:</strong></span>
+                    <span id="iban">AT53 3293 7000 0060 8745</span>
+                    <button class="copy-btn" onclick="copyToClipboard('iban')">Kopieren</button>
+                </div>
+                <div class="bank-info-item">
+                    <span><strong>BIC:</strong></span>
+                    <span id="bic">RLNWATWWWRN</span>
+                    <button class="copy-btn" onclick="copyToClipboard('bic')">Kopieren</button>
+                </div>
+                <div class="bank-info-item">
+                    <span><strong>Empfänger:</strong></span>
+                    <span id="empfaenger">KAD</span>
+                    <button class="copy-btn" onclick="copyToClipboard('empfaenger')">Kopieren</button>
+                </div>
+            </div>
+        </div>
+        </div><!-- End Tab: Dashboard -->
+
+        <!-- Tab: Guests -->
+        <div class="tab-content" id="tab-guests">
+        <!-- Guest List -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon"><i data-lucide="users"></i></div>
+                <div>
+                    <h3 class="card-title">Gästeliste</h3>
+                    <p class="card-subtitle">Alle registrierten Gäste</p>
+                </div>
+                <button class="btn btn-primary" onclick="openGuestModal()" style="margin-left: auto;">
+                    <i data-lucide="user-plus" style="width: 16px; height: 16px;"></i>
+                    Neuen Gast anlegen
+                </button>
+            </div>
+
+            <div class="search-box">
+                <span class="search-icon"><i data-lucide="search"></i></span>
+                <input type="text" id="guestSearch" placeholder="Gäste durchsuchen..." oninput="filterGuests()">
+            </div>
+
+            <div class="guest-list" id="guestList">
+                <!-- Guests will be inserted here -->
+            </div>
+        </div>
+        </div><!-- End Tab: Guests -->
+
+        <!-- Tab: Apartments -->
+        <div class="tab-content" id="tab-apartments">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon"><i data-lucide="building"></i></div>
+                <div>
+                    <h3 class="card-title">Apartments</h3>
+                    <p class="card-subtitle">Verwalte deine Apartments mit eigenen URLs</p>
+                </div>
+                <button class="btn btn-primary" onclick="openApartmentModal()" style="margin-left: auto;">
+                    <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+                    Neues Apartment
+                </button>
+            </div>
+
+            <div id="apartmentsList" style="display: flex; flex-direction: column; gap: 16px; margin-top: 20px;">
+                <!-- Apartments will be inserted here -->
+            </div>
+        </div>
+        </div><!-- End Tab: Apartments -->
+
+        <!-- Tab: Amenities -->
+        <div class="tab-content" id="tab-amenities">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon"><i data-lucide="sparkles"></i></div>
+                <div>
+                    <h3 class="card-title">Annehmlichkeiten</h3>
+                    <p class="card-subtitle">Inhalte bearbeiten und Sichtbarkeit steuern</p>
+                </div>
+            </div>
+
+            <div id="amenitiesList" style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- Amenities will be inserted here -->
+            </div>
+        </div>
+        </div><!-- End Tab: Amenities -->
+
+        <!-- Tab: Settings -->
+        <div class="tab-content" id="tab-settings">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon"><i data-lucide="settings"></i></div>
+                <div>
+                    <h3 class="card-title">Hostel-Einstellungen</h3>
+                    <p class="card-subtitle">Kontaktdaten, Zeiten und weitere Parameter</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" id="hostelName" placeholder="z.B. Gast auf Erden">
+            </div>
+
+            <div class="form-group">
+                <label>Standort</label>
+                <input type="text" id="hostelLocation" placeholder="z.B. Hollenthon am Waldrand">
+            </div>
+
+            <h4 style="margin-top: 32px; margin-bottom: 16px; color: var(--forest);">Kontaktdaten</h4>
+
+            <div class="form-group">
+                <label>Telefonnummer</label>
+                <input type="tel" id="hostelPhone" placeholder="+43 123 456 789">
+            </div>
+
+            <div class="form-group">
+                <label>E-Mail-Adresse</label>
+                <input type="email" id="hostelEmail" placeholder="office@hostel.at">
+            </div>
+
+            <h4 style="margin-top: 32px; margin-bottom: 16px; color: var(--forest);">Check-in / Check-out Zeiten</h4>
+
+            <div class="form-group">
+                <label>Check-in ab</label>
+                <input type="time" id="checkInTime" value="15:00">
+            </div>
+
+            <div class="form-group">
+                <label>Check-out bis</label>
+                <input type="time" id="checkOutTime" value="11:00">
+            </div>
+
+            <h4 style="margin-top: 32px; margin-bottom: 16px; color: var(--forest);">Anrede & Tonalität</h4>
+
+            <div class="form-group">
+                <label>Förmlichkeitsform</label>
+                <select id="hostelFormalAddress">
+                    <option value="du">Du (informell)</option>
+                    <option value="sie">Sie (formell)</option>
+                </select>
+                <div class="form-hint">Bestimmt die Anrede im gesamten Gäste-Portal</div>
+            </div>
+
+            <h4 style="margin-top: 32px; margin-bottom: 16px; color: var(--forest);">Bankdaten (für Gäste sichtbar)</h4>
+
+            <div class="form-group">
+                <label>IBAN</label>
+                <input type="text" id="hostelIban" placeholder="AT53 3293 7000 0060 8745" maxlength="34">
+                <div class="form-hint">Wird Gästen für Kurtaxe-Zahlung angezeigt</div>
+            </div>
+
+            <div class="form-group">
+                <label>BIC</label>
+                <input type="text" id="hostelBic" placeholder="RLNWATWWWRN" maxlength="11">
+            </div>
+
+            <div class="form-group">
+                <label>Kontoinhaber / Empfänger</label>
+                <input type="text" id="hostelAccountHolder" placeholder="z.B. KAD">
+            </div>
+
+            <div class="form-group">
+                <label>UID-Nummer (ATU)</label>
+                <input type="text" id="hostelUid" placeholder="ATU 41596803" maxlength="20">
+                <div class="form-hint">Umsatzsteuer-Identifikationsnummer (wird im Impressum angezeigt)</div>
+            </div>
+
+            <h4 style="margin-top: 32px; margin-bottom: 16px; color: var(--forest);">Strompreis & CO₂</h4>
+
+            <div class="form-group">
+                <label>Strompreis (€/kWh)</label>
+                <input type="number" id="pricePerKwh" step="0.01" min="0" placeholder="0.29">
+                <div class="form-hint">Österreich Durchschnitt: ~0.25-0.35 €/kWh</div>
+            </div>
+
+            <div class="form-group">
+                <label>CO₂-Faktor (kg/kWh)</label>
+                <input type="number" id="co2PerKwh" step="0.01" min="0" placeholder="0.20">
+                <div class="form-hint">Österreich-Mix: ~0.20 kg CO₂/kWh</div>
+            </div>
+
+            <button class="btn btn-primary" style="width: 100%; margin-top: 24px;" onclick="saveHostelSettings()">
+                Einstellungen speichern
+            </button>
+            <div class="error-text" id="settingsError"></div>
+            <div class="success-text" id="settingsSuccess"></div>
+        </div>
+        </div><!-- End Tab: Settings -->
+
+    </main>
+
     <script>
-        let adminToken = null;
+        const API_URL = 'https://hostel-app-api.office-509.workers.dev';
+        const KURTAXE_PER_PERSON_DAY = 2.50;
+        const ADMIN_TOKEN_KEY = 'hostel_admin_token';
+        let authToken = null;
 
-        function init() {
-            adminToken = localStorage.getItem('hostel_app_admin');
-            if (adminToken) {
-                showDashboard();
-            } else {
-                document.getElementById('loginScreen').style.display = 'block';
+        // Initialize
+        lucide.createIcons();
+
+        // Check for existing session on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedToken = localStorage.getItem(ADMIN_TOKEN_KEY);
+            if (savedToken) {
+                // Auto-login with saved token
+                authToken = savedToken;
+                document.getElementById('loginModal').classList.remove('active');
+                document.getElementById('adminContent').style.display = 'block';
+                loadData();
             }
-        }
+        });
 
-        async function handleAdminLogin() {
-            const password = document.getElementById('adminPassword').value;
+        // Login
+        async function login() {
+            const password = document.getElementById('loginPassword').value;
+            const errorEl = document.getElementById('loginError');
 
             try {
-                const response = await fetch(`${CONFIG.API_PROXY_URL}/login`, {
+                const response = await fetch(`${API_URL}/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password })
                 });
 
-                const result = await response.json();
+                const data = await response.json();
 
-                if (result.success) {
-                    adminToken = result.token;
-                    localStorage.setItem('hostel_app_admin', adminToken);
-                    showDashboard();
+                if (data.success) {
+                    authToken = data.token;
+                    // Save token to localStorage for persistent session
+                    localStorage.setItem(ADMIN_TOKEN_KEY, authToken);
+                    document.getElementById('loginModal').classList.remove('active');
+                    document.getElementById('adminContent').style.display = 'block';
+                    loadData();
                 } else {
-                    document.getElementById('loginError').style.display = 'block';
+                    errorEl.textContent = 'Falsches Passwort';
+                    errorEl.style.display = 'block';
                 }
             } catch (error) {
-                console.error('Login error:', error);
-                document.getElementById('loginError').style.display = 'block';
+                errorEl.textContent = 'Verbindungsfehler';
+                errorEl.style.display = 'block';
             }
         }
 
-        async function showDashboard() {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('adminDashboard').style.display = 'block';
-            await loadGuests();
+        // Logout
+        function logout() {
+            authToken = null;
+            // Remove token from localStorage
+            localStorage.removeItem(ADMIN_TOKEN_KEY);
+            document.getElementById('adminContent').style.display = 'none';
+            document.getElementById('loginModal').classList.add('active');
+            document.getElementById('loginPassword').value = '';
         }
 
+        // Tab Navigation
+        function switchTab(tabName) {
+            // Deactivate all tabs and buttons
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            // Activate selected tab
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            event.target.closest('.tab-btn').classList.add('active');
+
+            // Re-initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        // Load Data
+        async function loadData() {
+            await Promise.all([
+                loadGuests(),
+                loadEnergyData(),
+                loadAmenities(),
+                loadHostelSettings()
+            ]);
+        }
+
+        // Load Guests
         async function loadGuests() {
             try {
-                const response = await fetch(`${CONFIG.API_PROXY_URL}/guests`, {
-                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                const response = await fetch(`${API_URL}/guests`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
                 });
 
-                const result = await response.json();
-                const guests = result.guests || [];
+                const data = await response.json();
+                const guests = data.guests || [];
 
-                const list = document.getElementById('guestList');
-                list.textContent = ''; // Clear list
+                // Update stats
+                const now = new Date();
+                const activeGuests = guests.filter(g => {
+                    const checkIn = new Date(g.checkIn);
+                    const checkOut = new Date(g.checkOut);
+                    return now >= checkIn && now <= checkOut;
+                });
 
+                document.getElementById('activeGuests').textContent = activeGuests.length;
+
+                // Calculate total Kurtaxe
+                const totalKurtaxe = calculateTotalKurtaxe(activeGuests);
+                document.getElementById('totalKurtaxe').textContent = totalKurtaxe.toFixed(2);
+
+                // Render guest list
+                const listEl = document.getElementById('guestList');
                 if (guests.length === 0) {
-                    const emptyLi = document.createElement('li');
-                    emptyLi.className = 'empty-state';
-                    emptyLi.textContent = 'Keine Gäste vorhanden';
-                    list.appendChild(emptyLi);
+                    listEl.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 32px;">Noch keine Gäste angelegt</p>';
                 } else {
-                    guests.forEach(guest => {
-                        const li = document.createElement('li');
-                        li.className = 'guest-item';
-
-                        const info = document.createElement('div');
-                        info.className = 'guest-info';
-
-                        const h3 = document.createElement('h3');
-                        h3.textContent = guest.name;
-                        info.appendChild(h3);
-
-                        const p = document.createElement('p');
-                        p.textContent = `Username: ${guest.username} | Check-in: ${formatDate(guest.checkIn)} | Check-out: ${formatDate(guest.checkOut)}`;
-                        info.appendChild(p);
-
-                        const deleteBtn = document.createElement('button');
-                        deleteBtn.className = 'delete-btn';
-                        deleteBtn.textContent = 'Löschen';
-                        deleteBtn.onclick = () => deleteGuest(guest.id);
-
-                        li.appendChild(info);
-                        li.appendChild(deleteBtn);
-                        list.appendChild(li);
-                    });
+                    listEl.innerHTML = guests.map(guest => renderGuest(guest)).join('');
                 }
+
+                // Re-initialize icons after rendering
+                setTimeout(() => lucide.createIcons(), 0);
             } catch (error) {
                 console.error('Error loading guests:', error);
             }
         }
 
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        }
+        // Render Guest
+        function renderGuest(guest) {
+            const kurtaxe = calculateKurtaxe(guest);
+            const persons = guest.numberOfPersons || 1;
+            const checkInDate = new Date(guest.checkIn).toLocaleDateString('de-DE');
+            const checkOutDate = new Date(guest.checkOut).toLocaleDateString('de-DE');
 
-        function openAddGuestModal() {
-            document.getElementById('addGuestModal').classList.add('active');
-            const today = new Date().toISOString().split('T')[0];
-            const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
-            document.getElementById('guestCheckIn').value = today;
-            document.getElementById('guestCheckOut').value = tomorrow;
-            document.getElementById('guestPassword').value = generatePassword();
-        }
+            // Check if guest is currently active
+            const now = new Date();
+            const checkIn = new Date(guest.checkIn);
+            const checkOut = new Date(guest.checkOut);
+            const isActive = now >= checkIn && now <= checkOut;
 
-        function closeAddGuestModal() {
-            document.getElementById('addGuestModal').classList.remove('active');
-            document.getElementById('guestName').value = '';
-            document.getElementById('guestUsername').value = '';
-            document.getElementById('guestPassword').value = '';
-            document.getElementById('createError').style.display = 'none';
-        }
-
-        function generatePassword() {
-            const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-            let password = '';
-            for (let i = 0; i < 8; i++) {
-                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            // Calculate energy consumption for active guests
+            let energyDisplay = '';
+            if (isActive && guest.energyConsumption !== undefined) {
+                energyDisplay = `<span><i data-lucide="zap"></i> ${guest.energyConsumption.toFixed(2)} kWh</span>`;
+            } else if (isActive) {
+                energyDisplay = `<span><i data-lucide="zap"></i> Wird erfasst...</span>`;
             }
-            return password;
+
+            return `
+                <div class="guest-item" data-guest-name="${guest.name.toLowerCase()}" data-guest-username="${guest.username.toLowerCase()}">
+                    <div class="guest-avatar">${guest.name.charAt(0).toUpperCase()}</div>
+                    <div class="guest-info">
+                        <h3>${guest.name}</h3>
+                        <div class="guest-meta">
+                            <span><i data-lucide="user"></i> ${guest.username}</span>
+                            <span><i data-lucide="users"></i> ${persons} ${persons === 1 ? 'Person' : 'Personen'}</span>
+                            <span><i data-lucide="calendar"></i> ${checkInDate} - ${checkOutDate}</span>
+                            ${energyDisplay}
+                            <span><i data-lucide="banknote"></i> Kurtaxe: €${kurtaxe.toFixed(2)}</span>
+                        </div>
+                    </div>
+                    <div class="guest-actions">
+                        <button class="icon-btn delete" onclick="deleteGuest('${guest.id}')" title="Löschen">
+                            <i data-lucide="trash-2"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
         }
 
+        // Calculate Kurtaxe
+        function calculateKurtaxe(guest) {
+            const checkIn = new Date(guest.checkIn);
+            const checkOut = new Date(guest.checkOut);
+            const days = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+            const persons = guest.numberOfPersons || 1;
+            return days * persons * KURTAXE_PER_PERSON_DAY;
+        }
+
+        function calculateTotalKurtaxe(guests) {
+            return guests.reduce((sum, guest) => sum + calculateKurtaxe(guest), 0);
+        }
+
+        // Update Kurtaxe Preview
+        function updateKurtaxePreview() {
+            const checkIn = document.getElementById('guestCheckIn').value;
+            const checkOut = document.getElementById('guestCheckOut').value;
+            const persons = parseInt(document.getElementById('guestPersons').value) || 1;
+
+            if (checkIn && checkOut) {
+                const checkInDate = new Date(checkIn);
+                const checkOutDate = new Date(checkOut);
+                const days = Math.ceil((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
+                const kurtaxe = days * persons * KURTAXE_PER_PERSON_DAY;
+
+                document.getElementById('kurtaxeAmount').textContent = '€' + kurtaxe.toFixed(2);
+                document.getElementById('kurtaxePreview').style.display = 'block';
+            } else {
+                document.getElementById('kurtaxePreview').style.display = 'none';
+            }
+        }
+
+        // Add event listeners for date changes
+        document.addEventListener('DOMContentLoaded', () => {
+            const checkInInput = document.getElementById('guestCheckIn');
+            const checkOutInput = document.getElementById('guestCheckOut');
+
+            if (checkInInput) checkInInput.addEventListener('change', updateKurtaxePreview);
+            if (checkOutInput) checkOutInput.addEventListener('change', updateKurtaxePreview);
+        });
+
+        // Create Guest
         async function createGuest() {
             const name = document.getElementById('guestName').value;
             const username = document.getElementById('guestUsername').value;
             const password = document.getElementById('guestPassword').value;
             const checkIn = document.getElementById('guestCheckIn').value;
             const checkOut = document.getElementById('guestCheckOut').value;
+            const numberOfPersons = parseInt(document.getElementById('guestPersons').value) || 1;
+            const apartmentId = parseInt(document.getElementById('guestApartment').value) || 1;
+
+            const errorEl = document.getElementById('guestError');
+            const successEl = document.getElementById('guestSuccess');
+
+            errorEl.style.display = 'none';
+            successEl.style.display = 'none';
 
             if (!name || !username || !password || !checkIn || !checkOut) {
-                document.getElementById('createError').textContent = 'Alle Felder sind erforderlich';
-                document.getElementById('createError').style.display = 'block';
+                errorEl.textContent = 'Bitte alle Felder ausfüllen';
+                errorEl.style.display = 'block';
                 return;
             }
 
             try {
-                const response = await fetch(`${CONFIG.API_PROXY_URL}/guests`, {
+                const response = await fetch(`${API_URL}/guests`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${adminToken}`
+                        'Authorization': `Bearer ${authToken}`
                     },
-                    body: JSON.stringify({ name, username, password, checkIn, checkOut })
+                    body: JSON.stringify({ name, username, password, checkIn, checkOut, numberOfPersons, apartmentId })
                 });
 
-                const result = await response.json();
+                const data = await response.json();
 
-                if (result.success) {
-                    closeAddGuestModal();
-                    await loadGuests();
+                if (data.success) {
+                    successEl.textContent = 'Gast erfolgreich angelegt!';
+                    successEl.style.display = 'block';
+
+                    // Clear form
+                    document.getElementById('guestName').value = '';
+                    document.getElementById('guestUsername').value = '';
+                    document.getElementById('guestPassword').value = '';
+                    document.getElementById('guestCheckIn').value = '';
+                    document.getElementById('guestCheckOut').value = '';
+                    document.getElementById('guestPersons').value = '1';
+                    document.getElementById('kurtaxePreview').style.display = 'none';
+                    document.getElementById('guestSearch').value = '';
+
+                    // Reload guests
+                    loadGuests();
                 } else {
-                    document.getElementById('createError').textContent = result.error;
-                    document.getElementById('createError').style.display = 'block';
+                    errorEl.textContent = data.error || 'Fehler beim Anlegen';
+                    errorEl.style.display = 'block';
                 }
             } catch (error) {
-                console.error('Error creating guest:', error);
-                document.getElementById('createError').textContent = 'Fehler beim Erstellen';
-                document.getElementById('createError').style.display = 'block';
+                errorEl.textContent = 'Verbindungsfehler';
+                errorEl.style.display = 'block';
             }
         }
 
+        // Delete Guest
         async function deleteGuest(id) {
             if (!confirm('Gast wirklich löschen?')) return;
 
             try {
-                const response = await fetch(`${CONFIG.API_PROXY_URL}/guests/${id}`, {
+                const response = await fetch(`${API_URL}/guests/${id}`, {
                     method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                    headers: { 'Authorization': `Bearer ${authToken}` }
                 });
 
-                const result = await response.json();
+                const data = await response.json();
 
-                if (result.success) {
-                    await loadGuests();
+                if (data.success) {
+                    loadGuests();
                 }
             } catch (error) {
                 console.error('Error deleting guest:', error);
             }
         }
 
-        function handleLogout() {
-            adminToken = null;
-            localStorage.removeItem('hostel_app_admin');
-            document.getElementById('adminDashboard').style.display = 'none';
-            document.getElementById('loginScreen').style.display = 'block';
-            document.getElementById('adminPassword').value = '';
+        // Guest Modal Functions
+        async function openGuestModal() {
+            // Load apartments if not already loaded
+            if (apartments.length === 0) {
+                await loadApartments();
+            }
+
+            // Populate apartment select
+            const apartmentSelect = document.getElementById('guestApartment');
+            apartmentSelect.innerHTML = apartments.map(apt =>
+                `<option value="${apt.id}">${apt.name} (${apt.slug})</option>`
+            ).join('');
+
+            document.getElementById('guestModal').classList.add('active');
+            lucide.createIcons();
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            init();
-            document.getElementById('adminPassword').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') handleAdminLogin();
+        function closeGuestModal() {
+            document.getElementById('guestModal').classList.remove('active');
+            // Clear form
+            document.getElementById('guestName').value = '';
+            document.getElementById('guestUsername').value = '';
+            document.getElementById('guestPassword').value = '';
+            document.getElementById('guestCheckIn').value = '';
+            document.getElementById('guestCheckOut').value = '';
+            document.getElementById('guestPersons').value = '1';
+            document.getElementById('guestError').style.display = 'none';
+            document.getElementById('guestSuccess').style.display = 'none';
+        }
+
+        async function createGuestFromModal() {
+            await createGuest();
+            // If successful, close modal after 1.5 seconds
+            const successEl = document.getElementById('guestSuccess');
+            if (successEl.style.display === 'block') {
+                setTimeout(() => {
+                    closeGuestModal();
+                }, 1500);
+            }
+        }
+
+        // Load Energy Data
+        async function loadEnergyData() {
+            try {
+                const response = await fetch(`${API_URL}/`);
+                const data = await response.json();
+
+                if (data.data && data.data.device_status) {
+                    const status = data.data.device_status;
+                    const settings = data.settings || {};
+
+                    // Current Power
+                    const totalPower = status.total_act_power || 0;
+                    document.getElementById('currentPower').textContent = Math.abs(Math.round(totalPower));
+
+                    // 24h Energy
+                    const energy24h = (status.total_act || 0) / 1000;
+                    document.getElementById('energy24h').textContent = energy24h.toFixed(2);
+
+                    // 24h Cost
+                    const pricePerKwh = settings.pricePerKwh || 0.29;
+                    const cost24h = energy24h * pricePerKwh;
+                    document.getElementById('cost24h').textContent = cost24h.toFixed(2);
+                }
+            } catch (error) {
+                console.error('Error loading energy data:', error);
+            }
+        }
+
+        // Filter Guests
+        function filterGuests() {
+            const searchTerm = document.getElementById('guestSearch').value.toLowerCase();
+            const guestItems = document.querySelectorAll('.guest-item');
+
+            guestItems.forEach(item => {
+                const name = item.dataset.guestName || '';
+                const username = item.dataset.guestUsername || '';
+
+                if (name.includes(searchTerm) || username.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
             });
-            lucide.createIcons();
+        }
+
+        // Copy to Clipboard
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                // Show temporary success feedback
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✓ Kopiert';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            });
+        }
+
+        // Enter key login
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginInput = document.getElementById('loginPassword');
+            if (loginInput) {
+                loginInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') login();
+                });
+            }
         });
+
+        // Auto-refresh data every 30 seconds
+        setInterval(() => {
+            if (authToken) {
+                loadData();
+            }
+        }, 30000);
+
+        // ============================================
+        // AMENITIES (Annehmlichkeiten)
+        // ============================================
+
+        // Load Amenities
+        async function loadAmenities() {
+            try {
+                const response = await fetch(`${API_URL}/amenities/all`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                const data = await response.json();
+                const amenities = data.amenities || [];
+
+                const listEl = document.getElementById('amenitiesList');
+                if (amenities.length === 0) {
+                    listEl.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 32px;">Keine Annehmlichkeiten vorhanden</p>';
+                } else {
+                    listEl.innerHTML = amenities.map(amenity => renderAmenity(amenity)).join('');
+                }
+
+                // Re-initialize icons
+                setTimeout(() => lucide.createIcons(), 0);
+            } catch (error) {
+                console.error('Error loading amenities:', error);
+            }
+        }
+
+        // Render Amenity
+        function renderAmenity(amenity) {
+            const visibleClass = amenity.is_visible === 1 ? '' : 'hidden';
+            const visibleIcon = amenity.is_visible === 1 ? 'eye' : 'eye-off';
+            const toggleClass = amenity.is_visible === 1 ? '' : 'hidden-state';
+
+            return `
+                <div class="amenity-item ${visibleClass}" id="amenity-${amenity.id}">
+                    <div class="amenity-icon-preview">
+                        <i data-lucide="${amenity.icon}"></i>
+                    </div>
+                    <div class="amenity-content">
+                        <!-- Display Mode -->
+                        <div class="amenity-display" id="display-${amenity.id}">
+                            <div class="amenity-title-display">${amenity.title}</div>
+                            <div class="amenity-desc-display">${amenity.description}</div>
+                        </div>
+
+                        <!-- Edit Mode -->
+                        <div class="amenity-edit-form" id="edit-${amenity.id}">
+                            <input type="text" id="title-${amenity.id}" value="${amenity.title}" placeholder="Titel">
+                            <input type="text" id="desc-${amenity.id}" value="${amenity.description}" placeholder="Beschreibung">
+                            <div class="amenity-edit-actions">
+                                <button class="save-btn" onclick="saveAmenity('${amenity.id}')">Speichern</button>
+                                <button class="cancel-btn" onclick="cancelEditAmenity('${amenity.id}')">Abbrechen</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="amenity-actions">
+                        <button class="toggle-btn ${toggleClass}" onclick="toggleAmenityVisibility('${amenity.id}')" title="${amenity.is_visible === 1 ? 'Ausblenden' : 'Einblenden'}">
+                            <i data-lucide="${visibleIcon}"></i>
+                        </button>
+                        <button class="icon-btn" onclick="editAmenity('${amenity.id}')" title="Bearbeiten">
+                            <i data-lucide="edit-2"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Edit Amenity (activate edit mode)
+        function editAmenity(id) {
+            const displayEl = document.getElementById(`display-${id}`);
+            const editEl = document.getElementById(`edit-${id}`);
+            const itemEl = document.getElementById(`amenity-${id}`);
+
+            displayEl.style.display = 'none';
+            editEl.classList.add('active');
+            itemEl.classList.add('editing');
+        }
+
+        // Cancel Edit
+        function cancelEditAmenity(id) {
+            const displayEl = document.getElementById(`display-${id}`);
+            const editEl = document.getElementById(`edit-${id}`);
+            const itemEl = document.getElementById(`amenity-${id}`);
+
+            displayEl.style.display = 'block';
+            editEl.classList.remove('active');
+            itemEl.classList.remove('editing');
+        }
+
+        // Save Amenity
+        async function saveAmenity(id) {
+            const title = document.getElementById(`title-${id}`).value;
+            const description = document.getElementById(`desc-${id}`).value;
+
+            if (!title || !description) {
+                alert('Bitte alle Felder ausfüllen');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/amenities/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ title, description })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update display
+                    document.querySelector(`#display-${id} .amenity-title-display`).textContent = title;
+                    document.querySelector(`#display-${id} .amenity-desc-display`).textContent = description;
+
+                    // Exit edit mode
+                    cancelEditAmenity(id);
+                } else {
+                    alert('Fehler beim Speichern');
+                }
+            } catch (error) {
+                console.error('Error saving amenity:', error);
+                alert('Verbindungsfehler');
+            }
+        }
+
+        // Toggle Amenity Visibility
+        async function toggleAmenityVisibility(id) {
+            try {
+                const response = await fetch(`${API_URL}/amenities/${id}/toggle`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Reload amenities to reflect changes
+                    await loadAmenities();
+                } else {
+                    alert('Fehler beim Umschalten');
+                }
+            } catch (error) {
+                console.error('Error toggling amenity:', error);
+                alert('Verbindungsfehler');
+            }
+        }
+
+        // ============================================
+        // HOSTEL-EINSTELLUNGEN
+        // ============================================
+
+        // Load Hostel Settings
+        async function loadHostelSettings() {
+            try {
+                const response = await fetch(`${API_URL}/hostel/settings`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                const data = await response.json();
+                if (data.success && data.settings) {
+                    const s = data.settings;
+
+                    // Basic Info
+                    if (s.name) document.getElementById('hostelName').value = s.name;
+                    if (s.location) document.getElementById('hostelLocation').value = s.location;
+
+                    // Contact
+                    if (s.phone) document.getElementById('hostelPhone').value = s.phone;
+                    if (s.email) document.getElementById('hostelEmail').value = s.email;
+
+                    // Times
+                    if (s.checkInTime) document.getElementById('checkInTime').value = s.checkInTime;
+                    if (s.checkOutTime) document.getElementById('checkOutTime').value = s.checkOutTime;
+
+                    // Formal Address
+                    if (s.formalAddress) document.getElementById('hostelFormalAddress').value = s.formalAddress;
+
+                    // Bank Details
+                    if (s.iban) document.getElementById('hostelIban').value = s.iban;
+                    if (s.bic) document.getElementById('hostelBic').value = s.bic;
+                    if (s.accountHolder) document.getElementById('hostelAccountHolder').value = s.accountHolder;
+                    if (s.uid) document.getElementById('hostelUid').value = s.uid;
+
+                    // Energy
+                    if (s.pricePerKwh) document.getElementById('pricePerKwh').value = s.pricePerKwh;
+                    if (s.co2PerKwh) document.getElementById('co2PerKwh').value = s.co2PerKwh;
+                }
+            } catch (error) {
+                console.error('Error loading hostel settings:', error);
+            }
+        }
+
+        // Save Hostel Settings
+        async function saveHostelSettings() {
+            const errorEl = document.getElementById('settingsError');
+            const successEl = document.getElementById('settingsSuccess');
+
+            errorEl.style.display = 'none';
+            successEl.style.display = 'none';
+
+            const settings = {
+                name: document.getElementById('hostelName').value,
+                location: document.getElementById('hostelLocation').value,
+                phone: document.getElementById('hostelPhone').value,
+                email: document.getElementById('hostelEmail').value,
+                checkInTime: document.getElementById('checkInTime').value,
+                checkOutTime: document.getElementById('checkOutTime').value,
+                formalAddress: document.getElementById('hostelFormalAddress').value,
+                iban: document.getElementById('hostelIban').value,
+                bic: document.getElementById('hostelBic').value,
+                accountHolder: document.getElementById('hostelAccountHolder').value,
+                uid: document.getElementById('hostelUid').value,
+                pricePerKwh: parseFloat(document.getElementById('pricePerKwh').value) || 0.29,
+                co2PerKwh: parseFloat(document.getElementById('co2PerKwh').value) || 0.20
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/hostel/settings`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(settings)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast('Einstellungen erfolgreich gespeichert!', 'success');
+                    // Auch die alte Anzeige für Kompatibilität
+                    successEl.textContent = 'Einstellungen erfolgreich gespeichert!';
+                    successEl.style.display = 'block';
+                    setTimeout(() => {
+                        successEl.style.display = 'none';
+                    }, 3000);
+                } else {
+                    showToast(data.error || 'Fehler beim Speichern', 'error');
+                    errorEl.textContent = data.error || 'Fehler beim Speichern';
+                    errorEl.style.display = 'block';
+                }
+            } catch (error) {
+                showToast('Verbindungsfehler', 'error');
+                errorEl.textContent = 'Verbindungsfehler';
+                errorEl.style.display = 'block';
+            }
+        }
+
+        /**
+         * Toast Notification anzeigen
+         */
+        function showToast(message, type = 'success', duration = 3000) {
+            // Toast Container erstellen falls nicht vorhanden
+            let container = document.getElementById('toastContainer');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toastContainer';
+                container.className = 'toast-container';
+                document.body.appendChild(container);
+            }
+
+            // Icon basierend auf Typ
+            let iconName = 'check-circle';
+            let iconClass = 'success';
+            if (type === 'error') {
+                iconName = 'x-circle';
+                iconClass = 'error';
+            } else if (type === 'info') {
+                iconName = 'info';
+                iconClass = 'info';
+            }
+
+            // Toast Element erstellen
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <div class="toast-icon ${iconClass}">
+                    <i data-lucide="${iconName}" style="width: 20px; height: 20px;"></i>
+                </div>
+                <div class="toast-message">${message}</div>
+            `;
+
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            // Nach duration ausblenden
+            setTimeout(() => {
+                toast.classList.add('hiding');
+                setTimeout(() => {
+                    toast.remove();
+                    // Container entfernen falls leer
+                    if (container.children.length === 0) {
+                        container.remove();
+                    }
+                }, 300);
+            }, duration);
+        }
+
+        // ==========================================
+        // APARTMENTS MANAGEMENT
+        // ==========================================
+
+        let currentApartmentId = null;
+        let apartments = [];
+
+        // Load Apartments
+        async function loadApartments() {
+            try {
+                const response = await fetch(`${API_URL}/apartments`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    apartments = data.apartments;
+                    displayApartments();
+                }
+            } catch (error) {
+                console.error('Error loading apartments:', error);
+            }
+        }
+
+        // Display Apartments
+        function displayApartments() {
+            const container = document.getElementById('apartmentsList');
+            if (!container) return;
+
+            if (apartments.length === 0) {
+                container.innerHTML = '<p style="color: #999; text-align: center; padding: 40px;">Noch keine Apartments angelegt</p>';
+                return;
+            }
+
+            container.innerHTML = apartments.map(apt => `
+                <div class="card" style="padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                        <div>
+                            <h3 style="margin: 0 0 8px 0; color: var(--forest);">${apt.name}</h3>
+                            <p style="margin: 0; color: #666; font-size: 0.9rem;">${apt.location || 'Kein Standort'}</p>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-secondary" onclick="editApartment(${apt.id})" style="padding: 8px 16px;">
+                                <i data-lucide="edit" style="width: 14px; height: 14px;"></i>
+                                Bearbeiten
+                            </button>
+                            ${apt.id !== 1 ? `
+                                <button class="btn" onclick="deleteApartmentConfirm(${apt.id})" style="padding: 8px 16px; background: #dc3545; color: white;">
+                                    <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+
+                    <div style="background: var(--cream); padding: 16px; border-radius: 8px; margin-bottom: 12px;">
+                        <div style="font-size: 0.85rem; color: #666; margin-bottom: 8px;">Gäste-URL für dieses Apartment:</div>
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <code style="flex: 1; background: white; padding: 12px; border-radius: 6px; font-size: 0.9rem; word-break: break-all;">
+                                ${window.location.origin}/?apt=${apt.slug}
+                            </code>
+                            <button class="btn btn-primary" onclick="copyApartmentUrl('${apt.slug}')" style="padding: 12px 20px; white-space: nowrap;">
+                                <i data-lucide="copy" style="width: 16px; height: 16px; margin-right: 6px;"></i>
+                                Kopieren
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; font-size: 0.85rem;">
+                        <div>
+                            <strong>Slug:</strong> <code>${apt.slug}</code>
+                        </div>
+                        <div>
+                            <strong>Förmlichkeit:</strong> ${apt.settings?.formalAddress === 'sie' ? 'Sie (formell)' : 'Du (informell)'}
+                        </div>
+                        <div>
+                            <strong>Check-in:</strong> ${apt.settings?.checkInTime || '15:00'}
+                        </div>
+                        <div>
+                            <strong>Check-out:</strong> ${apt.settings?.checkOutTime || '11:00'}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            lucide.createIcons();
+        }
+
+        // Copy Apartment URL
+        function copyApartmentUrl(slug) {
+            const url = `${window.location.origin}/?apt=${slug}`;
+            navigator.clipboard.writeText(url).then(() => {
+                showToast('URL in Zwischenablage kopiert!', 'success');
+            }).catch(err => {
+                console.error('Fehler beim Kopieren:', err);
+                showToast('Fehler beim Kopieren', 'error');
+            });
+        }
+
+        // Open Apartment Modal (Create)
+        function openApartmentModal() {
+            currentApartmentId = null;
+            document.getElementById('apartmentModalTitle').textContent = 'Neues Apartment';
+            document.getElementById('apartmentSaveText').textContent = 'Apartment anlegen';
+            document.getElementById('apartmentName').value = '';
+            document.getElementById('apartmentSlug').value = '';
+            document.getElementById('apartmentLocation').value = '';
+            document.getElementById('apartmentError').textContent = '';
+            document.getElementById('apartmentSuccess').textContent = '';
+            document.getElementById('apartmentModal').classList.add('active');
+
+            // Slug preview on input
+            document.getElementById('apartmentSlug').oninput = (e) => {
+                const slug = e.target.value;
+                document.getElementById('apartmentUrlPreview').textContent =
+                    slug ? `${window.location.origin}/?apt=${slug}` : '${window.location.origin}/?apt=hollenthon';
+            };
+
+            lucide.createIcons();
+        }
+
+        // Edit Apartment
+        function editApartment(id) {
+            const apt = apartments.find(a => a.id === id);
+            if (!apt) return;
+
+            currentApartmentId = id;
+            document.getElementById('apartmentModalTitle').textContent = 'Apartment bearbeiten';
+            document.getElementById('apartmentSaveText').textContent = 'Änderungen speichern';
+            document.getElementById('apartmentName').value = apt.name;
+            document.getElementById('apartmentSlug').value = apt.slug;
+            document.getElementById('apartmentSlug').disabled = true; // Slug nicht änderbar
+            document.getElementById('apartmentLocation').value = apt.location || '';
+            document.getElementById('apartmentError').textContent = '';
+            document.getElementById('apartmentSuccess').textContent = '';
+            document.getElementById('apartmentModal').classList.add('active');
+            lucide.createIcons();
+        }
+
+        // Close Apartment Modal
+        function closeApartmentModal() {
+            document.getElementById('apartmentModal').classList.remove('active');
+            document.getElementById('apartmentSlug').disabled = false;
+        }
+
+        // Save Apartment from Modal
+        async function saveApartmentFromModal() {
+            const name = document.getElementById('apartmentName').value;
+            const slug = document.getElementById('apartmentSlug').value;
+            const location = document.getElementById('apartmentLocation').value;
+            const errorEl = document.getElementById('apartmentError');
+            const successEl = document.getElementById('apartmentSuccess');
+
+            errorEl.textContent = '';
+            successEl.textContent = '';
+
+            if (!name || !slug) {
+                errorEl.textContent = 'Name und Slug sind erforderlich';
+                return;
+            }
+
+            // Slug validation
+            if (!/^[a-z0-9-]+$/.test(slug)) {
+                errorEl.textContent = 'Slug darf nur lowercase Buchstaben, Zahlen und Bindestriche enthalten';
+                return;
+            }
+
+            try {
+                let response;
+                if (currentApartmentId) {
+                    // Update
+                    response = await fetch(`${API_URL}/apartments/${currentApartmentId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                        body: JSON.stringify({ name, location })
+                    });
+                } else {
+                    // Create
+                    response = await fetch(`${API_URL}/apartments`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                        body: JSON.stringify({ name, slug, location })
+                    });
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast(currentApartmentId ? 'Apartment aktualisiert!' : 'Apartment erstellt!', 'success');
+                    closeApartmentModal();
+                    await loadApartments();
+                } else {
+                    errorEl.textContent = data.error || 'Fehler beim Speichern';
+                }
+            } catch (error) {
+                console.error('Error saving apartment:', error);
+                errorEl.textContent = 'Verbindungsfehler';
+            }
+        }
+
+        // Delete Apartment
+        async function deleteApartmentConfirm(id) {
+            const apt = apartments.find(a => a.id === id);
+            if (!apt) return;
+
+            if (!confirm(`Apartment "${apt.name}" wirklich löschen?\n\nDies kann nicht rückgängig gemacht werden.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/apartments/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast('Apartment gelöscht', 'success');
+                    await loadApartments();
+                } else {
+                    alert(data.error || 'Fehler beim Löschen');
+                }
+            } catch (error) {
+                console.error('Error deleting apartment:', error);
+                alert('Verbindungsfehler');
+            }
+        }
+
+        // Load apartments on tab switch
+        const originalSwitchTab = switchTab;
+        switchTab = function(tab) {
+            originalSwitchTab(tab);
+            if (tab === 'apartments') {
+                loadApartments();
+            }
+        };
     </script>
 </body>
 </html>

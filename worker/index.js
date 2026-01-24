@@ -20,7 +20,7 @@ export default {
     const url = new URL(request.url);
     const corsHeaders = {
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
     };
 
@@ -69,9 +69,117 @@ export default {
         return await deleteGuest(request, env, corsHeaders, id);
       }
 
-      // GET / - Shelly Daten + Einstellungen
+      // GET / - Shelly Daten + Einstellungen + Energie-Historie
       if (path === "/" && request.method === "GET") {
         return await getShellyData(env, corsHeaders);
+      }
+
+      // GET /energy/today - Heutige Energie-Daten
+      if (path === "/energy/today" && request.method === "GET") {
+        return await getEnergyToday(env, corsHeaders);
+      }
+
+      // GET /energy/yesterday - Gestrige Energie-Daten
+      if (path === "/energy/yesterday" && request.method === "GET") {
+        return await getEnergyYesterday(env, corsHeaders);
+      }
+
+      // GET /energy/month - Monats-Energie-Daten
+      if (path === "/energy/month" && request.method === "GET") {
+        return await getEnergyMonth(env, corsHeaders);
+      }
+
+      // POST /energy/save - Energie-Daten speichern
+      if (path === "/energy/save" && request.method === "POST") {
+        return await saveEnergyData(request, env, corsHeaders);
+      }
+
+      // GET /amenities - Öffentlich: Nur sichtbare Annehmlichkeiten
+      if (path === "/amenities" && request.method === "GET") {
+        return await getAmenities(env, corsHeaders, false);
+      }
+
+      // GET /amenities/all - Admin: Alle Annehmlichkeiten inkl. ausgeblendete
+      if (path === "/amenities/all" && request.method === "GET") {
+        return await getAmenities(env, corsHeaders, true);
+      }
+
+      // PUT /amenities/:id/toggle - Sichtbarkeit umschalten (Admin only)
+      // WICHTIG: Muss VOR der generischen /amenities/:id Route stehen!
+      if (path.match(/\/amenities\/.*\/toggle$/) && request.method === "PUT") {
+        const id = path.split("/")[2];
+        return await toggleAmenity(request, env, corsHeaders, id);
+      }
+
+      // PUT /amenities/:id - Annehmlichkeit bearbeiten (Admin only)
+      if (path.startsWith("/amenities/") && request.method === "PUT") {
+        const id = path.split("/")[2];
+        return await updateAmenity(request, env, corsHeaders, id);
+      }
+
+      // GET /hostel/settings - Hostel-Einstellungen abrufen (Admin only)
+      if (path === "/hostel/settings" && request.method === "GET") {
+        return await getHostelSettings(request, env, corsHeaders);
+      }
+
+      // PUT /hostel/settings - Hostel-Einstellungen speichern (Admin only)
+      if (path === "/hostel/settings" && request.method === "PUT") {
+        return await updateHostelSettings(request, env, corsHeaders);
+      }
+
+      // GET /hostel/info - Öffentliche Hostel-Info (für Gäste)
+      if (path === "/hostel/info" && request.method === "GET") {
+        return await getPublicHostelInfo(env, corsHeaders);
+      }
+
+      // ============================================
+      // APARTMENTS MANAGEMENT
+      // ============================================
+
+      // GET /apartments - Alle Apartments auflisten (Admin only)
+      if (path === "/apartments" && request.method === "GET") {
+        return await getApartments(request, env, corsHeaders);
+      }
+
+      // POST /apartments - Neues Apartment anlegen (Admin only)
+      if (path === "/apartments" && request.method === "POST") {
+        return await createApartment(request, env, corsHeaders);
+      }
+
+      // GET /apartments/public/list - Öffentliche Liste aller Apartments (slug, name, location)
+      if (path === "/apartments/public/list" && request.method === "GET") {
+        return await getPublicApartmentsList(env, corsHeaders);
+      }
+
+      // GET /apartments/:slug/info - Public Info für ein Apartment
+      if (
+        path.match(/^\/apartments\/[^\/]+\/info$/) &&
+        request.method === "GET"
+      ) {
+        const slug = path.split("/")[2];
+        return await getApartmentInfo(slug, env, corsHeaders);
+      }
+
+      // PUT /apartments/:id - Apartment aktualisieren (Admin only)
+      if (path.match(/^\/apartments\/\d+$/) && request.method === "PUT") {
+        const id = parseInt(path.split("/")[2]);
+        return await updateApartment(request, env, corsHeaders, id);
+      }
+
+      // DELETE /apartments/:id - Apartment löschen (Admin only)
+      if (path.match(/^\/apartments\/\d+$/) && request.method === "DELETE") {
+        const id = parseInt(path.split("/")[2]);
+        return await deleteApartment(request, env, corsHeaders, id);
+      }
+
+      // GET /places/nearby - Google Maps Proxy (öffentlich)
+      if (path === "/places/nearby" && request.method === "GET") {
+        return await getPlacesNearby(url, env, corsHeaders);
+      }
+
+      // GET /places/distance - Google Distance Matrix Proxy (öffentlich)
+      if (path === "/places/distance" && request.method === "GET") {
+        return await getDistanceMatrix(url, env, corsHeaders);
       }
 
       return new Response("Not found", { status: 404, headers: corsHeaders });
@@ -282,7 +390,15 @@ async function createGuest(request, env, corsHeaders) {
   }
 
   const body = await request.json();
-  const { name, username, password, checkIn, checkOut } = body;
+  const {
+    name,
+    username,
+    password,
+    checkIn,
+    checkOut,
+    numberOfPersons,
+    apartmentId,
+  } = body;
 
   // Validierung
   if (!name || !username || !password || !checkIn || !checkOut) {
@@ -316,6 +432,8 @@ async function createGuest(request, env, corsHeaders) {
     password,
     checkIn,
     checkOut,
+    numberOfPersons: numberOfPersons || 1,
+    apartmentId: apartmentId || 1, // Default Apartment
     createdAt: new Date().toISOString(),
   };
 
@@ -371,4 +489,784 @@ async function isAdmin(request, env) {
   }
   const token = authHeader.substring(7);
   return token === env.ADMIN_PASSWORD;
+}
+
+// ============================================
+// ENERGIE-DATEN VERWALTUNG (D1)
+// ============================================
+
+const HOSTEL_ID = "hollenthon"; // Default für aktuelles Hostel
+
+/**
+ * Heutige Energie-Daten abrufen
+ */
+async function getEnergyToday(env, corsHeaders) {
+  const today = getDateString(new Date());
+
+  const result = await env.DB.prepare(
+    "SELECT * FROM energy_data WHERE hostel_id = ? AND date = ?",
+  )
+    .bind(HOSTEL_ID, today)
+    .first();
+
+  return new Response(
+    JSON.stringify({
+      success: true,
+      data: result || { date: today, energy_kwh: 0, cost: 0, peak_power: 0 },
+    }),
+    {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    },
+  );
+}
+
+/**
+ * Gestrige Energie-Daten abrufen
+ */
+async function getEnergyYesterday(env, corsHeaders) {
+  const yesterday = getDateString(new Date(Date.now() - 24 * 60 * 60 * 1000));
+
+  const result = await env.DB.prepare(
+    "SELECT * FROM energy_data WHERE hostel_id = ? AND date = ?",
+  )
+    .bind(HOSTEL_ID, yesterday)
+    .first();
+
+  return new Response(
+    JSON.stringify({
+      success: true,
+      data: result || {
+        date: yesterday,
+        energy_kwh: 0,
+        cost: 0,
+        peak_power: 0,
+      },
+    }),
+    {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    },
+  );
+}
+
+/**
+ * Monats-Energie-Daten abrufen
+ */
+async function getEnergyMonth(env, corsHeaders) {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const monthStart = `${year}-${month}-01`;
+  const monthEnd = `${year}-${month}-31`;
+
+  const result = await env.DB.prepare(
+    `SELECT
+      SUM(energy_kwh) as total_energy,
+      SUM(cost) as total_cost,
+      MAX(peak_power) as peak_power
+    FROM energy_data
+    WHERE hostel_id = ? AND date >= ? AND date <= ?`,
+  )
+    .bind(HOSTEL_ID, monthStart, monthEnd)
+    .first();
+
+  return new Response(
+    JSON.stringify({
+      success: true,
+      data: {
+        month: `${year}-${month}`,
+        energy_kwh: result?.total_energy || 0,
+        cost: result?.total_cost || 0,
+        peak_power: result?.peak_power || 0,
+      },
+    }),
+    {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    },
+  );
+}
+
+/**
+ * Energie-Daten speichern (upsert)
+ */
+async function saveEnergyData(request, env, corsHeaders) {
+  const body = await request.json();
+  const { date, energy_kwh, cost, peak_power, shelly_total_start } = body;
+
+  if (!date) {
+    return new Response(
+      JSON.stringify({ success: false, error: "Date required" }),
+      {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+
+  // Upsert: Insert or Update
+  await env.DB.prepare(
+    `INSERT INTO energy_data (hostel_id, date, energy_kwh, cost, peak_power, shelly_total_start, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, unixepoch())
+     ON CONFLICT(hostel_id, date)
+     DO UPDATE SET
+       energy_kwh = excluded.energy_kwh,
+       cost = excluded.cost,
+       peak_power = CASE WHEN excluded.peak_power > peak_power THEN excluded.peak_power ELSE peak_power END,
+       shelly_total_start = excluded.shelly_total_start,
+       updated_at = unixepoch()`,
+  )
+    .bind(
+      HOSTEL_ID,
+      date,
+      energy_kwh || 0,
+      cost || 0,
+      peak_power || 0,
+      shelly_total_start || null,
+    )
+    .run();
+
+  return new Response(JSON.stringify({ success: true }), {
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+/**
+ * Datum als String YYYY-MM-DD
+ */
+function getDateString(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+// ============================================
+// ANNEHMLICHKEITEN (AMENITIES)
+// ============================================
+
+/**
+ * Annehmlichkeiten abrufen
+ * @param {boolean} includeHidden - true = alle, false = nur sichtbare
+ */
+async function getAmenities(env, corsHeaders, includeHidden) {
+  let query = "SELECT * FROM amenities WHERE hostel_id = ?";
+  if (!includeHidden) {
+    query += " AND is_visible = 1";
+  }
+  query += " ORDER BY display_order ASC";
+
+  const result = await env.DB.prepare(query).bind(HOSTEL_ID).all();
+
+  return new Response(
+    JSON.stringify({
+      success: true,
+      amenities: result.results || [],
+    }),
+    {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    },
+  );
+}
+
+/**
+ * Annehmlichkeit bearbeiten (Admin only)
+ */
+async function updateAmenity(request, env, corsHeaders, id) {
+  // Admin Auth prüfen
+  if (!(await isAdmin(request, env))) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const body = await request.json();
+  const { title, description, icon } = body;
+
+  // Validierung
+  if (!title || !description) {
+    return new Response(
+      JSON.stringify({ error: "Titel und Beschreibung erforderlich" }),
+      {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+
+  // Update durchführen
+  await env.DB.prepare(
+    `UPDATE amenities
+     SET title = ?, description = ?, icon = ?
+     WHERE id = ? AND hostel_id = ?`,
+  )
+    .bind(title, description, icon || "sparkles", id, HOSTEL_ID)
+    .run();
+
+  return new Response(JSON.stringify({ success: true }), {
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+/**
+ * Sichtbarkeit einer Annehmlichkeit umschalten (Admin only)
+ */
+async function toggleAmenity(request, env, corsHeaders, id) {
+  // Admin Auth prüfen
+  if (!(await isAdmin(request, env))) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  // Aktuellen Zustand abrufen
+  const current = await env.DB.prepare(
+    "SELECT is_visible FROM amenities WHERE id = ? AND hostel_id = ?",
+  )
+    .bind(id, HOSTEL_ID)
+    .first();
+
+  if (!current) {
+    return new Response(JSON.stringify({ error: "Nicht gefunden" }), {
+      status: 404,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  // Toggle durchführen
+  const newVisibility = current.is_visible === 1 ? 0 : 1;
+  await env.DB.prepare(
+    "UPDATE amenities SET is_visible = ? WHERE id = ? AND hostel_id = ?",
+  )
+    .bind(newVisibility, id, HOSTEL_ID)
+    .run();
+
+  return new Response(
+    JSON.stringify({ success: true, is_visible: newVisibility }),
+    {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    },
+  );
+}
+
+// ============================================
+// HOSTEL-EINSTELLUNGEN
+// ============================================
+
+/**
+ * Hostel-Einstellungen abrufen (Admin only)
+ */
+async function getHostelSettings(request, env, corsHeaders) {
+  // Admin Auth prüfen
+  if (!(await isAdmin(request, env))) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  // Hostel-Daten aus DB laden
+  const hostel = await env.DB.prepare(
+    "SELECT name, location, settings_json FROM hostels WHERE id = ?",
+  )
+    .bind(HOSTEL_ID)
+    .first();
+
+  if (!hostel) {
+    return new Response(
+      JSON.stringify({ success: false, error: "Hostel nicht gefunden" }),
+      {
+        status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+
+  // Settings aus JSON parsen
+  let settings = {};
+  try {
+    settings = hostel.settings_json ? JSON.parse(hostel.settings_json) : {};
+  } catch (e) {
+    settings = {};
+  }
+
+  // Name und Location hinzufügen
+  settings.name = hostel.name;
+  settings.location = hostel.location;
+
+  return new Response(
+    JSON.stringify({
+      success: true,
+      settings: settings,
+    }),
+    {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    },
+  );
+}
+
+/**
+ * Hostel-Einstellungen speichern (Admin only)
+ */
+async function updateHostelSettings(request, env, corsHeaders) {
+  // Admin Auth prüfen
+  if (!(await isAdmin(request, env))) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const body = await request.json();
+
+  // Name und Location separat extrahieren
+  const name = body.name || "Hostel Hollenthon";
+  const location = body.location || "Hollenthon am Waldrand";
+
+  // Restliche Settings als JSON
+  const settingsObj = {
+    phone: body.phone || "",
+    email: body.email || "",
+    checkInTime: body.checkInTime || "15:00",
+    checkOutTime: body.checkOutTime || "11:00",
+    formalAddress: body.formalAddress || "du",
+    iban: body.iban || "",
+    bic: body.bic || "",
+    accountHolder: body.accountHolder || "",
+    uid: body.uid || "",
+    pricePerKwh: body.pricePerKwh || 0.29,
+    co2PerKwh: body.co2PerKwh || 0.2,
+  };
+
+  const settings_json = JSON.stringify(settingsObj);
+
+  // Update in DB
+  await env.DB.prepare(
+    `UPDATE hostels
+     SET name = ?, location = ?, settings_json = ?
+     WHERE id = ?`,
+  )
+    .bind(name, location, settings_json, HOSTEL_ID)
+    .run();
+
+  return new Response(JSON.stringify({ success: true }), {
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+// ============================================
+// GOOGLE MAPS PLACES PROXY
+// ============================================
+
+/**
+ * Öffentliche Hostel-Info für Gäste (Name, Kontakt, Bankdaten)
+ */
+async function getPublicHostelInfo(env, corsHeaders) {
+  const hostel = await env.DB.prepare(
+    "SELECT name, location, settings_json FROM hostels WHERE id = ?",
+  )
+    .bind(HOSTEL_ID)
+    .first();
+
+  if (!hostel) {
+    return new Response(JSON.stringify({ error: "Hostel not found" }), {
+      status: 404,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  // Settings parsen
+  let settings = {};
+  try {
+    settings = hostel.settings_json ? JSON.parse(hostel.settings_json) : {};
+  } catch (e) {
+    settings = {};
+  }
+
+  // Nur öffentliche Infos zurückgeben
+  const publicInfo = {
+    name: hostel.name,
+    location: hostel.location,
+    phone: settings.phone || "",
+    email: settings.email || "",
+    checkInTime: settings.checkInTime || "15:00",
+    checkOutTime: settings.checkOutTime || "11:00",
+    formalAddress: settings.formalAddress || "du",
+    iban: settings.iban || "",
+    bic: settings.bic || "",
+    accountHolder: settings.accountHolder || "",
+  };
+
+  return new Response(JSON.stringify({ success: true, info: publicInfo }), {
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+// ============================================
+// APARTMENTS MANAGEMENT
+// ============================================
+
+/**
+ * Alle Apartments auflisten (Admin only)
+ */
+async function getApartments(request, env, corsHeaders) {
+  if (!(await isAdmin(request, env))) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const apartments = await env.DB.prepare(
+    "SELECT id, slug, name, location, settings_json, created_at FROM apartments ORDER BY id ASC",
+  )
+    .all()
+    .then((result) => result.results);
+
+  // Settings parsen
+  const apartmentsWithSettings = apartments.map((apt) => {
+    let settings = {};
+    try {
+      settings = apt.settings_json ? JSON.parse(apt.settings_json) : {};
+    } catch (e) {
+      settings = {};
+    }
+    return {
+      id: apt.id,
+      slug: apt.slug,
+      name: apt.name,
+      location: apt.location,
+      settings,
+      created_at: apt.created_at,
+    };
+  });
+
+  return new Response(
+    JSON.stringify({ success: true, apartments: apartmentsWithSettings }),
+    {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    },
+  );
+}
+
+/**
+ * Neues Apartment anlegen (Admin only)
+ */
+async function createApartment(request, env, corsHeaders) {
+  if (!(await isAdmin(request, env))) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const body = await request.json();
+  const slug = body.slug || "";
+  const name = body.name || "";
+  const location = body.location || "";
+
+  if (!slug || !name) {
+    return new Response(
+      JSON.stringify({ error: "Slug and name are required" }),
+      {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+
+  // Slug validation (nur lowercase, zahlen, bindestriche)
+  if (!/^[a-z0-9-]+$/.test(slug)) {
+    return new Response(
+      JSON.stringify({
+        error:
+          "Slug muss lowercase sein und darf nur Buchstaben, Zahlen und Bindestriche enthalten",
+      }),
+      {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+
+  const settings = {
+    phone: body.phone || "",
+    email: body.email || "",
+    checkInTime: body.checkInTime || "15:00",
+    checkOutTime: body.checkOutTime || "11:00",
+    formalAddress: body.formalAddress || "du",
+    iban: body.iban || "",
+    bic: body.bic || "",
+    accountHolder: body.accountHolder || "",
+    pricePerKwh: body.pricePerKwh || 0.29,
+    co2PerKwh: body.co2PerKwh || 0.2,
+  };
+
+  try {
+    const result = await env.DB.prepare(
+      "INSERT INTO apartments (slug, name, location, settings_json) VALUES (?, ?, ?, ?)",
+    )
+      .bind(slug, name, location, JSON.stringify(settings))
+      .run();
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        apartment: { id: result.meta.last_row_id, slug, name, location },
+      }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  } catch (error) {
+    if (error.message.includes("UNIQUE")) {
+      return new Response(JSON.stringify({ error: "Slug bereits vergeben" }), {
+        status: 409,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    throw error;
+  }
+}
+
+/**
+ * Apartment aktualisieren (Admin only)
+ */
+async function updateApartment(request, env, corsHeaders, id) {
+  if (!(await isAdmin(request, env))) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const body = await request.json();
+
+  const settings = {
+    phone: body.phone || "",
+    email: body.email || "",
+    checkInTime: body.checkInTime || "15:00",
+    checkOutTime: body.checkOutTime || "11:00",
+    formalAddress: body.formalAddress || "du",
+    iban: body.iban || "",
+    bic: body.bic || "",
+    accountHolder: body.accountHolder || "",
+    pricePerKwh: body.pricePerKwh || 0.29,
+    co2PerKwh: body.co2PerKwh || 0.2,
+  };
+
+  await env.DB.prepare(
+    "UPDATE apartments SET name = ?, location = ?, settings_json = ? WHERE id = ?",
+  )
+    .bind(body.name, body.location, JSON.stringify(settings), id)
+    .run();
+
+  return new Response(JSON.stringify({ success: true }), {
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+/**
+ * Apartment löschen (Admin only)
+ */
+async function deleteApartment(request, env, corsHeaders, id) {
+  if (!(await isAdmin(request, env))) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  // Prüfen ob Apartment ID 1 (kann nicht gelöscht werden)
+  if (id === 1) {
+    return new Response(
+      JSON.stringify({ error: "Default-Apartment kann nicht gelöscht werden" }),
+      {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+
+  // Prüfen ob Gäste zugewiesen sind
+  const guests = await env.DB.prepare(
+    "SELECT COUNT(*) as count FROM guests WHERE apartment_id = ?",
+  )
+    .bind(id)
+    .first();
+
+  if (guests.count > 0) {
+    return new Response(
+      JSON.stringify({
+        error: `Apartment kann nicht gelöscht werden. ${guests.count} Gäste sind zugewiesen.`,
+      }),
+      {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+
+  await env.DB.prepare("DELETE FROM apartments WHERE id = ?").bind(id).run();
+
+  return new Response(JSON.stringify({ success: true }), {
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+/**
+ * Öffentliche Liste aller Apartments (nur slug, name, location)
+ */
+async function getPublicApartmentsList(env, corsHeaders) {
+  const apartments = await env.DB.prepare(
+    "SELECT slug, name, location FROM apartments ORDER BY id ASC",
+  )
+    .all()
+    .then((result) => result.results);
+
+  return new Response(
+    JSON.stringify({ success: true, apartments: apartments }),
+    {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    },
+  );
+}
+
+/**
+ * Öffentliche Apartment-Info für Gäste (by slug)
+ */
+async function getApartmentInfo(slug, env, corsHeaders) {
+  const apartment = await env.DB.prepare(
+    "SELECT id, slug, name, location, settings_json FROM apartments WHERE slug = ?",
+  )
+    .bind(slug)
+    .first();
+
+  if (!apartment) {
+    return new Response(JSON.stringify({ error: "Apartment not found" }), {
+      status: 404,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  let settings = {};
+  try {
+    settings = apartment.settings_json
+      ? JSON.parse(apartment.settings_json)
+      : {};
+  } catch (e) {
+    settings = {};
+  }
+
+  const publicInfo = {
+    id: apartment.id,
+    slug: apartment.slug,
+    name: apartment.name,
+    location: apartment.location,
+    phone: settings.phone || "",
+    email: settings.email || "",
+    checkInTime: settings.checkInTime || "15:00",
+    checkOutTime: settings.checkOutTime || "11:00",
+    formalAddress: settings.formalAddress || "du",
+    iban: settings.iban || "",
+    bic: settings.bic || "",
+    accountHolder: settings.accountHolder || "",
+  };
+
+  return new Response(JSON.stringify({ success: true, info: publicInfo }), {
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+/**
+ * Google Maps Places API Proxy (CORS-Problem umgehen)
+ */
+async function getPlacesNearby(url, env, corsHeaders) {
+  // URL Parameter extrahieren
+  const lat = url.searchParams.get("lat");
+  const lon = url.searchParams.get("lon");
+  const radius = url.searchParams.get("radius") || "20000";
+  const type = url.searchParams.get("type") || "tourist_attraction";
+  const apiKey = env.GOOGLE_MAPS_API_KEY;
+
+  if (!lat || !lon) {
+    return new Response(JSON.stringify({ error: "Lat/Lon required" }), {
+      status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  if (!apiKey) {
+    return new Response(
+      JSON.stringify({ error: "Google Maps API Key not configured" }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+
+  try {
+    // Google Maps API aufrufen
+    const googleUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lon}&radius=${radius}&type=${type}&key=${apiKey}`;
+
+    const response = await fetch(googleUrl);
+    const data = await response.json();
+
+    return new Response(JSON.stringify(data), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+}
+
+/**
+ * Google Distance Matrix API Proxy (Tatsächliche Fahrstrecke berechnen)
+ */
+async function getDistanceMatrix(url, env, corsHeaders) {
+  // URL Parameter extrahieren
+  const origins = url.searchParams.get("origins"); // z.B. "47.5833,16.1667"
+  const destinations = url.searchParams.get("destinations"); // z.B. "47.5,16.2|47.6,16.3"
+  const apiKey = env.GOOGLE_MAPS_API_KEY;
+
+  if (!origins || !destinations) {
+    return new Response(
+      JSON.stringify({ error: "Origins and destinations required" }),
+      {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+
+  if (!apiKey) {
+    return new Response(
+      JSON.stringify({ error: "Google Maps API Key not configured" }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+
+  try {
+    // Google Distance Matrix API aufrufen
+    const googleUrl = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(origins)}&destinations=${encodeURIComponent(destinations)}&mode=driving&key=${apiKey}`;
+
+    const response = await fetch(googleUrl);
+    const data = await response.json();
+
+    return new Response(JSON.stringify(data), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
 }

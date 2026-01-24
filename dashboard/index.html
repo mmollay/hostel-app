@@ -2,8 +2,34 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Genieße dein Haus | Hollenthon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Gast auf Erden | Spiritueller Rückzugsort am Waldrand</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="apple-touch-icon-120x120.png">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Mobile Web App -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Gast auf Erden">
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#9CAF88">
+    <meta name="msapplication-TileColor" content="#9CAF88">
+
+    <!-- Description -->
+    <meta name="description" content="Ein magischer Ort zum Sein. Tiny Haus mit Höhle, Feuerstelle, Wald – Spiritueller Rückzugsort für Lebenstraining und tiefe Entspannung.">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -45,6 +71,11 @@
             min-height: 100vh;
             font-weight: 400;
             letter-spacing: 0.02em;
+            /* Safe Area for iPhone X+ */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
         }
 
         /* Header */
@@ -83,7 +114,9 @@
             height: 140px;
             margin-bottom: 20px;
             border-radius: 50%;
-            object-fit: cover;
+            object-fit: contain;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
             box-shadow: 0 4px 24px rgba(0,0,0,0.2);
         }
 
@@ -103,10 +136,17 @@
             letter-spacing: 2px;
         }
 
-        .guest-login-btn {
+        .header-actions {
             position: absolute;
             top: 20px;
             right: 20px;
+            z-index: 10;
+            display: flex;
+            gap: 12px;
+        }
+
+        .guest-login-btn,
+        .status-btn {
             background: rgba(255,255,255,0.2);
             border: 1px solid rgba(255,255,255,0.3);
             color: white;
@@ -115,7 +155,6 @@
             border-radius: 30px;
             transition: all 0.3s;
             font-size: 0.9rem;
-            z-index: 10;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -123,12 +162,14 @@
             font-weight: 500;
         }
 
-        .guest-login-btn:hover {
+        .guest-login-btn:hover,
+        .status-btn:hover {
             background: rgba(255,255,255,0.3);
             transform: translateY(-2px);
         }
 
-        .guest-login-btn i {
+        .guest-login-btn i,
+        .status-btn i {
             width: 18px;
             height: 18px;
         }
@@ -136,6 +177,21 @@
         .guest-login-btn.logged-in {
             background: rgba(156, 175, 136, 0.3);
             border-color: rgba(156, 175, 136, 0.5);
+        }
+
+        .status-btn {
+            padding: 10px 16px;
+            cursor: default;
+        }
+
+        .status-btn.online {
+            background: rgba(156, 175, 136, 0.3);
+            border-color: rgba(156, 175, 136, 0.5);
+        }
+
+        .status-btn.offline {
+            background: rgba(212, 165, 165, 0.3);
+            border-color: rgba(212, 165, 165, 0.5);
         }
 
         /* Main Content */
@@ -207,6 +263,31 @@
             color: var(--forest);
             margin-bottom: 12px;
             letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        /* Farbige Icons für Tageszeiten */
+        .greeting [data-lucide="sunrise"] {
+            color: #f97316; /* Orange für Sonnenaufgang */
+            filter: drop-shadow(0 2px 4px rgba(249, 115, 22, 0.3));
+        }
+
+        .greeting [data-lucide="sun"] {
+            color: #fbbf24; /* Gelb für Sonne */
+            filter: drop-shadow(0 2px 4px rgba(251, 191, 36, 0.3));
+        }
+
+        .greeting [data-lucide="sunset"] {
+            color: #f43f5e; /* Rot-Orange für Sonnenuntergang */
+            filter: drop-shadow(0 2px 4px rgba(244, 63, 94, 0.3));
+        }
+
+        .greeting [data-lucide="moon"] {
+            color: #60a5fa; /* Blau für Mond */
+            filter: drop-shadow(0 2px 4px rgba(96, 165, 250, 0.3));
         }
 
         .welcome-card .message {
@@ -431,8 +512,14 @@
 
         .contact-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .contact-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
         .contact-item {
@@ -469,6 +556,118 @@
             font-weight: 500;
         }
 
+        /* Bank Details */
+        .bank-details {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .bank-detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: var(--warm-white);
+            border-radius: 8px;
+            border: 1px solid var(--sand);
+        }
+
+        .bank-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            min-width: 80px;
+        }
+
+        .bank-value-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            justify-content: flex-end;
+        }
+
+        .bank-value {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .copy-btn-inline {
+            background: transparent;
+            border: none;
+            color: var(--sage-dark);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .copy-btn-inline:hover {
+            background: var(--cream);
+            color: var(--sage);
+        }
+
+        .copy-btn-inline:active {
+            transform: scale(0.95);
+        }
+
+        /* Quick Navigation */
+        .quick-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            padding: 20px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 10;
+        }
+
+        .quick-nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 16px;
+            background: var(--warm-white);
+            border: 2px solid var(--sand);
+            border-radius: 12px;
+            color: var(--forest);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            font-weight: 500;
+            min-width: 80px;
+        }
+
+        .quick-nav-btn:hover {
+            background: var(--cream);
+            border-color: var(--sage);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(113, 140, 128, 0.15);
+        }
+
+        .quick-nav-btn:active {
+            transform: translateY(0);
+        }
+
+        .quick-nav-btn i {
+            width: 24px;
+            height: 24px;
+            color: var(--sage-dark);
+        }
+
+        .quick-nav-btn span {
+            color: var(--text);
+        }
+
         /* Footer */
         .footer {
             text-align: center;
@@ -484,33 +683,23 @@
         }
 
         .status-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--sage);
+            width: 10px;
+            height: 10px;
+            background: #22c55e; /* Grün für Online */
             border-radius: 50%;
             animation: pulse 2s infinite;
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
         }
 
         .status-dot.error {
-            background: var(--rose);
+            background: #ef4444; /* Rot für Offline */
             animation: none;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
         }
 
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
-        }
-
-        /* Error Message */
-        .error-message {
-            background: var(--rose-light);
-            border: 1px solid var(--rose);
-            border-radius: 16px;
-            padding: 20px;
-            text-align: center;
-            color: var(--text);
-            margin-bottom: 24px;
-            display: none;
         }
 
         /* Modal Styles */
@@ -748,6 +937,41 @@
             color: var(--sage);
         }
 
+        /* 5-Tage Wettervorhersage */
+        .weather-forecast {
+            display: flex;
+            gap: 12px;
+            padding-top: 20px;
+            border-top: 1px solid var(--sand);
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+
+        .forecast-day {
+            flex: 1;
+            min-width: 80px;
+            text-align: center;
+            padding: 12px;
+            background: var(--cream);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .forecast-day-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .forecast-temp {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--sage-dark);
+        }
+
         /* WiFi Card */
         .wifi-content {
             display: flex;
@@ -825,6 +1049,206 @@
             margin: 0;
         }
 
+        .recommendation-item .distance {
+            font-size: 0.85rem;
+            color: var(--sage-dark);
+            font-weight: 500;
+            margin-top: 4px;
+        }
+
+        .recommendation-item .rating {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.85rem;
+            color: var(--earth);
+            margin-top: 4px;
+        }
+
+        .recommendation-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .recommendation-address {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        .recommendation-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .recommendation-distance {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: var(--sage-dark);
+            font-weight: 500;
+        }
+
+        .open-status {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .open-status.open {
+            background: rgba(156, 175, 136, 0.15);
+            color: var(--sage-dark);
+        }
+
+        .open-status.closed {
+            background: rgba(212, 165, 165, 0.15);
+            color: var(--rose);
+        }
+
+        .recommendation-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+
+        .btn-maps, .btn-phone {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-maps {
+            background: linear-gradient(135deg, var(--sage) 0%, var(--sage-dark) 100%);
+            color: white;
+        }
+
+        .btn-maps:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(156, 175, 136, 0.3);
+        }
+
+        .btn-phone {
+            background: var(--cream);
+            color: var(--forest);
+            border: 1px solid var(--sand);
+        }
+
+        .btn-phone:hover {
+            background: var(--sand);
+        }
+
+        /* Recommendations Controls */
+        .recommendations-controls {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid var(--sand);
+            margin-bottom: 20px;
+        }
+
+        .radius-control {
+            margin-bottom: 16px;
+        }
+
+        .radius-control label {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        .radius-control strong {
+            color: var(--forest);
+        }
+
+        #radiusSlider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--sand);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        #radiusSlider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--sage);
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        #radiusSlider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--sage);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .category-filter {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 8px 16px;
+            border: 2px solid var(--sand);
+            background: white;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .category-btn:hover {
+            border-color: var(--sage-light);
+            background: var(--cream);
+        }
+
+        .category-btn.active {
+            background: var(--sage);
+            border-color: var(--sage);
+            color: white;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light);
+        }
+
+        .loading-state i {
+            width: 32px;
+            height: 32px;
+            color: var(--sage);
+            margin-bottom: 12px;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
         /* Button Styles */
         .btn {
             padding: 12px 24px;
@@ -894,37 +1318,88 @@
 <body>
     <!-- Header -->
     <header class="header">
-        <button class="guest-login-btn" id="guestLoginBtn">
-            <i data-lucide="user"></i>
-            <span>Anmelden</span>
-        </button>
+        <div class="header-actions">
+            <button class="status-btn offline" id="statusBtn" title="Verbindungsstatus">
+                <span class="status-dot error"></span>
+                <span id="statusText">Offline</span>
+            </button>
+            <button class="guest-login-btn" id="guestLoginBtn">
+                <i data-lucide="user"></i>
+                <span>Anmelden</span>
+            </button>
+        </div>
         <div class="header-content">
-            <img src="logo.png" alt="Logo" class="header-logo">
-            <h1 id="mainTitle">Genieße dein Haus</h1>
-            <p class="subtitle">am angrenzenden Wald • Hollenthon</p>
+            <img src="logo-neu.png" alt="Logo" class="header-logo">
+            <h1 id="mainTitle">Gast auf Erden</h1>
+            <p class="subtitle">Ein magischer Ort zum Sein • Hollenthon</p>
+        </div>
+
+        <!-- Quick Navigation (nur für eingeloggte Gäste) -->
+        <div class="quick-nav" id="quickNav" style="display: none;">
+            <button class="quick-nav-btn" onclick="scrollToSection('weatherCard')" title="Zum Wetter">
+                <i data-lucide="cloud-sun"></i>
+                <span>Wetter</span>
+            </button>
+            <button class="quick-nav-btn" onclick="scrollToSection('recommendationsCard')" title="Zu Empfehlungen">
+                <i data-lucide="map-pin"></i>
+                <span>Empfehlungen</span>
+            </button>
+            <button class="quick-nav-btn" onclick="scrollToSection('energyCard')" title="Zur Energie">
+                <i data-lucide="zap"></i>
+                <span>Energie</span>
+            </button>
+            <button class="quick-nav-btn" onclick="scrollToSection('wifiCard')" title="Zum WiFi">
+                <i data-lucide="wifi"></i>
+                <span>WiFi</span>
+            </button>
         </div>
     </header>
 
     <!-- Main Content -->
     <main class="main">
-        <!-- Error Message -->
-        <div class="error-message" id="errorMessage">
-            <p>Verbindung wird hergestellt...</p>
-        </div>
-
         <div id="dashboard">
             <!-- Welcome Card -->
             <div class="card welcome-card">
                 <h2 class="greeting" id="greeting">Herzlich Willkommen!</h2>
                 <p class="message" id="welcomeMessage">
-                    Genießen Sie Ihren Aufenthalt in unserem bewusst minimalistisch eingerichteten Haus
-                    am Waldrand. Hier finden Sie Ruhe, Erholung und alles für einen entspannten Aufenthalt.
+                    An diesem magischen Ort, wo Wald und Himmel sich berühren, laden wir dich ein,
+                    Ruhe zu finden und bei dir anzukommen. Nimm dir Zeit zum Sein.
                 </p>
                 <div class="time-display">
                     <i data-lucide="clock" style="width: 16px; height: 16px;"></i>
                     <span id="currentTime">--:--</span>
                     <span>•</span>
                     <span id="currentDate">--. --- ----</span>
+                </div>
+            </div>
+
+            <!-- Über diesen Ort -->
+            <div class="card" style="background: linear-gradient(135deg, var(--warm-white) 0%, var(--cream) 100%);">
+                <div class="card-header">
+                    <div class="card-icon" style="background: linear-gradient(135deg, var(--forest) 0%, var(--sage) 100%);"><i data-lucide="trees"></i></div>
+                    <div>
+                        <h3 class="card-title">Über diesen Ort</h3>
+                        <p class="card-subtitle">Wo Magie und Natur sich vereinen</p>
+                    </div>
+                </div>
+                <div style="color: var(--text-light); font-size: 1rem; line-height: 1.8; margin-top: 16px;">
+                    <p style="margin-bottom: 16px;">
+                        Hier, am Rand des Waldes, hat sich ein besonderer Platz entfaltet – ein Ort zum Innehalten,
+                        zum Auftanken und zum Wiederfinden. Die alten Bäume flüstern ihre Geschichten,
+                        die Feuerstelle lädt zu stillen Momenten unter dem Sternenhimmel ein.
+                    </p>
+                    <p style="margin-bottom: 16px;">
+                        <strong style="color: var(--forest);">🔥 Die Feuerstelle</strong> – Hier kannst du zur Ruhe kommen,
+                        die Flammen beobachten und einfach sein. Ein Ort der Wärme und Geborgenheit.
+                    </p>
+                    <p style="margin-bottom: 16px;">
+                        <strong style="color: var(--forest);">🌲 Der Wald</strong> – Direkt neben uns erstreckt sich die Natur
+                        in ihrer ganzen Kraft. Lass dich einladen zu Spaziergängen, die den Geist klären und das Herz öffnen.
+                    </p>
+                    <p style="margin-bottom: 0;">
+                        Dieser Platz ist mehr als ein Ort zum Übernachten – er ist eine Einladung,
+                        wieder mit dir selbst und der Natur in Verbindung zu treten. <em>Willkommen, Gast auf Erden.</em>
+                    </p>
                 </div>
             </div>
 
@@ -991,60 +1466,73 @@
                     </div>
                 </div>
                 <div class="amenities-grid">
-                    <div class="amenity">
-                        <div class="amenity-icon"><i data-lucide="chef-hat"></i></div>
-                        <div class="amenity-text">
-                            <h4>Voll ausgestattete Küche</h4>
-                            <p>Herd, Ofen, Kühlschrank, Kaffeemaschine</p>
+                    <!-- Wird dynamisch von app.js geladen -->
+                </div>
+            </div>
+
+            <!-- Coming Soon / In Entstehung -->
+            <div class="card" style="background: linear-gradient(135deg, var(--warm-white) 0%, var(--sand) 100%); border: 2px dashed var(--sage);">
+                <div class="card-header">
+                    <div class="card-icon" style="background: linear-gradient(135deg, var(--forest) 0%, var(--sage-dark) 100%);"><i data-lucide="construction"></i></div>
+                    <div>
+                        <h3 class="card-title">In Entstehung</h3>
+                        <p class="card-subtitle">Zauberhafte Projekte erwachen zum Leben</p>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
+                    <!-- Tiny Haus mit Höhle -->
+                    <div style="background: white; padding: 24px; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--earth) 0%, var(--earth-light) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white;">
+                                <i data-lucide="home" style="width: 20px; height: 20px;"></i>
+                            </div>
+                            <h4 style="color: var(--forest); font-size: 1.1rem; margin: 0;">Tiny Haus mit Höhle</h4>
+                        </div>
+                        <p style="color: var(--text-light); font-size: 0.95rem; line-height: 1.6; margin: 0;">Ein magischer Rückzugsort in der Natur – derzeit im Bau. Hier verbinden sich Geborgenheit und Erdverbundenheit.</p>
+                        <div style="margin-top: 12px; padding: 8px 12px; background: var(--sage-light); border-radius: 8px; display: inline-block;">
+                            <span style="color: white; font-size: 0.85rem; font-weight: 500;">🔨 Im Bau</span>
                         </div>
                     </div>
-                    <div class="amenity">
-                        <div class="amenity-icon"><i data-lucide="flame"></i></div>
-                        <div class="amenity-text">
-                            <h4>Kamin</h4>
-                            <p>Pellets & Holz vorhanden</p>
+
+                    <!-- Sauna -->
+                    <div style="background: white; padding: 24px; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--rose) 0%, var(--rose-light) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white;">
+                                <i data-lucide="flame" style="width: 20px; height: 20px;"></i>
+                            </div>
+                            <h4 style="color: var(--forest); font-size: 1.1rem; margin: 0;">Sauna</h4>
+                        </div>
+                        <p style="color: var(--text-light); font-size: 0.95rem; line-height: 1.6; margin: 0;">Tiefe Entspannung und Reinigung für Körper und Seele. Bald können Sie hier zur Ruhe kommen.</p>
+                        <div style="margin-top: 12px; padding: 8px 12px; background: var(--sage-light); border-radius: 8px; display: inline-block;">
+                            <span style="color: white; font-size: 0.85rem; font-weight: 500;">✨ Coming Soon</span>
                         </div>
                     </div>
-                    <div class="amenity">
-                        <div class="amenity-icon"><i data-lucide="trees"></i></div>
-                        <div class="amenity-text">
-                            <h4>Garten mit Feuerstelle</h4>
-                            <p>Gartenmöbel & Hängematte</p>
+
+                    <!-- Hot Tub -->
+                    <div style="background: white; padding: 24px; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--sky) 0%, #90B5C9 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white;">
+                                <i data-lucide="droplets" style="width: 20px; height: 20px;"></i>
+                            </div>
+                            <h4 style="color: var(--forest); font-size: 1.1rem; margin: 0;">Hot Tub</h4>
+                        </div>
+                        <p style="color: var(--text-light); font-size: 0.95rem; line-height: 1.6; margin: 0;">Unter freiem Himmel im warmen Wasser verweilen und die Sterne beobachten – pure Magie.</p>
+                        <div style="margin-top: 12px; padding: 8px 12px; background: var(--sage-light); border-radius: 8px; display: inline-block;">
+                            <span style="color: white; font-size: 0.85rem; font-weight: 500;">✨ Coming Soon</span>
                         </div>
                     </div>
-                    <div class="amenity">
-                        <div class="amenity-icon"><i data-lucide="utensils"></i></div>
-                        <div class="amenity-text">
-                            <h4>Grill & Außenküche</h4>
-                            <p>Essbereich im Freien</p>
+
+                    <!-- Lebenstraining -->
+                    <div style="background: white; padding: 24px; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--sage) 0%, var(--sage-light) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white;">
+                                <i data-lucide="heart" style="width: 20px; height: 20px;"></i>
+                            </div>
+                            <h4 style="color: var(--forest); font-size: 1.1rem; margin: 0;">Lebenstraining</h4>
                         </div>
-                    </div>
-                    <div class="amenity">
-                        <div class="amenity-icon"><i data-lucide="washing-machine"></i></div>
-                        <div class="amenity-text">
-                            <h4>Waschmaschine</h4>
-                            <p>Kostenlos nutzbar</p>
-                        </div>
-                    </div>
-                    <div class="amenity">
-                        <div class="amenity-icon"><i data-lucide="book-open"></i></div>
-                        <div class="amenity-text">
-                            <h4>Bibliothek</h4>
-                            <p>Bücher & Lesematerial</p>
-                        </div>
-                    </div>
-                    <div class="amenity">
-                        <div class="amenity-icon"><i data-lucide="bath"></i></div>
-                        <div class="amenity-text">
-                            <h4>Handtücher & Bettwäsche</h4>
-                            <p>Pflegeprodukte inklusive</p>
-                        </div>
-                    </div>
-                    <div class="amenity">
-                        <div class="amenity-icon"><i data-lucide="baby"></i></div>
-                        <div class="amenity-text">
-                            <h4>Familienfreundlich</h4>
-                            <p>Kindergeschirr vorhanden</p>
+                        <p style="color: var(--text-light); font-size: 0.95rem; line-height: 1.6; margin: 0;">Persönliche Begleitung auf deinem Weg. Finde zu dir selbst, gewinne Klarheit und innere Stärke.</p>
+                        <div style="margin-top: 12px; padding: 8px 12px; background: var(--forest); border-radius: 8px; display: inline-block;">
+                            <span style="color: white; font-size: 0.85rem; font-weight: 500;">🌟 Verfügbar</span>
                         </div>
                     </div>
                 </div>
@@ -1124,6 +1612,11 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- 5-Tage Wettervorhersage -->
+                <div class="weather-forecast" id="weatherForecast">
+                    <!-- Wird dynamisch gefüllt -->
+                </div>
             </div>
 
             <!-- WiFi QR Code Card (nur für Gäste sichtbar) -->
@@ -1136,22 +1629,39 @@
                     </div>
                 </div>
                 <div class="wifi-content">
-                    <div class="wifi-qr">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=WIFI:S:Hostel Power;T:WPA;P:hostl21;;"
-                             alt="WiFi QR Code"
-                             style="width: 200px; height: 200px; border-radius: 12px;">
-                    </div>
-                    <div class="wifi-details">
-                        <div class="wifi-info-row">
-                            <strong>Netzwerk:</strong> Hostel Power
+                    <!-- WLAN 1: Hostel Power -->
+                    <div style="text-align: center; width: 100%;">
+                        <h4 style="color: var(--forest); margin-bottom: 12px; font-size: 1rem;">Hostel Power</h4>
+                        <div class="wifi-qr">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=WIFI:S:Hostel%20Power;T:WPA;P:Hostel%2021;;"
+                                 alt="WiFi QR Code - Hostel Power"
+                                 style="width: 180px; height: 180px; border-radius: 12px;">
                         </div>
-                        <div class="wifi-info-row">
-                            <strong>Passwort:</strong> hostl21
+                        <div class="wifi-details" style="margin-top: 12px;">
+                            <div class="wifi-info-row">
+                                <strong>Passwort:</strong> Hostel 21
+                            </div>
                         </div>
-                        <p style="margin-top: 12px; color: var(--text-muted); font-size: 0.85rem;">
-                            Scannen Sie den QR-Code mit Ihrer Kamera, um sich automatisch zu verbinden.
-                        </p>
                     </div>
+
+                    <!-- WLAN 2: Hostel -->
+                    <div style="text-align: center; width: 100%; border-top: 1px solid var(--sand); padding-top: 24px;">
+                        <h4 style="color: var(--forest); margin-bottom: 12px; font-size: 1rem;">Hostel</h4>
+                        <div class="wifi-qr">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=WIFI:S:Hostel;T:WPA;P:Hostel%2021;;"
+                                 alt="WiFi QR Code - Hostel"
+                                 style="width: 180px; height: 180px; border-radius: 12px;">
+                        </div>
+                        <div class="wifi-details" style="margin-top: 12px;">
+                            <div class="wifi-info-row">
+                                <strong>Passwort:</strong> Hostel 21
+                            </div>
+                        </div>
+                    </div>
+
+                    <p style="margin-top: 20px; color: var(--text-muted); font-size: 0.85rem; text-align: center;">
+                        Scannen Sie den QR-Code mit Ihrer Kamera, um sich automatisch zu verbinden.
+                    </p>
                 </div>
             </div>
 
@@ -1161,44 +1671,31 @@
                     <div class="card-icon"><i data-lucide="map"></i></div>
                     <div>
                         <h3 class="card-title">Empfehlungen in der Umgebung</h3>
-                        <p class="card-subtitle">Ausflugstipps & Lokale</p>
+                        <p class="card-subtitle">Entdecke echte Ausflugsziele</p>
                     </div>
                 </div>
-                <div class="recommendations-list">
-                    <div class="recommendation-item">
-                        <div class="recommendation-icon"><i data-lucide="mountain"></i></div>
-                        <div>
-                            <h4>Wanderungen</h4>
-                            <p>Pittental-Rundweg (5 km), Hochwechsel (1743 m)</p>
-                        </div>
+
+                <!-- Umkreis-Filter -->
+                <div class="recommendations-controls">
+                    <div class="radius-control">
+                        <label for="radiusSlider">
+                            Umkreis: <strong><span id="radiusValue">20</span> km</strong>
+                        </label>
+                        <input type="range" id="radiusSlider" min="10" max="30" value="20" step="5">
                     </div>
-                    <div class="recommendation-item">
-                        <div class="recommendation-icon"><i data-lucide="utensils"></i></div>
-                        <div>
-                            <h4>Gasthof Hollenthon</h4>
-                            <p>Traditionelle österreichische Küche, 5 Min. zu Fuß</p>
-                        </div>
+                    <div class="category-filter">
+                        <button class="category-btn active" data-category="all">Alle</button>
+                        <button class="category-btn" data-category="tourist_attraction">Sehenswürdigkeiten</button>
+                        <button class="category-btn" data-category="spa">Thermen</button>
+                        <button class="category-btn" data-category="restaurant">Restaurants</button>
                     </div>
-                    <div class="recommendation-item">
-                        <div class="recommendation-icon"><i data-lucide="shopping-bag"></i></div>
-                        <div>
-                            <h4>Nahversorger</h4>
-                            <p>SPAR Markt in Aspang (7 km), täglich geöffnet</p>
-                        </div>
-                    </div>
-                    <div class="recommendation-item">
-                        <div class="recommendation-icon"><i data-lucide="bath"></i></div>
-                        <div>
-                            <h4>Therme Loipersdorf</h4>
-                            <p>Wellness & Entspannung, 30 km entfernt</p>
-                        </div>
-                    </div>
-                    <div class="recommendation-item">
-                        <div class="recommendation-icon"><i data-lucide="castle"></i></div>
-                        <div>
-                            <h4>Burg Seebenstein</h4>
-                            <p>Historische Burganlage, 12 km</p>
-                        </div>
+                </div>
+
+                <!-- Dynamische Empfehlungs-Liste -->
+                <div class="recommendations-list" id="recommendationsList">
+                    <div class="loading-state">
+                        <i data-lucide="loader" style="animation: spin 1s linear infinite;"></i>
+                        <p>Lade Empfehlungen...</p>
                     </div>
                 </div>
             </div>
@@ -1217,21 +1714,21 @@
                         <div class="contact-icon"><i data-lucide="user"></i></div>
                         <div>
                             <div class="contact-label">Gastgeber</div>
-                            <div class="contact-value">Martin Mollay</div>
+                            <div class="contact-value" id="hostelHost">Martin Mollay</div>
                         </div>
                     </div>
                     <div class="contact-item">
                         <div class="contact-icon"><i data-lucide="phone"></i></div>
                         <div>
                             <div class="contact-label">Telefon</div>
-                            <div class="contact-value">+43 650 25 26 26 26</div>
+                            <div class="contact-value" id="hostelPhoneDisplay">+43 650 25 26 26 26</div>
                         </div>
                     </div>
                     <div class="contact-item">
                         <div class="contact-icon"><i data-lucide="mail"></i></div>
                         <div>
                             <div class="contact-label">E-Mail</div>
-                            <div class="contact-value">martin@ssi.at</div>
+                            <div class="contact-value" id="hostelEmailDisplay">martin@ssi.at</div>
                         </div>
                     </div>
                     <div class="contact-item">
@@ -1250,6 +1747,58 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Payment Info Card -->
+            <div class="card" id="paymentInfoCard" style="display: none;">
+                <div class="card-header">
+                    <div class="card-icon"><i data-lucide="info"></i></div>
+                    <div>
+                        <h3 class="card-title">Transparenz & Information</h3>
+                        <p class="card-subtitle">Für Ihre Unterlagen</p>
+                    </div>
+                </div>
+                <div style="padding: 0 20px 20px;">
+                    <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.6;">
+                        Im Rahmen Ihres Aufenthalts können Kurtaxe und Energiekosten anfallen.
+                        Für Ihre Unterlagen und vollständige Transparenz finden Sie hier die Kontodaten:
+                    </p>
+
+                    <div class="bank-details">
+                        <div class="bank-detail-row">
+                            <span class="bank-label">IBAN</span>
+                            <div class="bank-value-group">
+                                <span class="bank-value" id="displayIban">AT53 3293 7000 0060 8745</span>
+                                <button class="copy-btn-inline" onclick="copyBankDetail('displayIban')" title="Kopieren">
+                                    <i data-lucide="copy" style="width: 14px; height: 14px;"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="bank-detail-row">
+                            <span class="bank-label">BIC</span>
+                            <div class="bank-value-group">
+                                <span class="bank-value" id="displayBic">RLNWATWWWRN</span>
+                                <button class="copy-btn-inline" onclick="copyBankDetail('displayBic')" title="Kopieren">
+                                    <i data-lucide="copy" style="width: 14px; height: 14px;"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="bank-detail-row">
+                            <span class="bank-label">Empfänger</span>
+                            <div class="bank-value-group">
+                                <span class="bank-value" id="displayAccountHolder">KAD</span>
+                                <button class="copy-btn-inline" onclick="copyBankDetail('displayAccountHolder')" title="Kopieren">
+                                    <i data-lucide="copy" style="width: 14px; height: 14px;"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 16px; padding: 12px; background: var(--cream); border-radius: 8px; font-size: 0.85rem; color: var(--text-light);">
+                        <i data-lucide="info" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i>
+                        Die genauen Beträge für Kurtaxe und Energiekosten werden separat kommuniziert.
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
@@ -1258,6 +1807,21 @@
         <div class="update-time">
             <span class="status-dot" id="statusIndicator"></span>
             <span>Aktualisiert: <span id="lastUpdate">--:--</span></span>
+        </div>
+
+        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(0,0,0,0.1); text-align: center;">
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-bottom: 16px; font-size: 0.85rem;">
+                <a href="impressum.html" style="color: var(--text-muted); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--forest)'" onmouseout="this.style.color='var(--text-muted)'">Impressum</a>
+                <span style="color: var(--text-muted);">•</span>
+                <a href="datenschutz.html" style="color: var(--text-muted); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--forest)'" onmouseout="this.style.color='var(--text-muted)'">Datenschutz</a>
+                <span style="color: var(--text-muted);">•</span>
+                <a href="kontakt.html" style="color: var(--text-muted); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--forest)'" onmouseout="this.style.color='var(--text-muted)'">Kontakt</a>
+                <span style="color: var(--text-muted);">•</span>
+                <a href="admin.html" style="color: var(--text-muted); text-decoration: none; transition: color 0.2s; opacity: 0.5;" onmouseover="this.style.color='var(--forest)'; this.style.opacity='1'" onmouseout="this.style.color='var(--text-muted)'; this.style.opacity='0.5'" title="Admin">Admin</a>
+            </div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">
+                Powered by <a href="https://ssi.at" target="_blank" style="color: var(--sage-dark); text-decoration: none; font-weight: 500;" onmouseover="this.style.color='var(--forest)'" onmouseout="this.style.color='var(--sage-dark)'">SSI</a>
+            </div>
         </div>
     </footer>
 
@@ -1342,6 +1906,19 @@
 
         // Initialize Lucide icons
         lucide.createIcons();
+
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registered:', registration.scope);
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed:', err);
+                    });
+            });
+        }
 
         // Update energy status text
         const originalUpdateUI = window.updateUI;
