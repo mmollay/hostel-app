@@ -356,6 +356,27 @@ const InlineEditor = {
   },
 
   /**
+   * Get current language from I18N module
+   */
+  getCurrentLang() {
+    // Check I18N module
+    if (typeof I18N !== 'undefined' && I18N.currentLang) {
+      return I18N.currentLang;
+    }
+    // Fallback: check localStorage or URL
+    const savedLang = localStorage.getItem('hostel_language');
+    if (savedLang && ['de', 'en'].includes(savedLang)) {
+      return savedLang;
+    }
+    // Check URL
+    if (window.location.pathname.startsWith('/en/') || 
+        window.location.search.includes('lang=en')) {
+      return 'en';
+    }
+    return 'de';
+  },
+
+  /**
    * Änderungen speichern
    */
   async saveChanges() {
@@ -363,8 +384,9 @@ const InlineEditor = {
 
     const key = this.currentElement.dataset.editable;
     const content = this.sanitizeHTML(this.currentElement.innerHTML);
+    const lang = this.getCurrentLang();
     
-    console.log(`[InlineEditor] Saving: ${key}`);
+    console.log(`[InlineEditor] Saving: ${key} (${lang})`);
 
     try {
       const token = localStorage.getItem('hostel_admin_token') || 
@@ -378,7 +400,8 @@ const InlineEditor = {
         },
         body: JSON.stringify({ 
           content: content,
-          blockKey: key
+          blockKey: key,
+          lang: lang
         })
       });
 
@@ -389,7 +412,8 @@ const InlineEditor = {
         this.originalContent[key] = content;
         this.currentElement.innerHTML = content;
         
-        this.showNotification('Gespeichert!', 'success');
+        const langLabel = lang === 'de' ? 'DE' : 'EN';
+        this.showNotification(`Gespeichert (${langLabel})!`, 'success');
         this.stopEditing();
       } else {
         this.showNotification(data.error || 'Fehler beim Speichern', 'error');

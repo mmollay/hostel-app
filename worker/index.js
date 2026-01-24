@@ -146,9 +146,11 @@ export default {
       // ============================================
 
       // GET /content/:key - Content-Block abrufen (öffentlich)
+      // Supports ?lang=de|en query parameter
       if (path.startsWith("/content/") && request.method === "GET") {
         const key = path.split("/")[2];
-        return await getContent(key, env, corsHeaders);
+        const lang = url.searchParams.get("lang") || "de";
+        return await getContent(key, env, corsHeaders, lang);
       }
 
       // PUT /content/:key - Content-Block speichern (Admin only)
@@ -158,8 +160,10 @@ export default {
       }
 
       // GET /content - Alle Content-Blöcke abrufen (öffentlich)
+      // Supports ?lang=de|en query parameter
       if (path === "/content" && request.method === "GET") {
-        return await getAllContent(env, corsHeaders);
+        const lang = url.searchParams.get("lang") || "de";
+        return await getAllContent(env, corsHeaders, lang);
       }
 
       // ============================================
@@ -783,44 +787,55 @@ async function getEnergyMonth(env, corsHeaders) {
  * Energie-Daten speichern (upsert)
  */
 async function saveEnergyData(request, env, corsHeaders) {
-  const body = await request.json();
-  const { date, energy_kwh, cost, peak_power, shelly_total_start } = body;
+  try {
+    const body = await request.json();
+    const { date, energy_kwh, cost, peak_power, shelly_total_start } = body;
 
-  if (!date) {
+    if (!date) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Date required" }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    // Upsert: Insert or Update
+    await env.DB.prepare(
+      `INSERT INTO energy_data (hostel_id, date, energy_kwh, cost, peak_power, shelly_total_start, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, unixepoch())
+       ON CONFLICT(hostel_id, date)
+       DO UPDATE SET
+         energy_kwh = excluded.energy_kwh,
+         cost = excluded.cost,
+         peak_power = CASE WHEN excluded.peak_power > peak_power THEN excluded.peak_power ELSE peak_power END,
+         shelly_total_start = excluded.shelly_total_start,
+         updated_at = unixepoch()`,
+    )
+      .bind(
+        HOSTEL_ID,
+        date,
+        energy_kwh || 0,
+        cost || 0,
+        peak_power || 0,
+        shelly_total_start || null,
+      )
+      .run();
+
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("[saveEnergyData] Error:", error);
     return new Response(
-      JSON.stringify({ success: false, error: "Date required" }),
+      JSON.stringify({ success: false, error: error.message || "Database error" }),
       {
-        status: 400,
+        status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       },
     );
   }
-
-  // Upsert: Insert or Update
-  await env.DB.prepare(
-    `INSERT INTO energy_data (hostel_id, date, energy_kwh, cost, peak_power, shelly_total_start, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, unixepoch())
-     ON CONFLICT(hostel_id, date)
-     DO UPDATE SET
-       energy_kwh = excluded.energy_kwh,
-       cost = excluded.cost,
-       peak_power = CASE WHEN excluded.peak_power > peak_power THEN excluded.peak_power ELSE peak_power END,
-       shelly_total_start = excluded.shelly_total_start,
-       updated_at = unixepoch()`,
-  )
-    .bind(
-      HOSTEL_ID,
-      date,
-      energy_kwh || 0,
-      cost || 0,
-      peak_power || 0,
-      shelly_total_start || null,
-    )
-    .run();
-
-  return new Response(JSON.stringify({ success: true }), {
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
 }
 
 /**
@@ -1605,7 +1620,7 @@ function sanitizeContentJson(obj) {
 /**
  * Einzelnen Content-Block abrufen (für Inline Editor)
  */
-async function getContent(key, env, corsHeaders) {
+async function getContent(key, env, corsHeaders, lang = 'de') {
   try {
     const result = await env.DB.prepare(
       `SELECT content_json FROM page_content
@@ -1621,10 +1636,22 @@ async function getContent(key, env, corsHeaders) {
       );
     }
 
+    // Parse content and return language-specific content
+    const content = JSON.parse(result.content_json || "{}");
+    
+    // Support both old format {html: "..."} and new i18n format {de: "...", en: "..."}
+    let htmlContent = content.html || null;
+    if (content[lang]) {
+      htmlContent = content[lang];
+    } else if (content.de) {
+      // Fallback to German
+      htmlContent = content.de;
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
-        content: JSON.parse(result.content_json || "{}"),
+        content: { html: htmlContent, raw: content },
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
@@ -1638,6 +1665,7 @@ async function getContent(key, env, corsHeaders) {
 
 /**
  * Content-Block speichern (für Inline Editor, Admin only)
+ * Supports i18n: content is stored per language {de: "...", en: "..."}
  */
 async function updateContent(request, key, env, corsHeaders) {
   // Admin Auth prüfen
@@ -1651,10 +1679,39 @@ async function updateContent(request, key, env, corsHeaders) {
   try {
     const body = await request.json();
     const content = body.content || "";
+    const lang = body.lang || "de";  // Default to German
     
     // HTML sanitieren (nur sichere Tags erlauben)
     const sanitizedContent = sanitizeHTML(content);
-    const contentJson = JSON.stringify({ html: sanitizedContent });
+    
+    // Get existing content to merge languages
+    const existing = await env.DB.prepare(
+      `SELECT content_json FROM page_content
+       WHERE hostel_id = ? AND block_key = ?`,
+    )
+      .bind(HOSTEL_ID, key)
+      .first();
+    
+    // Build content object with language support
+    let contentObj = {};
+    if (existing && existing.content_json) {
+      try {
+        contentObj = JSON.parse(existing.content_json);
+        // Migrate old format {html: "..."} to new format
+        if (contentObj.html && !contentObj.de) {
+          contentObj.de = contentObj.html;
+          delete contentObj.html;
+        }
+      } catch (e) {
+        // Start fresh
+        contentObj = {};
+      }
+    }
+    
+    // Set content for current language
+    contentObj[lang] = sanitizedContent;
+    
+    const contentJson = JSON.stringify(contentObj);
 
     // Upsert: Insert oder Update
     await env.DB.prepare(
@@ -1667,7 +1724,7 @@ async function updateContent(request, key, env, corsHeaders) {
       .run();
 
     return new Response(
-      JSON.stringify({ success: true }),
+      JSON.stringify({ success: true, lang }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (error) {
@@ -1681,7 +1738,7 @@ async function updateContent(request, key, env, corsHeaders) {
 /**
  * Alle Content-Blöcke abrufen (für Page Load)
  */
-async function getAllContent(env, corsHeaders) {
+async function getAllContent(env, corsHeaders, lang = 'de') {
   try {
     const result = await env.DB.prepare(
       `SELECT block_key, content_json FROM page_content
@@ -1693,7 +1750,16 @@ async function getAllContent(env, corsHeaders) {
     const content = {};
     (result.results || []).forEach(row => {
       try {
-        content[row.block_key] = JSON.parse(row.content_json || "{}");
+        const parsed = JSON.parse(row.content_json || "{}");
+        // Return language-specific content with fallback
+        let htmlContent = parsed.html || null;
+        if (parsed[lang]) {
+          htmlContent = parsed[lang];
+        } else if (parsed.de) {
+          // Fallback to German
+          htmlContent = parsed.de;
+        }
+        content[row.block_key] = { html: htmlContent, raw: parsed };
       } catch (e) {
         content[row.block_key] = { html: row.content_json };
       }
