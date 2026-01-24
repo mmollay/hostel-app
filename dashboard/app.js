@@ -135,6 +135,14 @@ async function init() {
 
   // Annehmlichkeiten laden
   loadAmenities();
+  
+  // i18n: Bei Sprachwechsel Amenities neu laden
+  if (typeof I18N !== 'undefined') {
+    I18N.onChange(() => {
+      loadAmenities();
+      updateGreeting();
+    });
+  }
 }
 
 /**
@@ -1639,7 +1647,9 @@ async function geocodeAddress(address) {
  */
 async function loadAmenities() {
   try {
-    const response = await fetch(`${CONFIG.API_PROXY_URL}/amenities`);
+    // i18n: Sprache an API übergeben
+    const lang = (typeof I18N !== 'undefined' && I18N.currentLang) ? I18N.currentLang : 'de';
+    const response = await fetch(`${CONFIG.API_PROXY_URL}/amenities?lang=${lang}`);
     const data = await response.json();
 
     if (data.success && data.amenities) {

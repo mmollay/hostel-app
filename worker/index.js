@@ -103,12 +103,14 @@ export default {
 
       // GET /amenities - Öffentlich: Nur sichtbare Annehmlichkeiten
       if (path === "/amenities" && request.method === "GET") {
-        return await getAmenities(env, corsHeaders, false);
+        const lang = url.searchParams.get("lang") || "de";
+        return await getAmenities(env, corsHeaders, false, lang);
       }
 
       // GET /amenities/all - Admin: Alle Annehmlichkeiten inkl. ausgeblendete
       if (path === "/amenities/all" && request.method === "GET") {
-        return await getAmenities(env, corsHeaders, true);
+        const lang = url.searchParams.get("lang") || "de";
+        return await getAmenities(env, corsHeaders, true, lang);
       }
 
       // PUT /amenities/:id/toggle - Sichtbarkeit umschalten (Admin only)
@@ -817,8 +819,9 @@ function getDateString(date) {
 /**
  * Annehmlichkeiten abrufen
  * @param {boolean} includeHidden - true = alle, false = nur sichtbare
+ * @param {string} lang - Sprachcode (de, en)
  */
-async function getAmenities(env, corsHeaders, includeHidden) {
+async function getAmenities(env, corsHeaders, includeHidden, lang = "de") {
   let query = "SELECT * FROM amenities WHERE hostel_id = ?";
   if (!includeHidden) {
     query += " AND is_visible = 1";
@@ -826,11 +829,38 @@ async function getAmenities(env, corsHeaders, includeHidden) {
   query += " ORDER BY display_order ASC";
 
   const result = await env.DB.prepare(query).bind(HOSTEL_ID).all();
+  
+  // i18n: Übersetzte Texte zurückgeben
+  const amenities = (result.results || []).map(amenity => {
+    let title = amenity.title;
+    let description = amenity.description;
+    
+    // Wenn i18n-Spalten vorhanden, übersetzen
+    if (amenity.title_i18n) {
+      try {
+        const titleI18n = JSON.parse(amenity.title_i18n);
+        title = titleI18n[lang] || titleI18n.de || amenity.title;
+      } catch (e) { /* Fallback auf title */ }
+    }
+    
+    if (amenity.description_i18n) {
+      try {
+        const descI18n = JSON.parse(amenity.description_i18n);
+        description = descI18n[lang] || descI18n.de || amenity.description;
+      } catch (e) { /* Fallback auf description */ }
+    }
+    
+    return {
+      ...amenity,
+      title,
+      description,
+    };
+  });
 
   return new Response(
     JSON.stringify({
       success: true,
-      amenities: result.results || [],
+      amenities,
     }),
     {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
