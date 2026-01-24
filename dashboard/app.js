@@ -1540,6 +1540,18 @@ function displayRecommendations(places) {
     "[displayRecommendations] Finished rendering. Total items:",
     listEl.children.length,
   );
+
+  // DEBUG: Add red border to all items for visibility test
+  Array.from(listEl.children).forEach((item, i) => {
+    item.style.border = "3px solid red";
+    item.style.minHeight = "100px";
+    const rect = item.getBoundingClientRect();
+    console.log(
+      `Item ${i}: height=${item.offsetHeight}px, visible=${item.offsetHeight > 0}, rect=`,
+      rect,
+    );
+  });
+
   console.log("[displayRecommendations] Creating Lucide icons...");
   lucide.createIcons();
   console.log("[displayRecommendations] DONE!");
