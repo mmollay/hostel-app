@@ -733,6 +733,8 @@ function updateGuestUI() {
   const recommendationsCard = document.getElementById("recommendationsCard");
   const wifiCard = document.getElementById("wifiCard");
   const quickNav = document.getElementById("quickNav");
+  const wifiInfoName = document.getElementById("wifiInfoName");
+  const wifiInfoPassword = document.getElementById("wifiInfoPassword");
 
   if (btn) {
     btn.classList.toggle("logged-in", !!guestToken);
@@ -748,6 +750,11 @@ function updateGuestUI() {
   if (recommendationsCard)
     recommendationsCard.style.display = guestToken ? "block" : "none";
   if (wifiCard) wifiCard.style.display = guestToken ? "block" : "none";
+
+  // WiFi-Infos in "Wichtige Infos" nur für eingeloggte Gäste anzeigen
+  if (wifiInfoName) wifiInfoName.style.display = guestToken ? "flex" : "none";
+  if (wifiInfoPassword)
+    wifiInfoPassword.style.display = guestToken ? "flex" : "none";
 
   // Quick Navigation nur für eingeloggte Gäste anzeigen
   if (quickNav) quickNav.style.display = guestToken ? "flex" : "none";
