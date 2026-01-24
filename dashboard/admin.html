@@ -497,11 +497,12 @@
         .guest-item {
             display: flex;
             align-items: center;
-            gap: 16px;
-            padding: 16px;
+            gap: 20px;
+            padding: 24px;
             background: var(--cream);
             border-radius: 14px;
             transition: background 0.2s, transform 0.2s;
+            margin-bottom: 12px;
         }
 
         .guest-item:hover {
@@ -510,15 +511,15 @@
         }
 
         .guest-avatar {
-            width: 48px;
-            height: 48px;
+            width: 56px;
+            height: 56px;
             background: linear-gradient(135deg, var(--sage-light) 0%, var(--sage) 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             font-weight: 600;
             flex-shrink: 0;
         }
@@ -537,20 +538,21 @@
         .guest-meta {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
-            font-size: 0.85rem;
+            gap: 16px;
+            font-size: 0.9rem;
             color: var(--text-light);
+            line-height: 1.6;
         }
 
         .guest-meta span {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
         }
 
         .guest-meta i {
-            width: 14px;
-            height: 14px;
+            width: 16px;
+            height: 16px;
             color: var(--sage-dark);
         }
 
@@ -928,11 +930,40 @@
             .guest-item {
                 flex-direction: column;
                 align-items: flex-start;
+                padding: 20px;
+                gap: 16px;
+            }
+
+            .guest-avatar {
+                width: 48px;
+                height: 48px;
+                font-size: 1.2rem;
+            }
+
+            .guest-info {
+                width: 100%;
+            }
+
+            .guest-info h3 {
+                font-size: 1.05rem;
+                margin-bottom: 8px;
+            }
+
+            .guest-meta {
+                flex-direction: column;
+                gap: 10px;
+                font-size: 0.85rem;
+            }
+
+            .guest-meta span {
+                width: 100%;
             }
 
             .guest-actions {
                 width: 100%;
                 justify-content: flex-end;
+                padding-top: 12px;
+                border-top: 1px solid rgba(0,0,0,0.05);
             }
 
             .tabs-container {
