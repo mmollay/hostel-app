@@ -1365,6 +1365,7 @@ async function getApartmentInfo(slug, env, corsHeaders) {
     slug: apartment.slug,
     name: apartment.name,
     location: apartment.location,
+    address: apartment.location || "",  // address = location für Geocoding
     phone: settings.phone || "",
     email: settings.email || "",
     checkInTime: settings.checkInTime || "15:00",
@@ -1373,6 +1374,11 @@ async function getApartmentInfo(slug, env, corsHeaders) {
     iban: settings.iban || "",
     bic: settings.bic || "",
     accountHolder: settings.accountHolder || "",
+    // Neue Felder für dynamische Inhalte
+    hostName: settings.hostName || "",
+    website: settings.website || "",
+    tagline: settings.tagline || "",
+    tagline_en: settings.tagline_en || "",
   };
 
   return new Response(JSON.stringify({ success: true, info: publicInfo }), {

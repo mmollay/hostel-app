@@ -136,11 +136,12 @@ async function init() {
   // Annehmlichkeiten laden
   loadAmenities();
   
-  // i18n: Bei Sprachwechsel Amenities neu laden
+  // i18n: Bei Sprachwechsel Daten neu laden
   if (typeof I18N !== 'undefined') {
     I18N.onChange(() => {
       loadAmenities();
       updateGreeting();
+      loadHostelInfo();  // Tagline neu laden (DE/EN)
     });
   }
 }
@@ -1788,11 +1789,21 @@ async function loadHostelInfo() {
     if (data.success && data.info) {
       const info = data.info;
 
-      // Apartment-Namen im Title anzeigen
-      if (info.name && apartmentSlug) {
-        document.getElementById("mainTitle").textContent = info.name;
-        if (info.location) {
-          document.querySelector(".subtitle").textContent = info.location;
+      // Website/Domain im Title anzeigen
+      if (info.website) {
+        const titleEl = document.getElementById("mainTitle");
+        if (titleEl) titleEl.textContent = info.website;
+      }
+
+      // Tagline/Subtitle anzeigen (i18n-aware)
+      const currentLang = (typeof I18N !== 'undefined' && I18N.currentLang) || 'de';
+      const tagline = currentLang === 'en' && info.tagline_en ? info.tagline_en : info.tagline;
+      if (tagline) {
+        const subtitleEl = document.querySelector(".subtitle");
+        if (subtitleEl) {
+          // Format: "Tagline • Location"
+          const locationPart = info.name || 'Hollenthon';
+          subtitleEl.textContent = `${tagline} • ${locationPart}`;
         }
       }
 
@@ -1803,6 +1814,12 @@ async function loadHostelInfo() {
         updateGreeting();
         // Alle Du/Sie-Texte aktualisieren
         updateFormalAddressTexts();
+      }
+
+      // Gastgeber-Name
+      if (info.hostName) {
+        const hostEl = document.getElementById("hostelHost");
+        if (hostEl) hostEl.textContent = info.hostName;
       }
 
       // Kontaktdaten aktualisieren
