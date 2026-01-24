@@ -1313,6 +1313,212 @@
             text-align: center;
             display: none;
         }
+
+        /* ============================================
+           INLINE EDITOR STYLES
+           ============================================ */
+
+        /* Editable Elements */
+        .editable-element {
+            position: relative;
+            transition: outline 0.2s ease;
+        }
+
+        .editable-element:hover::after {
+            content: '✏️';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--sage);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Edit Toolbar */
+        .edit-toolbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--forest);
+            color: white;
+            padding: 12px 20px;
+            z-index: 10000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .edit-toolbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .edit-mode-badge {
+            font-size: 14px;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .btn-exit-edit {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-exit-edit:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Editor Modal */
+        .editor-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10001;
+        }
+
+        .editor-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .editor-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .editor-header h2 {
+            color: var(--forest);
+            font-size: 1.3rem;
+            margin: 0;
+        }
+
+        .editor-close {
+            background: none;
+            border: none;
+            font-size: 32px;
+            cursor: pointer;
+            color: #999;
+            line-height: 1;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+        }
+
+        .editor-close:hover {
+            color: var(--forest);
+        }
+
+        .editor-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .editor-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--forest);
+            font-size: 0.9rem;
+        }
+
+        .editor-form input,
+        .editor-form textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .editor-form input:focus,
+        .editor-form textarea:focus {
+            outline: none;
+            border-color: var(--sage);
+        }
+
+        .editor-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+
+        .editor-actions .btn-primary,
+        .editor-actions .btn-secondary {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .editor-actions .btn-primary {
+            background: var(--sage);
+            color: white;
+        }
+
+        .editor-actions .btn-primary:hover {
+            background: var(--sage-dark);
+        }
+
+        .editor-actions .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .editor-actions .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        /* SSI Protection */
+        [data-ssi-protected] {
+            cursor: default !important;
+            outline: none !important;
+        }
+
+        [data-ssi-protected]::after {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -1359,7 +1565,7 @@
     <main class="main">
         <div id="dashboard">
             <!-- Welcome Card -->
-            <div class="card welcome-card">
+            <div class="card welcome-card" data-editable="welcome-main">
                 <h2 class="greeting" id="greeting">Herzlich Willkommen!</h2>
                 <p class="message" id="welcomeMessage">
                     An diesem magischen Ort, wo Wald und Himmel sich berühren, laden wir dich ein,
@@ -1374,7 +1580,7 @@
             </div>
 
             <!-- Über diesen Ort -->
-            <div class="card" style="background: linear-gradient(135deg, var(--warm-white) 0%, var(--cream) 100%);">
+            <div class="card" style="background: linear-gradient(135deg, var(--warm-white) 0%, var(--cream) 100%);" data-editable="text-about">
                 <div class="card-header">
                     <div class="card-icon" style="background: linear-gradient(135deg, var(--forest) 0%, var(--sage) 100%);"><i data-lucide="trees"></i></div>
                     <div>
@@ -1471,7 +1677,7 @@
             </div>
 
             <!-- Coming Soon / In Entstehung -->
-            <div class="card" style="background: linear-gradient(135deg, var(--warm-white) 0%, var(--sand) 100%); border: 2px dashed var(--sage);">
+            <div class="card" style="background: linear-gradient(135deg, var(--warm-white) 0%, var(--sand) 100%); border: 2px dashed var(--sage);" data-editable="projects-coming-soon">
                 <div class="card-header">
                     <div class="card-icon" style="background: linear-gradient(135deg, var(--forest) 0%, var(--sage-dark) 100%);"><i data-lucide="construction"></i></div>
                     <div>
@@ -1802,8 +2008,8 @@
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="footer">
+    <!-- Footer (SSI Protected) -->
+    <footer class="footer" data-ssi-protected>
         <div class="update-time">
             <span class="status-dot" id="statusIndicator"></span>
             <span>Aktualisiert: <span id="lastUpdate">--:--</span></span>
@@ -1877,6 +2083,7 @@
 
     <script src="config.js"></script>
     <script src="app.js"></script>
+    <script src="inline-editor.js"></script>
     <script>
         // Update time display
         function updateDateTime() {

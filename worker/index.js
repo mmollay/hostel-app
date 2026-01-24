@@ -182,6 +182,67 @@ export default {
         return await getDistanceMatrix(url, env, corsHeaders);
       }
 
+      // ============================================
+      // CONTENT MANAGEMENT (INLINE EDITOR)
+      // ============================================
+
+      // GET /content/:hostelId - Alle Content Blocks abrufen
+      if (path.match(/^\/content\/[^\/]+$/) && request.method === "GET") {
+        const hostelId = path.split("/")[2];
+        return await getContentBlocks(env, corsHeaders, hostelId);
+      }
+
+      // GET /content/:hostelId/:blockKey - Einzelnen Content Block abrufen
+      if (
+        path.match(/^\/content\/[^\/]+\/[^\/]+$/) &&
+        request.method === "GET"
+      ) {
+        const parts = path.split("/");
+        const hostelId = parts[2];
+        const blockKey = parts[3];
+        return await getContentBlock(env, corsHeaders, hostelId, blockKey);
+      }
+
+      // POST /content/:hostelId - Neuen Content Block erstellen (Admin only)
+      if (path.match(/^\/content\/[^\/]+$/) && request.method === "POST") {
+        const hostelId = path.split("/")[2];
+        return await createContentBlock(request, env, corsHeaders, hostelId);
+      }
+
+      // PUT /content/:hostelId/:blockKey - Content Block aktualisieren (Admin only)
+      if (
+        path.match(/^\/content\/[^\/]+\/[^\/]+$/) &&
+        request.method === "PUT"
+      ) {
+        const parts = path.split("/");
+        const hostelId = parts[2];
+        const blockKey = parts[3];
+        return await updateContentBlock(
+          request,
+          env,
+          corsHeaders,
+          hostelId,
+          blockKey,
+        );
+      }
+
+      // DELETE /content/:hostelId/:blockKey - Content Block löschen (Admin only)
+      if (
+        path.match(/^\/content\/[^\/]+\/[^\/]+$/) &&
+        request.method === "DELETE"
+      ) {
+        const parts = path.split("/");
+        const hostelId = parts[2];
+        const blockKey = parts[3];
+        return await deleteContentBlock(
+          request,
+          env,
+          corsHeaders,
+          hostelId,
+          blockKey,
+        );
+      }
+
       return new Response("Not found", { status: 404, headers: corsHeaders });
     } catch (error) {
       return new Response(JSON.stringify({ error: error.message }), {
@@ -1268,5 +1329,328 @@ async function getDistanceMatrix(url, env, corsHeaders) {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
+  }
+}
+
+// ============================================
+// CONTENT MANAGEMENT FUNCTIONS
+// ============================================
+
+/**
+ * Sanitize text content (remove HTML tags)
+ * CRITICAL: XSS prevention
+ */
+function sanitizeText(text) {
+  if (!text || typeof text !== "string") return "";
+  // Remove all HTML tags, keep plain text only
+  return text.replace(/<[^>]*>/g, "").trim();
+}
+
+/**
+ * Sanitize JSON content recursively
+ */
+function sanitizeContentJson(obj) {
+  if (typeof obj === "string") {
+    return sanitizeText(obj);
+  } else if (Array.isArray(obj)) {
+    return obj.map((item) => sanitizeContentJson(item));
+  } else if (obj && typeof obj === "object") {
+    const sanitized = {};
+    for (const [key, value] of Object.entries(obj)) {
+      sanitized[key] = sanitizeContentJson(value);
+    }
+    return sanitized;
+  }
+  return obj;
+}
+
+/**
+ * Alle Content Blocks für ein Hostel abrufen
+ */
+async function getContentBlocks(env, corsHeaders, hostelId) {
+  try {
+    const result = await env.DB.prepare(
+      `SELECT * FROM page_content
+       WHERE hostel_id = ?
+       ORDER BY display_order ASC, id ASC`,
+    )
+      .bind(hostelId)
+      .all();
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        content: result.results || [],
+      }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ success: false, error: error.message }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+}
+
+/**
+ * Einzelnen Content Block abrufen
+ */
+async function getContentBlock(env, corsHeaders, hostelId, blockKey) {
+  try {
+    const result = await env.DB.prepare(
+      `SELECT * FROM page_content
+       WHERE hostel_id = ? AND block_key = ?`,
+    )
+      .bind(hostelId, blockKey)
+      .first();
+
+    if (!result) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Block not found" }),
+        {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        content: result,
+      }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ success: false, error: error.message }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+}
+
+/**
+ * Neuen Content Block erstellen (Admin only)
+ */
+async function createContentBlock(request, env, corsHeaders, hostelId) {
+  // Admin Auth prüfen
+  if (!(await isAdmin(request, env))) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  try {
+    const body = await request.json();
+    const { block_type, block_key, content_json, display_order } = body;
+
+    // Validierung
+    if (!block_type || !block_key || !content_json) {
+      return new Response(
+        JSON.stringify({
+          error: "block_type, block_key, and content_json are required",
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    // Parse und sanitize content
+    let content;
+    try {
+      content =
+        typeof content_json === "string"
+          ? JSON.parse(content_json)
+          : content_json;
+    } catch (e) {
+      return new Response(
+        JSON.stringify({ error: "Invalid JSON in content_json" }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    // CRITICAL: Sanitize all text content
+    const sanitizedContent = sanitizeContentJson(content);
+
+    // Insert in DB
+    await env.DB.prepare(
+      `INSERT INTO page_content (hostel_id, block_type, block_key, content_json, display_order)
+       VALUES (?, ?, ?, ?, ?)`,
+    )
+      .bind(
+        hostelId,
+        block_type,
+        block_key,
+        JSON.stringify(sanitizedContent),
+        display_order || 0,
+      )
+      .run();
+
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    if (error.message.includes("UNIQUE")) {
+      return new Response(
+        JSON.stringify({ error: "Block key already exists" }),
+        {
+          status: 409,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
+    }
+    return new Response(
+      JSON.stringify({ success: false, error: error.message }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+}
+
+/**
+ * Content Block aktualisieren (Admin only)
+ */
+async function updateContentBlock(
+  request,
+  env,
+  corsHeaders,
+  hostelId,
+  blockKey,
+) {
+  // Admin Auth prüfen
+  if (!(await isAdmin(request, env))) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  try {
+    const body = await request.json();
+    const { content_json, is_visible, display_order } = body;
+
+    if (!content_json) {
+      return new Response(
+        JSON.stringify({ error: "content_json is required" }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    // Parse und sanitize content
+    let content;
+    try {
+      content =
+        typeof content_json === "string"
+          ? JSON.parse(content_json)
+          : content_json;
+    } catch (e) {
+      return new Response(
+        JSON.stringify({ error: "Invalid JSON in content_json" }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    // CRITICAL: Sanitize all text content
+    const sanitizedContent = sanitizeContentJson(content);
+
+    // Build UPDATE query dynamically
+    const updates = ["content_json = ?", "updated_at = unixepoch()"];
+    const params = [JSON.stringify(sanitizedContent)];
+
+    if (is_visible !== undefined) {
+      updates.push("is_visible = ?");
+      params.push(is_visible ? 1 : 0);
+    }
+
+    if (display_order !== undefined) {
+      updates.push("display_order = ?");
+      params.push(display_order);
+    }
+
+    params.push(hostelId, blockKey);
+
+    await env.DB.prepare(
+      `UPDATE page_content
+       SET ${updates.join(", ")}
+       WHERE hostel_id = ? AND block_key = ?`,
+    )
+      .bind(...params)
+      .run();
+
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ success: false, error: error.message }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+}
+
+/**
+ * Content Block löschen (Admin only)
+ */
+async function deleteContentBlock(
+  request,
+  env,
+  corsHeaders,
+  hostelId,
+  blockKey,
+) {
+  // Admin Auth prüfen
+  if (!(await isAdmin(request, env))) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  try {
+    await env.DB.prepare(
+      `DELETE FROM page_content
+       WHERE hostel_id = ? AND block_key = ?`,
+    )
+      .bind(hostelId, blockKey)
+      .run();
+
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ success: false, error: error.message }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
   }
 }
