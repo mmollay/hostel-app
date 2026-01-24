@@ -1287,8 +1287,10 @@ async function fetchAllPagesForType(type) {
       // WICHTIG: Google braucht ~2 Sekunden Wartezeit zwischen Requests!
       await new Promise((resolve) => setTimeout(resolve, 2000));
     } else {
-      // Erste Seite mit location/radius/type
-      url = `${CONFIG.API_PROXY_URL}/places/nearby?lat=${LOCATION.lat}&lon=${LOCATION.lon}&radius=${currentRadius}&type=${type}`;
+      // Erste Seite mit location/type/rankby
+      // WICHTIG: rankby=distance gibt die NÄCHSTEN 60 Orte (nicht die "wichtigsten")
+      // Bei rankby=distance darf KEIN radius-Parameter verwendet werden!
+      url = `${CONFIG.API_PROXY_URL}/places/nearby?lat=${LOCATION.lat}&lon=${LOCATION.lon}&type=${type}&rankby=distance`;
     }
 
     const response = await fetch(url);
@@ -1331,10 +1333,16 @@ async function fetchNearbyPlaces() {
 
   try {
     // Google Places API (New) - Nearby Search mit Pagination
-    const types =
-      currentCategory === "all"
-        ? ["tourist_attraction", "restaurant", "spa", "museum", "park"]
-        : [currentCategory];
+    let types;
+    if (currentCategory === "all") {
+      types = ["tourist_attraction", "restaurant", "spa", "museum", "park"];
+    } else if (currentCategory === "restaurant") {
+      // WICHTIG: Auch "food" abfragen, um Hybrid-Orte zu finden
+      // (z.B. Hotels mit Restaurant wie Krumbacherhof - primär "lodging", sekundär "restaurant")
+      types = ["restaurant", "food"];
+    } else {
+      types = [currentCategory];
+    }
 
     // Für jeden Type ALLE Seiten holen (nicht nur erste 20!)
     const placesPromises = types.map((type) => fetchAllPagesForType(type));

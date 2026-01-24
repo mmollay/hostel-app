@@ -1351,9 +1351,10 @@ async function getPlacesNearby(url, env, corsHeaders) {
   // URL Parameter extrahieren
   const lat = url.searchParams.get("lat");
   const lon = url.searchParams.get("lon");
-  const radius = url.searchParams.get("radius") || "20000";
+  const radius = url.searchParams.get("radius");
   const type = url.searchParams.get("type") || "tourist_attraction";
   const pagetoken = url.searchParams.get("pagetoken"); // Pagination Support
+  const rankby = url.searchParams.get("rankby"); // distance | prominence
   const apiKey = env.GOOGLE_MAPS_API_KEY;
 
   if (!lat || !lon) {
@@ -1380,8 +1381,16 @@ async function getPlacesNearby(url, env, corsHeaders) {
       // Wenn pagetoken vorhanden, nur diesen verwenden (NICHT lat/lon/radius!)
       googleUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?pagetoken=${pagetoken}&key=${apiKey}`;
     } else {
-      // Initiale Suche mit location/radius/type
-      googleUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lon}&radius=${radius}&type=${type}&key=${apiKey}`;
+      // Initiale Suche mit location/type
+      // WICHTIG: rankby=distance und radius schließen sich aus!
+      if (rankby === "distance") {
+        // Sortierung nach Entfernung (nächste 60 Orte)
+        googleUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lon}&type=${type}&rankby=distance&key=${apiKey}`;
+      } else {
+        // Standard: Sortierung nach Prominence (wichtigste 60 Orte im Radius)
+        const radiusValue = radius || "20000";
+        googleUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lon}&radius=${radiusValue}&type=${type}&key=${apiKey}`;
+      }
     }
 
     const response = await fetch(googleUrl);
