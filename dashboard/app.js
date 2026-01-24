@@ -121,10 +121,8 @@ async function init() {
   // Auto-Refresh: Daten alle 5 Minuten komplett neu laden (gegen Cache)
   startAutoRefresh();
 
-  // Hostel-Info laden (Kontakt, Bankdaten)
-  if (guestToken) {
-    await loadHostelInfo();
-  }
+  // Hostel-Info laden (Kontakt, Bankdaten) - IMMER laden, auch ohne Login
+  await loadHostelInfo();
 
   // Wetter laden
   if (guestToken) {
