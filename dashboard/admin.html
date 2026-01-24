@@ -1054,6 +1054,9 @@
                 <input type="password" id="loginPassword" placeholder="Admin-Passwort">
             </div>
             <button class="btn btn-primary" style="width: 100%;" onclick="login()">Anmelden</button>
+            <a href="/" class="btn btn-secondary" style="width: 100%; display: block; text-align: center; text-decoration: none; margin-top: 12px;">
+                ← Zurück zur Hauptseite
+            </a>
             <div class="error-text" id="loginError"></div>
         </div>
     </div>
@@ -1147,9 +1150,9 @@
     <!-- Header -->
     <header class="header">
         <div style="position: absolute; top: 20px; left: 20px; display: flex; gap: 12px; z-index: 10;">
-            <a href="index.html" class="logout-btn" style="text-decoration: none;">
-                <i data-lucide="eye"></i>
-                <span>Gäste-Portal</span>
+            <a href="/" class="logout-btn" style="text-decoration: none; background: var(--sage); border-color: var(--sage);">
+                <i data-lucide="arrow-left"></i>
+                <span>Zurück zu Gast auf Erden</span>
             </a>
             <button class="logout-btn" onclick="logout()">
                 <i data-lucide="log-out"></i>
