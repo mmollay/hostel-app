@@ -719,18 +719,20 @@ async function getEnergyMonth(env, corsHeaders) {
   const now = new Date();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
   const monthStart = `${year}-${month}-01`;
-  const monthEnd = `${year}-${month}-31`;
+  const today = `${year}-${month}-${day}`;
 
+  // WICHTIG: Nur vergangene Tage (OHNE heute), weil heute wird in app.js separat addiert
   const result = await env.DB.prepare(
     `SELECT
       SUM(energy_kwh) as total_energy,
       SUM(cost) as total_cost,
       MAX(peak_power) as peak_power
     FROM energy_data
-    WHERE hostel_id = ? AND date >= ? AND date <= ?`,
+    WHERE hostel_id = ? AND date >= ? AND date < ?`,
   )
-    .bind(HOSTEL_ID, monthStart, monthEnd)
+    .bind(HOSTEL_ID, monthStart, today)
     .first();
 
   return new Response(
