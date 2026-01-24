@@ -1299,6 +1299,13 @@ async function fetchNearbyPlaces() {
         ? ["tourist_attraction", "restaurant", "spa", "museum", "park"]
         : [currentCategory];
 
+    console.log(
+      "[Recommendations] Category:",
+      currentCategory,
+      "Types:",
+      types,
+    );
+
     // Worker-Proxy verwenden (um CORS zu vermeiden)
     const placesPromises = types.map((type) =>
       fetch(
@@ -1318,6 +1325,12 @@ async function fetchNearbyPlaces() {
       (p) => !p.rating || p.rating >= 3.5,
     );
 
+    console.log(
+      "[Recommendations] After rating filter:",
+      filteredPlaces.length,
+      "places",
+    );
+
     if (filteredPlaces.length === 0) {
       showRecommendationsError(
         "Keine Empfehlungen gefunden. Versuche einen größeren Umkreis.",
@@ -1328,11 +1341,18 @@ async function fetchNearbyPlaces() {
     // Tatsächliche Fahrstrecke mit Distance Matrix API berechnen
     await enrichPlacesWithDrivingDistance(filteredPlaces);
 
+    console.log(
+      "[Recommendations] After distance enrichment - places with distance:",
+      filteredPlaces.filter((p) => p.drivingDistance).length,
+    );
+
     // Nach tatsächlicher Fahrstrecke sortieren
     const sortedPlaces = filteredPlaces
       .filter((p) => p.drivingDistance) // Nur Places mit berechneter Distanz
       .sort((a, b) => a.drivingDistance - b.drivingDistance)
       .slice(0, 10); // Top 10 nächstgelegene
+
+    console.log("[Recommendations] Final sorted places:", sortedPlaces.length);
 
     if (sortedPlaces.length === 0) {
       showRecommendationsError(
