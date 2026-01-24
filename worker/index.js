@@ -189,6 +189,11 @@ export default {
         return await getDistanceMatrix(url, env, corsHeaders);
       }
 
+      // GET /geocode - Google Geocoding API Proxy (öffentlich)
+      if (path === "/geocode" && request.method === "GET") {
+        return await geocodeAddress(url, env, corsHeaders);
+      }
+
       // ============================================
       // CONTENT MANAGEMENT (INLINE EDITOR)
       // ============================================
@@ -1440,6 +1445,47 @@ async function getDistanceMatrix(url, env, corsHeaders) {
   try {
     // Google Distance Matrix API aufrufen
     const googleUrl = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(origins)}&destinations=${encodeURIComponent(destinations)}&mode=driving&key=${apiKey}`;
+
+    const response = await fetch(googleUrl);
+    const data = await response.json();
+
+    return new Response(JSON.stringify(data), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+}
+
+/**
+ * Google Geocoding API Proxy (Adresse → Koordinaten)
+ */
+async function geocodeAddress(url, env, corsHeaders) {
+  const address = url.searchParams.get("address");
+  const apiKey = env.GOOGLE_MAPS_API_KEY;
+
+  if (!address) {
+    return new Response(JSON.stringify({ error: "Address required" }), {
+      status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  if (!apiKey) {
+    return new Response(
+      JSON.stringify({ error: "Google Maps API Key not configured" }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+
+  try {
+    const googleUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
 
     const response = await fetch(googleUrl);
     const data = await response.json();

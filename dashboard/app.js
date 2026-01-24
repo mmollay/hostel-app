@@ -95,8 +95,8 @@ const GUEST_TOKEN_KEY = "hostel_guest_token";
 const GUEST_DATA_KEY = "hostel_guest_data";
 const NIGHT_MODE_KEY = "hostel_night_mode";
 
-// Hollenthon Koordinaten für Wetter
-const LOCATION = {
+// Location wird dynamisch aus Adresse geocoded (Default: Hollenthon)
+let LOCATION = {
   lat: 47.5833,
   lon: 16.1667,
   name: "Hollenthon",
@@ -1590,6 +1590,34 @@ function showRecommendationsError(message) {
   lucide.createIcons();
 }
 
+/**
+ * Geocode address to lat/lon coordinates
+ */
+async function geocodeAddress(address) {
+  if (!address || !GOOGLE_MAPS_API_KEY) return;
+
+  try {
+    const response = await fetch(
+      `${CONFIG.API_PROXY_URL}/geocode?address=${encodeURIComponent(address)}`,
+    );
+    const data = await response.json();
+
+    if (data.status === "OK" && data.results && data.results[0]) {
+      const location = data.results[0].geometry.location;
+      LOCATION.lat = location.lat;
+      LOCATION.lon = location.lng;
+      console.log(`Geocoded "${address}" to ${LOCATION.lat}, ${LOCATION.lon}`);
+
+      // Refresh weather with new coordinates
+      fetchWeather();
+    } else {
+      console.warn(`Geocoding failed for "${address}":`, data.status);
+    }
+  } catch (error) {
+    console.error("Geocoding error:", error);
+  }
+}
+
 // ============================================
 // ANNEHMLICHKEITEN (AMENITIES)
 // ============================================
@@ -1751,6 +1779,14 @@ async function loadHostelInfo() {
       if (info.email) {
         const emailEl = document.getElementById("hostelEmailDisplay");
         if (emailEl) emailEl.textContent = info.email;
+      }
+
+      if (info.address) {
+        const addressEl = document.getElementById("hostelAddressDisplay");
+        if (addressEl) addressEl.textContent = info.address;
+
+        // Geocode address to update LOCATION coordinates
+        await geocodeAddress(info.address);
       }
 
       // Bankdaten anzeigen (nur wenn vorhanden)

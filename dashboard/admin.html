@@ -1435,6 +1435,12 @@
                 <input type="email" id="hostelEmail" placeholder="office@hostel.at">
             </div>
 
+            <div class="form-group">
+                <label>Adresse</label>
+                <input type="text" id="hostelAddress" placeholder="Straße Hausnummer, PLZ Ort">
+                <div class="form-hint">Vollständige Adresse für Karten und Navigation (z.B. Ausstraße 33, 2812 Hollenthon)</div>
+            </div>
+
             <h4 style="margin-top: 32px; margin-bottom: 16px; color: var(--forest);">Check-in / Check-out Zeiten</h4>
 
             <div class="form-group">
@@ -2264,6 +2270,7 @@
                     // Contact
                     if (s.phone) document.getElementById('hostelPhone').value = s.phone;
                     if (s.email) document.getElementById('hostelEmail').value = s.email;
+                    if (s.address) document.getElementById('hostelAddress').value = s.address;
 
                     // Times
                     if (s.checkInTime) document.getElementById('checkInTime').value = s.checkInTime;
@@ -2300,6 +2307,7 @@
                 location: document.getElementById('hostelLocation').value,
                 phone: document.getElementById('hostelPhone').value,
                 email: document.getElementById('hostelEmail').value,
+                address: document.getElementById('hostelAddress').value,
                 checkInTime: document.getElementById('checkInTime').value,
                 checkOutTime: document.getElementById('checkOutTime').value,
                 formalAddress: document.getElementById('hostelFormalAddress').value,
