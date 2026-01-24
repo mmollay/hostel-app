@@ -213,38 +213,45 @@ const I18N = {
   },
 
   /**
-   * Switch to a different language
+   * Switch to a different language (without page reload)
    */
-  switchLanguage(lang) {
+  async switchLanguage(lang) {
     if (!this.languages.includes(lang)) return;
     if (lang === this.currentLang) return;
     
     // Save preference
     localStorage.setItem('hostel_language', lang);
     
-    // Navigate to the correct URL
+    // Update current language
+    this.currentLang = lang;
+    
+    // Load new translations
+    await this.loadTranslations();
+    
+    // Apply to DOM
+    this.applyTranslations();
+    this.updateHtmlLang();
+    
+    // Update switcher buttons
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+    });
+    
+    // Update URL without reload (for bookmarking/sharing)
     const currentPath = window.location.pathname;
     let newPath;
     
     if (lang === 'en') {
-      // Going to English
-      if (currentPath.startsWith('/en/')) {
-        return; // Already on English
-      }
-      // Remove leading slash and add /en/
-      newPath = '/en' + (currentPath === '/' ? '/' : currentPath);
+      newPath = '/en' + (currentPath === '/' ? '/' : currentPath.replace('/en/', '/').replace('/en', ''));
     } else {
-      // Going to German (default)
-      if (currentPath.startsWith('/en/')) {
-        newPath = currentPath.replace('/en/', '/');
-      } else if (currentPath === '/en') {
-        newPath = '/';
-      } else {
-        return; // Already on German
-      }
+      newPath = currentPath.startsWith('/en/') ? currentPath.replace('/en/', '/') : 
+                currentPath === '/en' ? '/' : currentPath;
     }
     
-    window.location.href = newPath;
+    // Use pushState to update URL without reload
+    window.history.pushState({ lang }, '', newPath);
+    
+    console.log(`[i18n] Switched to: ${lang}`);
   },
 
   /**
@@ -275,6 +282,19 @@ if (document.readyState === 'loading') {
 } else {
   I18N.init();
 }
+
+// Handle browser back/forward buttons
+window.addEventListener('popstate', async (event) => {
+  I18N.detectLanguage();
+  await I18N.loadTranslations();
+  I18N.applyTranslations();
+  I18N.updateHtmlLang();
+  
+  // Update switcher buttons
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-lang') === I18N.currentLang);
+  });
+});
 
 // Export for use in other scripts
 window.I18N = I18N;

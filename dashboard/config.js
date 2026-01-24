@@ -17,8 +17,8 @@ const CONFIG = {
   // Strompreis in €/kWh (Österreich Durchschnitt ~0.25-0.35)
   PRICE_PER_KWH: 0.3,
 
-  // Aktualisierungsintervall in Millisekunden
-  UPDATE_INTERVAL: 5000,
+  // Aktualisierungsintervall in Millisekunden (30s wegen Shelly Cloud Rate Limit)
+  UPDATE_INTERVAL: 30000,
 
   // Anzeige-Einstellungen
   CURRENCY: "€",
