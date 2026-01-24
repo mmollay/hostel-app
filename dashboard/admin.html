@@ -1073,6 +1073,41 @@
                 width: 100%;
             }
         }
+
+        /* Sticky Save Button Bar */
+        .sticky-save-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, var(--bg-primary) 80%, transparent);
+            padding: 24px 16px 24px 16px;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+        }
+
+        .sticky-save-bar .btn {
+            max-width: 400px;
+            width: 100%;
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .sticky-save-bar .btn i {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Add padding to settings tab so button doesn't overlap content */
+        #tab-settings .card {
+            padding-bottom: 100px;
+        }
     </style>
 </head>
 <body>
@@ -1516,11 +1551,16 @@
                 <div class="form-hint">Österreich-Mix: ~0.20 kg CO₂/kWh</div>
             </div>
 
-            <button class="btn btn-primary" style="width: 100%; margin-top: 24px;" onclick="saveHostelSettings()">
-                Einstellungen speichern
-            </button>
             <div class="error-text" id="settingsError"></div>
             <div class="success-text" id="settingsSuccess"></div>
+        </div>
+        
+        <!-- Sticky Save Button -->
+        <div class="sticky-save-bar">
+            <button class="btn btn-primary" onclick="saveHostelSettings()">
+                <i data-lucide="save"></i>
+                Einstellungen speichern
+            </button>
         </div>
         </div><!-- End Tab: Settings -->
 

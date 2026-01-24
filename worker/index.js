@@ -1051,7 +1051,7 @@ async function updateHostelSettings(request, env, corsHeaders) {
   // Update in apartments Tabelle
   await env.DB.prepare(
     `UPDATE apartments
-     SET name = ?, location = ?, settings_json = ?, updated_at = unixepoch()
+     SET name = ?, location = ?, settings_json = ?
      WHERE slug = ?`,
   )
     .bind(name, location, settings_json, HOSTEL_ID)
