@@ -14,7 +14,7 @@ git checkout develop
 npm run build
 
 # Deploy to Cloudflare Pages (develop branch)
-npx wrangler pages deploy dist --project-name=hostel-app --branch=develop
+npx wrangler pages deploy dashboard --project-name=hostel-app --branch=develop
 
 echo ""
 echo "✅ Deploy complete!"

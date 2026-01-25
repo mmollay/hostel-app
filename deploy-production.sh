@@ -18,7 +18,7 @@ git merge develop --no-edit
 npm run build
 
 # Deploy to Cloudflare Pages (main branch = production)
-npx wrangler pages deploy dist --project-name=hostel-app --branch=main
+npx wrangler pages deploy dashboard --project-name=hostel-app --branch=main
 
 # Push changes
 git push origin main
