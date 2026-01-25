@@ -92,6 +92,43 @@
             top: 0;
             z-index: 100;
             overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        /* Kompakter Header beim Scrollen */
+        .header.collapsed {
+            padding: 12px 24px 12px;
+            padding-top: calc(env(safe-area-inset-top) + 12px);
+        }
+
+        .header.collapsed .header-logo {
+            width: 40px;
+            height: 40px;
+            padding: 6px;
+            margin-bottom: 0;
+            margin-right: 12px;
+        }
+
+        .header.collapsed .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .header.collapsed h1 {
+            font-size: 1.2rem;
+            margin-bottom: 0;
+        }
+
+        .header.collapsed .subtitle {
+            display: none;
+        }
+
+        .header.collapsed .header-actions {
+            position: relative;
+            top: auto;
+            right: auto;
         }
 
         .header::before {
@@ -121,12 +158,14 @@
             background: rgba(255, 255, 255, 0.95);
             padding: 20px;
             box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
         }
 
         .header h1 {
             font-family: 'DM Sans', sans-serif;
             font-size: 2.8rem;
             font-weight: 500;
+            transition: all 0.3s ease;
             letter-spacing: 2px;
             margin-bottom: 12px;
         }
@@ -2197,6 +2236,27 @@
                 }
             };
         }
+
+        // Collapsing Header on Scroll
+        (function() {
+            const header = document.querySelector('.header');
+            if (!header) return;
+
+            let lastScroll = 0;
+            const collapseThreshold = 100;
+
+            window.addEventListener('scroll', () => {
+                const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+                
+                if (currentScroll > collapseThreshold) {
+                    header.classList.add('collapsed');
+                } else {
+                    header.classList.remove('collapsed');
+                }
+                
+                lastScroll = currentScroll;
+            }, { passive: true });
+        })();
     </script>
 </body>
 </html>
