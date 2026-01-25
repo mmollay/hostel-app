@@ -23,11 +23,26 @@
       "night": "Good Night"
     },
     "default": "Welcome!",
-    "message": "Welcome to this magical place. Please log in to begin your personal journey.",
-    "enjoy": "Enjoy every moment!",
-    "daysRemaining": "{days} day(s) left until departure. Let yourself be enchanted!",
-    "lastDay": "Tomorrow begins a new path. We hope this place has touched your heart.",
-    "stay": "May this place give you strength and grant you peace."
+    "message": {
+      "du": "Welcome to this magical place. Please log in to begin your personal journey.",
+      "sie": "Welcome to this magical place. Please log in to begin your personal journey."
+    },
+    "enjoy": {
+      "du": "Enjoy every moment!",
+      "sie": "Enjoy every moment!"
+    },
+    "daysRemaining": {
+      "du": "{days} day(s) left until departure. Let yourself be enchanted!",
+      "sie": "{days} day(s) left until departure. Let yourself be enchanted!"
+    },
+    "lastDay": {
+      "du": "Tomorrow begins a new path. We hope this place has touched your heart.",
+      "sie": "Tomorrow begins a new path. We hope this place has touched your heart."
+    },
+    "stay": {
+      "du": "May this place give you strength and grant you peace.",
+      "sie": "May this place give you strength and grant you peace."
+    }
   },
   "about": {
     "title": "About This Place",
@@ -60,7 +75,10 @@
   },
   "amenities": {
     "title": "Amenities",
-    "subtitle": "For your comfort"
+    "subtitle": {
+      "du": "For your comfort",
+      "sie": "For your comfort"
+    }
   },
   "comingSoon": {
     "title": "In Progress",
@@ -146,7 +164,10 @@
   },
   "contact": {
     "title": "Contact & Help",
-    "subtitle": "We're here for you",
+    "subtitle": {
+      "du": "We're here for you",
+      "sie": "We're here for you"
+    },
     "host": "Host",
     "phone": "Phone",
     "email": "Email",

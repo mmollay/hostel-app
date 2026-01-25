@@ -1,6 +1,6 @@
 {
   "name": "hostel-app",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Hostel Guest Portal with Energy Monitoring",
   "scripts": {
     "dev": "npx serve dashboard -p 8080",

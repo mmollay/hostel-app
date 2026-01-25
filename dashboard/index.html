@@ -92,7 +92,12 @@
             top: 0;
             z-index: 100;
             overflow: hidden;
-            transition: all 0.3s ease;
+            transition: padding 0.3s ease;
+            /* GPU Acceleration for smooth scrolling */
+            transform: translate3d(0, 0, 0);
+            will-change: transform, padding;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
         }
 
         /* Kompakter Header beim Scrollen */
@@ -160,16 +165,26 @@
             background: rgba(255, 255, 255, 0.95);
             padding: 20px;
             box-shadow: 0 4px 24px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
+            transition: width 0.3s ease, height 0.3s ease, padding 0.3s ease, margin 0.3s ease;
+            /* GPU Acceleration */
+            transform: translate3d(0, 0, 0);
+            will-change: transform, width, height;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
         }
 
         .header h1 {
             font-family: 'DM Sans', sans-serif;
             font-size: 2.8rem;
             font-weight: 500;
-            transition: all 0.3s ease;
+            transition: font-size 0.3s ease, margin 0.3s ease;
             letter-spacing: 2px;
             margin-bottom: 12px;
+            /* GPU Acceleration */
+            transform: translate3d(0, 0, 0);
+            will-change: transform, font-size;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
         }
 
         .header .subtitle {
