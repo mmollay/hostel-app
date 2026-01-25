@@ -794,7 +794,7 @@ function updateGuestUI() {
     wifiInfoPassword.style.display = guestToken ? "block" : "none";
 
   // Quick Navigation nur für eingeloggte Gäste anzeigen
-  if (quickNav) quickNav.style.display = guestToken ? "flex" : "none";
+  if (quickNav) quickNav.style.display = "flex";
 }
 
 /**
