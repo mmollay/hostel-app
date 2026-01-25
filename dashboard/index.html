@@ -1031,34 +1031,34 @@
             margin-bottom: 8px;
         }
 
-        /* Recommendations Card */
+        /* Recommendations Card - Compact Layout */
         .recommendations-list {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 8px;
         }
 
         .recommendation-item {
             display: flex;
             align-items: flex-start;
-            gap: 16px;
-            padding: 16px;
+            gap: 10px;
+            padding: 10px 12px;
             background: var(--cream);
-            border-radius: 12px;
+            border-radius: 10px;
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .recommendation-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.06);
         }
 
         .recommendation-icon {
             flex-shrink: 0;
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             background: linear-gradient(135deg, var(--sage-light) 0%, var(--sage) 100%);
-            border-radius: 10px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1066,72 +1066,76 @@
         }
 
         .recommendation-icon i {
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
         }
 
         .recommendation-item h4 {
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 600;
             color: var(--forest);
-            margin-bottom: 4px;
+            margin-bottom: 2px;
+            line-height: 1.2;
         }
 
         .recommendation-item p {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: var(--text-light);
             margin: 0;
         }
 
         .recommendation-item .distance {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--sage-dark);
             font-weight: 500;
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
         .recommendation-item .rating {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            font-size: 0.85rem;
+            gap: 3px;
+            font-size: 0.8rem;
             color: var(--earth);
-            margin-top: 4px;
         }
 
         .recommendation-content {
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 4px;
+            min-width: 0;
         }
 
         .recommendation-address {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: var(--text-light);
             margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .recommendation-meta {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
             flex-wrap: wrap;
         }
 
         .recommendation-distance {
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 0.85rem;
+            gap: 4px;
+            font-size: 0.8rem;
             color: var(--sage-dark);
             font-weight: 500;
         }
 
         .open-status {
-            font-size: 0.75rem;
-            padding: 4px 8px;
-            border-radius: 6px;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
             font-weight: 500;
         }
 
@@ -1147,18 +1151,18 @@
 
         .recommendation-actions {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             flex-wrap: wrap;
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
         .btn-maps, .btn-phone {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 0.85rem;
+            gap: 4px;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
             font-weight: 500;
             text-decoration: none;
             transition: all 0.2s;
@@ -1171,7 +1175,7 @@
 
         .btn-maps:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(156, 175, 136, 0.3);
+            box-shadow: 0 3px 6px rgba(156, 175, 136, 0.3);
         }
 
         .btn-phone {
@@ -1186,20 +1190,20 @@
 
         /* Recommendations Controls */
         .recommendations-controls {
-            padding: 0 20px 20px;
+            padding: 0 16px 16px;
             border-bottom: 1px solid var(--sand);
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
         .radius-control {
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
         .radius-control label {
             display: block;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--text-light);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .radius-control strong {
@@ -1243,11 +1247,11 @@
         }
 
         .category-btn {
-            padding: 8px 16px;
-            border: 2px solid var(--sand);
+            padding: 6px 12px;
+            border: 1.5px solid var(--sand);
             background: white;
-            border-radius: 20px;
-            font-size: 0.85rem;
+            border-radius: 16px;
+            font-size: 0.8rem;
             font-weight: 500;
             color: var(--text);
             cursor: pointer;
@@ -1267,15 +1271,20 @@
 
         .loading-state {
             text-align: center;
-            padding: 40px 20px;
+            padding: 24px 16px;
             color: var(--text-light);
         }
 
         .loading-state i {
-            width: 32px;
-            height: 32px;
+            width: 24px;
+            height: 24px;
             color: var(--sage);
-            margin-bottom: 12px;
+            margin-bottom: 8px;
+        }
+
+        .loading-state p {
+            font-size: 0.85rem;
+            margin: 0;
         }
 
         @keyframes spin {
@@ -1957,8 +1966,9 @@
                     <div class="category-filter">
                         <button class="category-btn active" data-category="all" data-i18n="recommendations.filter.all">Alle</button>
                         <button class="category-btn" data-category="tourist_attraction" data-i18n="recommendations.filter.attractions">Sehenswürdigkeiten</button>
-                        <button class="category-btn" data-category="spa" data-i18n="recommendations.filter.spas">Thermen</button>
                         <button class="category-btn" data-category="restaurant" data-i18n="recommendations.filter.restaurants">Restaurants</button>
+                        <button class="category-btn" data-category="heuriger" data-i18n="recommendations.filter.heurige">Heurige</button>
+                        <button class="category-btn" data-category="spa" data-i18n="recommendations.filter.spas">Thermen</button>
                     </div>
                 </div>
 

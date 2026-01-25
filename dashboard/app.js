@@ -94,6 +94,7 @@ const STORAGE_KEY = "shelly_energy_data";
 const GUEST_TOKEN_KEY = "hostel_guest_token";
 const GUEST_DATA_KEY = "hostel_guest_data";
 const NIGHT_MODE_KEY = "hostel_night_mode";
+const CATEGORY_KEY = "hostel_recommendations_category";
 
 // Location wird dynamisch aus Adresse geocoded (Default: Hollenthon)
 let LOCATION = {
@@ -1273,6 +1274,12 @@ const GOOGLE_MAPS_API_KEY = CONFIG.GOOGLE_MAPS_API_KEY || "";
  * Empfehlungen initialisieren
  */
 function initRecommendations() {
+  // Gespeicherte Kategorie aus localStorage laden
+  const savedCategory = localStorage.getItem(CATEGORY_KEY);
+  if (savedCategory) {
+    currentCategory = savedCategory;
+  }
+
   // Radius-Slider
   const radiusSlider = document.getElementById("radiusSlider");
   const radiusValue = document.getElementById("radiusValue");
@@ -1288,11 +1295,22 @@ function initRecommendations() {
 
   // Kategorie-Buttons
   const categoryBtns = document.querySelectorAll(".category-btn");
+  
+  // Gespeicherte Kategorie visuell aktivieren
+  categoryBtns.forEach((btn) => {
+    if (btn.dataset.category === currentCategory) {
+      categoryBtns.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+    }
+  });
+
   categoryBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
       categoryBtns.forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
       currentCategory = btn.dataset.category;
+      // Kategorie in localStorage speichern
+      localStorage.setItem(CATEGORY_KEY, currentCategory);
       fetchNearbyPlaces();
     });
   });
@@ -1367,10 +1385,15 @@ async function fetchNearbyPlaces() {
 
   try {
     // Google Places API (New) - Nearby Search mit Pagination
-    const types =
-      currentCategory === "all"
-        ? ["tourist_attraction", "restaurant", "spa", "museum", "park"]
-        : [currentCategory];
+    let types;
+    if (currentCategory === "all") {
+      types = ["tourist_attraction", "restaurant", "spa", "museum", "park", "bar"];
+    } else if (currentCategory === "heuriger") {
+      // Heurige sind als bar/restaurant gelistet
+      types = ["bar", "restaurant"];
+    } else {
+      types = [currentCategory];
+    }
 
     // Für jeden Type ALLE Seiten holen (nicht nur erste 20!)
     const placesPromises = types.map((type) => fetchAllPagesForType(type));
@@ -1402,6 +1425,26 @@ async function fetchNearbyPlaces() {
           thermalKeywords.some((keyword) => name.includes(keyword)) ||
           hotelThermalPattern.test(name)
         );
+      });
+    }
+
+    // SPEZIALFILTER für Heurige: Typisch österreichische Weinschenken
+    if (currentCategory === "heuriger") {
+      const heurigenKeywords = [
+        "heurig",     // Heuriger, Heurigen
+        "buschenschank", // Buschenschank
+        "weingut",    // Weingut mit Ausschank
+        "weinbau",    // Weinbau
+        "winzer",     // Winzer
+        "kellerstöckl", // Kellerstöckl
+        "weinstube",  // Weinstube
+        "weinschenke", // Weinschenke
+        "mostheurig", // Mostheuriger
+      ];
+
+      filteredPlaces = filteredPlaces.filter((p) => {
+        const name = p.name.toLowerCase();
+        return heurigenKeywords.some((keyword) => name.includes(keyword));
       });
     }
 
@@ -1509,8 +1552,8 @@ function displayRecommendations(places) {
     const item = document.createElement("div");
     item.className = "recommendation-item";
 
-    // Icon basierend auf Typ
-    const icon = getPlaceIcon(place.types);
+    // Icon basierend auf Typ und Namen (für Heurige etc.)
+    const icon = getPlaceIcon(place.types, place.name);
 
     // Fahrstrecke verwenden (falls vorhanden), sonst Luftlinie
     const distance =
@@ -1527,42 +1570,42 @@ function displayRecommendations(places) {
     const openStatus =
       openNow !== undefined
         ? openNow
-          ? '<span class="open-status open">Jetzt geöffnet</span>'
-          : '<span class="open-status closed">Geschlossen</span>'
+          ? '<span class="open-status open">Offen</span>'
+          : '<span class="open-status closed">Zu</span>'
         : "";
 
     // Google Maps Navigations-Link
     const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${LOCATION.lat},${LOCATION.lon}&destination=${place.geometry.location.lat},${place.geometry.location.lng}&travelmode=driving`;
 
+    // Kompakte Darstellung
     item.innerHTML = `
       <div class="recommendation-icon">
         <i data-lucide="${icon}"></i>
       </div>
       <div class="recommendation-content">
         <h4>${place.name}</h4>
-        <p class="recommendation-address">${place.vicinity || ""}</p>
         <div class="recommendation-meta">
           <div class="rating">
-            <i data-lucide="star" style="width: 14px; height: 14px; fill: currentColor;"></i>
-            ${place.rating || "—"} ${place.user_ratings_total ? `(${place.user_ratings_total})` : ""}
+            <i data-lucide="star" style="width: 12px; height: 12px; fill: currentColor;"></i>
+            ${place.rating || "—"}${place.user_ratings_total ? ` (${place.user_ratings_total})` : ""}
+          </div>
+          <div class="recommendation-distance">
+            <i data-lucide="navigation" style="width: 12px; height: 12px;"></i>
+            ${distance.toFixed(1)} km
           </div>
           ${openStatus}
         </div>
-        <div class="recommendation-distance">
-          <i data-lucide="navigation" style="width: 14px; height: 14px;"></i>
-          ${distance.toFixed(1)} km ${place.drivingDuration ? `(~${place.drivingDuration})` : ""}
-        </div>
         <div class="recommendation-actions">
           <a href="${mapsUrl}" target="_blank" class="btn-maps">
-            <i data-lucide="map" style="width: 16px; height: 16px;"></i>
-            Navigation starten
+            <i data-lucide="map" style="width: 14px; height: 14px;"></i>
+            Route
           </a>
           ${
             place.formatted_phone_number
               ? `
             <a href="tel:${place.formatted_phone_number}" class="btn-phone">
-              <i data-lucide="phone" style="width: 16px; height: 16px;"></i>
-              Anrufen
+              <i data-lucide="phone" style="width: 14px; height: 14px;"></i>
+              ${place.formatted_phone_number}
             </a>
           `
               : ""
@@ -1580,9 +1623,18 @@ function displayRecommendations(places) {
 /**
  * Icon für Typ ermitteln
  */
-function getPlaceIcon(types) {
+function getPlaceIcon(types, placeName = "") {
+  // Spezial-Icons basierend auf Namen (für Heurige etc.)
+  const name = placeName.toLowerCase();
+  if (name.includes("heurig") || name.includes("buschenschank") || 
+      name.includes("weingut") || name.includes("winzer") ||
+      name.includes("weinbau") || name.includes("weinstube")) {
+    return "wine"; // Weinglas-Icon für Heurige
+  }
+  
   if (types.includes("spa")) return "bath";
   if (types.includes("restaurant")) return "utensils";
+  if (types.includes("bar")) return "wine";
   if (types.includes("cafe")) return "coffee";
   if (types.includes("museum")) return "landmark";
   if (types.includes("park")) return "trees";

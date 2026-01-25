@@ -169,8 +169,9 @@
     "filter": {
       "all": "Alle",
       "attractions": "Sehenswürdigkeiten",
-      "spas": "Thermen",
-      "restaurants": "Restaurants"
+      "restaurants": "Restaurants",
+      "heurige": "Heurige",
+      "spas": "Thermen"
     }
   },
   "contact": {

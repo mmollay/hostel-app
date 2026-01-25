@@ -169,8 +169,9 @@
     "filter": {
       "all": "All",
       "attractions": "Attractions",
-      "spas": "Spas",
-      "restaurants": "Restaurants"
+      "restaurants": "Restaurants",
+      "heurige": "Wine Taverns",
+      "spas": "Spas"
     }
   },
   "contact": {
