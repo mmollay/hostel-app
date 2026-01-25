@@ -1,5 +1,5 @@
 /**
- * Inline Editor v0.6.0
+ * Inline Editor v0.7.0
  * WYSIWYG-style editing for admin users
  * Works with AdminUI module for authentication
  * 
