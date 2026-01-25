@@ -1107,7 +1107,7 @@ async function updateHostelSettings(request, env, corsHeaders) {
  */
 async function getPublicHostelInfo(env, corsHeaders) {
   const hostel = await env.DB.prepare(
-    "SELECT name, location, settings_json FROM hostels WHERE id = ?",
+    "SELECT name, location, settings_json FROM apartments WHERE id = ?",
   )
     .bind(HOSTEL_ID)
     .first();
