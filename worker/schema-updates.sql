@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS page_content (
   is_visible INTEGER DEFAULT 1,          -- Anzeigen/Verstecken
   created_at INTEGER DEFAULT (unixepoch()),
   updated_at INTEGER DEFAULT (unixepoch()),
-  FOREIGN KEY (hostel_id) REFERENCES hostels(id) ON DELETE CASCADE,
+  
   UNIQUE(hostel_id, block_key)
 );
 
