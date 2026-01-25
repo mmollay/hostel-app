@@ -109,33 +109,39 @@ let LOCATION = {
 async function init() {
   loadGuestSession();
   applyNightMode();
-  await loadEnergyFromDB(); // Energie-Daten aus D1 laden
-  await fetchData(); // Shelly-Daten abrufen
-  setInterval(fetchData, CONFIG.UPDATE_INTERVAL);
-  scheduleDailyReset();
+  
+  // UI sofort initialisieren (kein Warten auf API)
   initGuestUI();
   updateGuestUI(); // CRITICAL: Hide guest-only cards on page load
   updateGreeting();
   updateFormalAddressTexts(); // Du/Sie-Texte initialisieren
-  setInterval(updateGreeting, 60000); // Aktualisiere Begrüßung jede Minute
-
-  // Auto-Refresh: Daten alle 5 Minuten komplett neu laden (gegen Cache)
-  startAutoRefresh();
-
-  // Hostel-Info laden (Kontakt, Bankdaten) - IMMER laden, auch ohne Login
-  await loadHostelInfo();
-
-  // Wetter laden
+  initRecommendations();
+  
+  // API-Calls PARALLEL starten für schnelleres Laden
+  const apiPromises = [
+    loadEnergyFromDB(),      // Energie-Daten aus D1
+    fetchData(),             // Shelly-Daten
+    loadHostelInfo(),        // Hostel-Info (Kontakt, Bankdaten)
+    loadAmenities(),         // Annehmlichkeiten
+  ];
+  
+  // Wetter nur für eingeloggte Gäste
   if (guestToken) {
-    fetchWeather();
+    apiPromises.push(fetchWeather());
+  }
+  
+  // Alle API-Calls parallel ausführen
+  await Promise.allSettled(apiPromises);
+  
+  // Intervals nach dem initialen Load starten
+  setInterval(fetchData, CONFIG.UPDATE_INTERVAL);
+  setInterval(updateGreeting, 60000);
+  if (guestToken) {
     setInterval(fetchWeather, 600000); // Alle 10 Minuten
   }
-
-  // Empfehlungen initialisieren
-  initRecommendations();
-
-  // Annehmlichkeiten laden
-  loadAmenities();
+  
+  scheduleDailyReset();
+  startAutoRefresh();
   
   // i18n: Bei Sprachwechsel Daten neu laden
   if (typeof I18N !== 'undefined') {
@@ -1270,6 +1276,26 @@ let currentRadius = 40000; // 40km default (in meters)
 let currentCategory = "all";
 const GOOGLE_MAPS_API_KEY = CONFIG.GOOGLE_MAPS_API_KEY || "";
 
+// Simple in-memory cache für Places (5 Minuten TTL)
+const placesCache = {
+  data: {},
+  timestamp: {},
+  TTL: 5 * 60 * 1000, // 5 Minuten
+  
+  get(key) {
+    if (this.data[key] && (Date.now() - this.timestamp[key]) < this.TTL) {
+      console.log(`[Cache HIT] ${key}`);
+      return this.data[key];
+    }
+    return null;
+  },
+  
+  set(key, value) {
+    this.data[key] = value;
+    this.timestamp[key] = Date.now();
+  }
+};
+
 /**
  * Empfehlungen initialisieren
  */
@@ -1374,14 +1400,27 @@ async function fetchNearbyPlaces() {
   const listEl = document.getElementById("recommendationsList");
   if (!listEl) return;
 
-  // Loading anzeigen
-  listEl.innerHTML = `
-    <div class="loading-state">
-      <i data-lucide="loader" style="animation: spin 1s linear infinite;"></i>
-      <p>Lade Empfehlungen...</p>
+  // Cache-Key basierend auf Kategorie und Radius
+  const cacheKey = `${currentCategory}_${currentRadius}`;
+  
+  // Prüfe ob gecachte Daten vorhanden
+  const cachedPlaces = placesCache.get(cacheKey);
+  if (cachedPlaces) {
+    displayRecommendations(cachedPlaces);
+    return;
+  }
+
+  // Skeleton Loading anzeigen (sieht aus wie echte Items)
+  listEl.innerHTML = Array(5).fill(`
+    <div class="skeleton-item">
+      <div class="skeleton skeleton-icon"></div>
+      <div class="skeleton-content">
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-meta"></div>
+        <div class="skeleton skeleton-actions"></div>
+      </div>
     </div>
-  `;
-  lucide.createIcons();
+  `).join('');
 
   try {
     // Google Places API (New) - Nearby Search mit Pagination
@@ -1472,6 +1511,9 @@ async function fetchNearbyPlaces() {
       return;
     }
 
+    // Ergebnisse cachen für schnelleren Zugriff
+    placesCache.set(cacheKey, sortedPlaces);
+    
     displayRecommendations(sortedPlaces);
   } catch (error) {
     console.error("Places API Error:", error);
@@ -1782,7 +1824,7 @@ body.night-mode {
 
 body.night-mode .header {
   background: linear-gradient(135deg, rgba(20, 30, 25, 0.9) 0%, rgba(40, 50, 45, 0.8) 100%),
-              url('header-bg.png');
+              url('header-bg.jpg');
 }
 
 body.night-mode .card {
