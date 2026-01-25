@@ -1,3 +1,15 @@
+## [0.5.2] - 2026-01-25
+
+### Fixed
+- Header scrollt jetzt normal mit (kein Flimmern mehr)
+- Quick-Nav Buttons immer sichtbar (nicht nur für eingeloggte Gäste)
+- Welcome-Card z-index korrigiert (überlappt Header sauber)
+- Energy API: FOREIGN KEY Constraint auf alte 'hostels' Tabelle entfernt
+- Worker: 'hostels' → 'apartments' Tabellen-Referenz korrigiert
+
+### Changed
+- Collapsed Header-Funktion entfernt (verursachte Flimmern)
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
