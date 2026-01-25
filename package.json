@@ -1,11 +1,14 @@
 {
   "name": "hostel-app",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Hostel Guest Portal with Energy Monitoring",
   "scripts": {
     "dev": "npx serve dashboard -p 8080",
     "build": "echo 'Static site - no build needed'",
-    "preview": "npx serve dashboard -p 3000"
+    "preview": "npx serve dashboard -p 3000",
+    "ios:sync": "npx cap sync ios",
+    "ios:open": "npx cap open ios",
+    "ios:build": "npx cap sync ios && npx cap open ios"
   },
   "keywords": [
     "hostel",
@@ -16,5 +19,13 @@
     "dashboard"
   ],
   "author": "SSI",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@capacitor/cli": "^8.0.1",
+    "@capacitor/core": "^8.0.1",
+    "@capacitor/ios": "^8.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
 }
