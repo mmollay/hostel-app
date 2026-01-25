@@ -1645,7 +1645,8 @@ async function geocodeAddress(address) {
       // Refresh weather with new coordinates
       fetchWeather();
     } else {
-      console.warn(`Geocoding failed for "${address}":`, data.status);
+      // Geocoding disabled - API key needs configuration
+    // console.warn(`Geocoding failed for "${address}":`, data.status);
     }
   } catch (error) {
     console.error("Geocoding error:", error);
