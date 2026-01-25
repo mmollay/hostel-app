@@ -136,7 +136,9 @@
     }
   },
   "wifi": {
-    "title": "WiFi Connection",
+    "title": "WiFi Access",
+    "cardTitle": "WiFi Access",
+    "cardSubtitle": "Quick connection",
     "subtitle": "Quick & easy connection",
     "scanQr": {
       "du": "Scan the QR code with your camera to connect automatically.",
@@ -147,6 +149,8 @@
   },
   "recommendations": {
     "title": "Recommendations",
+    "cardTitle": "Recommendations nearby",
+    "cardSubtitle": "Discover real attractions",
     "subtitle": "In the area",
     "radius": "Radius",
     "km": "km",
@@ -154,12 +158,19 @@
     "closed": "Closed",
     "openMaps": "Open in Maps",
     "call": "Call",
+    "loading": "Loading recommendations...",
     "categories": {
       "restaurant": "Restaurants",
       "supermarket": "Supermarkets",
       "pharmacy": "Pharmacies",
       "gasStation": "Gas Stations",
       "hiking": "Hiking Trails"
+    },
+    "filter": {
+      "all": "All",
+      "attractions": "Attractions",
+      "spas": "Spas",
+      "restaurants": "Restaurants"
     }
   },
   "contact": {
@@ -175,7 +186,7 @@
     "emergency": "Emergency"
   },
   "transparency": {
-    "title": "Transparency",
+    "title": "Transparency & Information",
     "subtitle": {
       "du": "For your records",
       "sie": "For your records"
@@ -188,9 +199,14 @@
     "iban": "IBAN",
     "bic": "BIC",
     "accountHolder": "Account Holder",
+    "recipient": "Recipient",
     "reference": "Reference",
     "copy": "Copy",
-    "copied": "Copied!"
+    "copied": "Copied!",
+    "info": {
+      "du": "The exact amounts for tourist tax and energy costs will be communicated separately.",
+      "sie": "The exact amounts for tourist tax and energy costs will be communicated separately."
+    }
   },
   "login": {
     "title": "Guest Login",
@@ -209,7 +225,8 @@
     "madeWith": "Made with",
     "imprint": "Imprint",
     "privacy": "Privacy Policy",
-    "contact": "Contact"
+    "contact": "Contact",
+    "updated": "Updated"
   },
   "common": {
     "loading": "Loading...",
@@ -219,5 +236,11 @@
     "cancel": "Cancel",
     "yes": "Yes",
     "no": "No"
+  },
+  "guestMenu": {
+    "title": "Guest Menu",
+    "nightMode": "Toggle Night Mode",
+    "logout": "Logout",
+    "close": "Close"
   }
 }

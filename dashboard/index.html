@@ -1895,8 +1895,8 @@
                 <div class="card-header">
                     <div class="card-icon"><i data-lucide="wifi"></i></div>
                     <div>
-                        <h3 class="card-title">WLAN-Zugang</h3>
-                        <p class="card-subtitle">Schnell verbinden</p>
+                        <h3 class="card-title" data-i18n="wifi.cardTitle">WLAN-Zugang</h3>
+                        <p class="card-subtitle" data-i18n="wifi.cardSubtitle">Schnell verbinden</p>
                     </div>
                 </div>
                 <div class="wifi-content">
@@ -1941,8 +1941,8 @@
                 <div class="card-header">
                     <div class="card-icon"><i data-lucide="map"></i></div>
                     <div>
-                        <h3 class="card-title">Empfehlungen in der Umgebung</h3>
-                        <p class="card-subtitle">Entdecke echte Ausflugsziele</p>
+                        <h3 class="card-title" data-i18n="recommendations.cardTitle">Empfehlungen in der Umgebung</h3>
+                        <p class="card-subtitle" data-i18n="recommendations.cardSubtitle">Entdecke echte Ausflugsziele</p>
                     </div>
                 </div>
 
@@ -1950,15 +1950,15 @@
                 <div class="recommendations-controls">
                     <div class="radius-control">
                         <label for="radiusSlider">
-                            Umkreis: <strong><span id="radiusValue">40</span> km</strong>
+                            <span data-i18n="recommendations.radius">Umkreis</span>: <strong><span id="radiusValue">40</span> <span data-i18n="recommendations.km">km</span></strong>
                         </label>
                         <input type="range" id="radiusSlider" min="10" max="50" value="40" step="5">
                     </div>
                     <div class="category-filter">
-                        <button class="category-btn active" data-category="all">Alle</button>
-                        <button class="category-btn" data-category="tourist_attraction">Sehenswürdigkeiten</button>
-                        <button class="category-btn" data-category="spa">Thermen</button>
-                        <button class="category-btn" data-category="restaurant">Restaurants</button>
+                        <button class="category-btn active" data-category="all" data-i18n="recommendations.filter.all">Alle</button>
+                        <button class="category-btn" data-category="tourist_attraction" data-i18n="recommendations.filter.attractions">Sehenswürdigkeiten</button>
+                        <button class="category-btn" data-category="spa" data-i18n="recommendations.filter.spas">Thermen</button>
+                        <button class="category-btn" data-category="restaurant" data-i18n="recommendations.filter.restaurants">Restaurants</button>
                     </div>
                 </div>
 
@@ -1966,7 +1966,7 @@
                 <div class="recommendations-list" id="recommendationsList">
                     <div class="loading-state">
                         <i data-lucide="loader" style="animation: spin 1s linear infinite;"></i>
-                        <p>Lade Empfehlungen...</p>
+                        <p data-i18n="recommendations.loading">Lade Empfehlungen...</p>
                     </div>
                 </div>
             </div>
@@ -2024,40 +2024,40 @@
                 <div class="card-header">
                     <div class="card-icon"><i data-lucide="info"></i></div>
                     <div>
-                        <h3 class="card-title">Transparenz & Information</h3>
-                        <p id="transparencySubtitle" class="card-subtitle">Für Ihre Unterlagen</p>
+                        <h3 class="card-title" data-i18n="transparency.title">Transparenz & Information</h3>
+                        <p id="transparencySubtitle" class="card-subtitle" data-i18n="transparency.subtitle">Für Ihre Unterlagen</p>
                     </div>
                 </div>
                 <div style="padding: 0 20px 20px;">
-                    <p id="transparencyText" style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.6;">
+                    <p id="transparencyText" style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.6;" data-i18n="transparency.text">
                         Im Rahmen Ihres Aufenthalts können Kurtaxe und Energiekosten anfallen.
                         Für Ihre Unterlagen und vollständige Transparenz finden Sie hier die Kontodaten:
                     </p>
 
                     <div class="bank-details">
                         <div class="bank-detail-row">
-                            <span class="bank-label">IBAN</span>
+                            <span class="bank-label" data-i18n="transparency.iban">IBAN</span>
                             <div class="bank-value-group">
                                 <span class="bank-value" id="displayIban">AT53 3293 7000 0060 8745</span>
-                                <button class="copy-btn-inline" onclick="copyBankDetail('displayIban')" title="Kopieren">
+                                <button class="copy-btn-inline" onclick="copyBankDetail('displayIban')" data-i18n-title="transparency.copy" title="Kopieren">
                                     <i data-lucide="copy" style="width: 14px; height: 14px;"></i>
                                 </button>
                             </div>
                         </div>
                         <div class="bank-detail-row">
-                            <span class="bank-label">BIC</span>
+                            <span class="bank-label" data-i18n="transparency.bic">BIC</span>
                             <div class="bank-value-group">
                                 <span class="bank-value" id="displayBic">RLNWATWWWRN</span>
-                                <button class="copy-btn-inline" onclick="copyBankDetail('displayBic')" title="Kopieren">
+                                <button class="copy-btn-inline" onclick="copyBankDetail('displayBic')" data-i18n-title="transparency.copy" title="Kopieren">
                                     <i data-lucide="copy" style="width: 14px; height: 14px;"></i>
                                 </button>
                             </div>
                         </div>
                         <div class="bank-detail-row">
-                            <span class="bank-label">Empfänger</span>
+                            <span class="bank-label" data-i18n="transparency.recipient">Empfänger</span>
                             <div class="bank-value-group">
                                 <span class="bank-value" id="displayAccountHolder">KAD</span>
-                                <button class="copy-btn-inline" onclick="copyBankDetail('displayAccountHolder')" title="Kopieren">
+                                <button class="copy-btn-inline" onclick="copyBankDetail('displayAccountHolder')" data-i18n-title="transparency.copy" title="Kopieren">
                                     <i data-lucide="copy" style="width: 14px; height: 14px;"></i>
                                 </button>
                             </div>
@@ -2066,7 +2066,7 @@
 
                     <div style="margin-top: 16px; padding: 12px; background: var(--cream); border-radius: 8px; font-size: 0.85rem; color: var(--text-light);">
                         <i data-lucide="info" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i>
-                        Die genauen Beträge für Kurtaxe und Energiekosten werden separat kommuniziert.
+                        <span data-i18n="transparency.info">Die genauen Beträge für Kurtaxe und Energiekosten werden separat kommuniziert.</span>
                     </div>
                 </div>
             </div>
@@ -2077,7 +2077,7 @@
     <footer class="footer" data-ssi-protected>
         <div class="update-time">
             <span class="status-dot" id="statusIndicator"></span>
-            <span>Aktualisiert: <span id="lastUpdate">--:--</span></span>
+            <span><span data-i18n="footer.updated">Aktualisiert</span>: <span id="lastUpdate">--:--</span></span>
         </div>
 
         <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(0,0,0,0.1); text-align: center;">
@@ -2122,18 +2122,18 @@
     <!-- Guest Menu Modal -->
     <div class="modal-overlay" id="guestMenu">
         <div class="modal">
-            <h2>Gast-Menü</h2>
+            <h2 data-i18n="guestMenu.title">Gast-Menü</h2>
             <div style="margin: 24px 0;">
                 <button class="btn btn-secondary" id="nightModeToggle" style="width: 100%; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 10px;">
                     <i data-lucide="moon"></i>
-                    <span>Nachtmodus umschalten</span>
+                    <span data-i18n="guestMenu.nightMode">Nachtmodus umschalten</span>
                 </button>
                 <button class="btn btn-primary" id="guestLogoutBtn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;">
                     <i data-lucide="log-out"></i>
-                    <span>Abmelden</span>
+                    <span data-i18n="guestMenu.logout">Abmelden</span>
                 </button>
             </div>
-            <button class="btn btn-secondary" id="closeGuestMenuBtn">Schließen</button>
+            <button class="btn btn-secondary" id="closeGuestMenuBtn" data-i18n="guestMenu.close">Schließen</button>
         </div>
     </div>
 

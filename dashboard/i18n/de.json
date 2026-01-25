@@ -136,7 +136,9 @@
     }
   },
   "wifi": {
-    "title": "WLAN-Verbindung",
+    "title": "WLAN-Zugang",
+    "cardTitle": "WLAN-Zugang",
+    "cardSubtitle": "Schnell verbinden",
     "subtitle": "Schnell & einfach verbinden",
     "scanQr": {
       "du": "Scanne den QR-Code mit deiner Kamera, um dich automatisch zu verbinden.",
@@ -147,6 +149,8 @@
   },
   "recommendations": {
     "title": "Empfehlungen",
+    "cardTitle": "Empfehlungen in der Umgebung",
+    "cardSubtitle": "Entdecke echte Ausflugsziele",
     "subtitle": "In der Umgebung",
     "radius": "Umkreis",
     "km": "km",
@@ -154,12 +158,19 @@
     "closed": "Geschlossen",
     "openMaps": "In Maps öffnen",
     "call": "Anrufen",
+    "loading": "Lade Empfehlungen...",
     "categories": {
       "restaurant": "Restaurants",
       "supermarket": "Supermärkte",
       "pharmacy": "Apotheken",
       "gasStation": "Tankstellen",
       "hiking": "Wanderwege"
+    },
+    "filter": {
+      "all": "Alle",
+      "attractions": "Sehenswürdigkeiten",
+      "spas": "Thermen",
+      "restaurants": "Restaurants"
     }
   },
   "contact": {
@@ -175,7 +186,7 @@
     "emergency": "Notfall"
   },
   "transparency": {
-    "title": "Transparenz",
+    "title": "Transparenz & Information",
     "subtitle": {
       "du": "Für deine Unterlagen",
       "sie": "Für Ihre Unterlagen"
@@ -188,9 +199,14 @@
     "iban": "IBAN",
     "bic": "BIC",
     "accountHolder": "Kontoinhaber",
+    "recipient": "Empfänger",
     "reference": "Verwendungszweck",
     "copy": "Kopieren",
-    "copied": "Kopiert!"
+    "copied": "Kopiert!",
+    "info": {
+      "du": "Die genauen Beträge für Kurtaxe und Energiekosten werden separat kommuniziert.",
+      "sie": "Die genauen Beträge für Kurtaxe und Energiekosten werden separat kommuniziert."
+    }
   },
   "login": {
     "title": "Gast-Login",
@@ -209,7 +225,8 @@
     "madeWith": "Made with",
     "imprint": "Impressum",
     "privacy": "Datenschutz",
-    "contact": "Kontakt"
+    "contact": "Kontakt",
+    "updated": "Aktualisiert"
   },
   "common": {
     "loading": "Laden...",
@@ -219,5 +236,11 @@
     "cancel": "Abbrechen",
     "yes": "Ja",
     "no": "Nein"
+  },
+  "guestMenu": {
+    "title": "Gast-Menü",
+    "nightMode": "Nachtmodus umschalten",
+    "logout": "Abmelden",
+    "close": "Schließen"
   }
 }
