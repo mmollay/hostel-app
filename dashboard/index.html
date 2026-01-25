@@ -1651,6 +1651,7 @@
         }
     </style>
     <link rel="stylesheet" href="inline-editor.css">
+    <link rel="stylesheet" href="admin-ui.css">
 </head>
 <body>
     <!-- Header -->
@@ -1667,8 +1668,8 @@
         </div>
         <div class="header-content">
             <img src="/logo-neu.png" alt="Logo" class="header-logo" loading="lazy" decoding="async">
-            <h1 id="mainTitle">gastauferden.at</h1>
-            <p class="subtitle">Ein magischer Ort zum Sein • Hollenthon</p>
+            <h1 id="mainTitle" data-editable="site-title">gastauferden.at</h1>
+            <p class="subtitle" data-editable="site-tagline">Ein magischer Ort zum Sein • Hollenthon</p>
         </div>
 
         <!-- Quick Navigation (nur für eingeloggte Gäste) -->
@@ -2219,6 +2220,7 @@
     <script src="/config.js"></script>
     <script src="/app.js"></script>
     <script src="/inline-editor.js"></script>
+    <script src="/admin-ui.js"></script>
     <script>
         // Display version from config
         if (CONFIG.VERSION) {

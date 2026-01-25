@@ -1,0 +1,636 @@
+/**
+ * Admin UI Styles v1.0.0
+ * Styles for admin interface on main page
+ */
+
+/* ============================================
+   SETTINGS BUTTON (Header)
+   ============================================ */
+
+.settings-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 30px;
+  color: white;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.settings-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.settings-btn i {
+  width: 18px;
+  height: 18px;
+}
+
+/* ============================================
+   ADMIN INDICATOR BAR
+   ============================================ */
+
+.admin-indicator {
+  background: linear-gradient(135deg, var(--forest, #2D4A3E) 0%, var(--sage-dark, #7A9168) 100%);
+  color: white;
+  padding: 8px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.admin-indicator-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.admin-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.admin-hint {
+  font-size: 0.85rem;
+  opacity: 0.9;
+  flex: 1;
+  text-align: center;
+}
+
+.btn-edit-mode {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-edit-mode:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.btn-edit-mode.active {
+  background: white;
+  color: var(--forest, #2D4A3E);
+}
+
+/* ============================================
+   MODAL STYLES (Enhanced)
+   ============================================ */
+
+.admin-modal,
+.settings-modal {
+  max-width: 500px;
+}
+
+.settings-modal {
+  max-width: 700px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--sand, #E8E2D9);
+  margin-bottom: 20px;
+}
+
+.modal-header h2 {
+  display: flex;
+  align-items: center;
+  font-size: 1.4rem;
+  color: var(--forest, #2D4A3E);
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: var(--text-muted, #9A9A9A);
+  cursor: pointer;
+  padding: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: var(--cream, #FAF8F5);
+  color: var(--text, #3D3D3D);
+}
+
+/* Form enhancements */
+.checkbox-group {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-light, #6B6B6B);
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--sage, #9CAF88);
+}
+
+/* ============================================
+   SETTINGS TABS
+   ============================================ */
+
+.settings-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--cream, #FAF8F5);
+  border-radius: 12px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.settings-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-light, #6B6B6B);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.settings-tab:hover {
+  background: rgba(156, 175, 136, 0.1);
+  color: var(--forest, #2D4A3E);
+}
+
+.settings-tab.active {
+  background: white;
+  color: var(--forest, #2D4A3E);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.settings-tab i {
+  width: 16px;
+  height: 16px;
+}
+
+/* ============================================
+   SETTINGS PANELS
+   ============================================ */
+
+.settings-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 8px;
+  margin-right: -8px;
+}
+
+.settings-panel {
+  display: none;
+}
+
+.settings-panel.active {
+  display: block;
+}
+
+.settings-panel h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--forest, #2D4A3E);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--sand, #E8E2D9);
+}
+
+.settings-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px;
+  background: var(--cream, #FAF8F5);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--text-light, #6B6B6B);
+  margin-top: 16px;
+}
+
+.settings-hint.warning {
+  background: #FFF3CD;
+  color: #856404;
+}
+
+.settings-hint i {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.input-hint {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted, #9A9A9A);
+  margin-top: 4px;
+}
+
+/* WiFi Network Cards */
+.wifi-network-card {
+  background: var(--cream, #FAF8F5);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.wifi-network-card h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--forest, #2D4A3E);
+  margin-bottom: 16px;
+}
+
+/* Color Picker */
+.color-picker-group {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.color-picker-group input[type="color"] {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 2px solid var(--sand, #E8E2D9);
+  border-radius: 8px;
+  cursor: pointer;
+  background: none;
+}
+
+.color-picker-group input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 4px;
+}
+
+.color-picker-group input[type="color"]::-webkit-color-swatch {
+  border-radius: 4px;
+  border: none;
+}
+
+.color-picker-group input[type="text"] {
+  flex: 1;
+  font-family: 'Courier New', monospace;
+  text-transform: uppercase;
+}
+
+/* Settings Actions */
+.settings-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.settings-actions .btn {
+  flex: 1;
+  min-width: 150px;
+}
+
+/* Settings Footer */
+.settings-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid var(--sand, #E8E2D9);
+  margin-top: 24px;
+}
+
+/* ============================================
+   BUTTONS (Extended)
+   ============================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--sage, #9CAF88) 0%, var(--sage-dark, #7A9168) 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(156, 175, 136, 0.4);
+}
+
+.btn-secondary {
+  background: var(--sand, #E8E2D9);
+  color: var(--text, #3D3D3D);
+}
+
+.btn-secondary:hover {
+  background: #DDD7CC;
+}
+
+.btn-danger {
+  background: var(--rose-light, #E8C4C4);
+  color: #8B3A3A;
+}
+
+.btn-danger:hover {
+  background: var(--rose, #D4A5A5);
+}
+
+/* ============================================
+   NOTIFICATIONS
+   ============================================ */
+
+.admin-notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+  font-size: 0.95rem;
+  font-weight: 500;
+  z-index: 10002;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.admin-notification.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.admin-notification.success {
+  border-left: 4px solid var(--sage, #9CAF88);
+  color: var(--forest, #2D4A3E);
+}
+
+.admin-notification.error {
+  border-left: 4px solid var(--rose, #D4A5A5);
+  color: #8B3A3A;
+}
+
+.admin-notification.info {
+  border-left: 4px solid var(--sky, #A7C5D4);
+  color: var(--text, #3D3D3D);
+}
+
+/* ============================================
+   ADMIN LOGGED IN STATE
+   ============================================ */
+
+body.admin-logged-in .header {
+  padding-top: calc(env(safe-area-inset-top) + 40px);
+}
+
+/* Editable elements styling for admin */
+body.admin-logged-in [data-editable] {
+  position: relative;
+}
+
+body.admin-logged-in.inline-edit-mode [data-editable] {
+  outline: 2px dashed var(--sage, #9CAF88);
+  outline-offset: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+body.admin-logged-in.inline-edit-mode [data-editable]:hover {
+  outline-color: var(--forest, #2D4A3E);
+  background: rgba(156, 175, 136, 0.08);
+}
+
+body.admin-logged-in.inline-edit-mode [data-editable]::after {
+  content: '✏️';
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  font-size: 16px;
+  background: white;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  z-index: 10;
+}
+
+body.admin-logged-in.inline-edit-mode [data-editable]:hover::after {
+  opacity: 1;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+  .admin-indicator-content {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .admin-hint {
+    text-align: left;
+    order: 3;
+    width: 100%;
+    font-size: 0.8rem;
+  }
+  
+  .settings-modal {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    margin: 0;
+  }
+  
+  .settings-tabs {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    padding-bottom: 8px;
+  }
+  
+  .settings-tab {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+  
+  .settings-tab span {
+    display: none;
+  }
+  
+  .settings-footer {
+    flex-direction: column-reverse;
+  }
+  
+  .settings-footer .btn {
+    width: 100%;
+  }
+  
+  .settings-btn span {
+    display: none;
+  }
+  
+  .settings-btn {
+    padding: 10px;
+  }
+  
+  .admin-notification {
+    left: 20px;
+    right: 20px;
+    bottom: 80px;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-indicator {
+    padding: 6px 12px;
+  }
+  
+  .admin-badge {
+    font-size: 0.8rem;
+    padding: 3px 10px;
+  }
+  
+  .btn-edit-mode {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+  }
+}
+
+/* ============================================
+   FORM ELEMENTS (Enhanced)
+   ============================================ */
+
+.settings-modal .form-group {
+  margin-bottom: 16px;
+}
+
+.settings-modal .form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-light, #6B6B6B);
+  margin-bottom: 6px;
+}
+
+.settings-modal .form-group input,
+.settings-modal .form-group select,
+.settings-modal .form-group textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid var(--sand, #E8E2D9);
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  color: var(--text, #3D3D3D);
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.settings-modal .form-group input:focus,
+.settings-modal .form-group select:focus,
+.settings-modal .form-group textarea:focus {
+  outline: none;
+  border-color: var(--sage, #9CAF88);
+  box-shadow: 0 0 0 3px rgba(156, 175, 136, 0.1);
+}
+
+.settings-modal .form-group input::placeholder {
+  color: var(--text-muted, #9A9A9A);
+}
+
+.settings-modal .form-group select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239A9A9A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 40px;
+}
+
+/* Error text styling */
+.admin-modal .error-text {
+  color: #c45050;
+  font-size: 0.85rem;
+  text-align: center;
+  margin-top: 12px;
+  display: none;
+}
+
+.admin-modal .error-text:not(:empty) {
+  display: block;
+}

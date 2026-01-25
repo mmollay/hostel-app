@@ -1,6 +1,7 @@
 /**
- * Inline Editor v0.5.0
+ * Inline Editor v0.6.0
  * WYSIWYG-style editing for admin users
+ * Works with AdminUI module for authentication
  * 
  * Erlaubte HTML-Tags: <b>, <i>, <u>, <a>, <br>, <p>, <ul>, <ol>, <li>
  */
@@ -19,25 +20,37 @@ const InlineEditor = {
   currentElement: null,
   toolbar: null,
   originalContent: {},
+  initialized: false,
 
   /**
    * Initialisierung
    */
   init() {
-    // Check if user is admin (has token in localStorage or sessionStorage)
+    // Prevent double initialization
+    if (this.initialized) {
+      console.log('[InlineEditor] Already initialized');
+      return;
+    }
+
+    // Check if user is admin (via AdminUI or token)
     const adminToken = localStorage.getItem('hostel_admin_token') || 
                        sessionStorage.getItem('hostel_admin_token');
     
-    if (!adminToken) {
+    // Also check AdminUI if available
+    const isAdminViaUI = typeof AdminUI !== 'undefined' && AdminUI.isAdmin;
+    
+    if (!adminToken && !isAdminViaUI) {
       console.log('[InlineEditor] No admin token, editor disabled');
       return;
     }
 
     this.isAdmin = true;
+    this.initialized = true;
     this.createToolbar();
     this.markEditableElements();
     this.addEventListeners();
-    this.addEditModeToggle();
+    // Don't add edit mode toggle - AdminUI handles this now
+    // this.addEditModeToggle();
     
     console.log('[InlineEditor] Initialized for admin user');
   },
@@ -97,8 +110,15 @@ const InlineEditor = {
 
   /**
    * Edit-Mode Toggle Button zum Header hinzufügen
+   * NOTE: This is now handled by AdminUI module
    */
   addEditModeToggle() {
+    // Skip if AdminUI is handling the toggle button
+    if (typeof AdminUI !== 'undefined') {
+      console.log('[InlineEditor] Edit mode toggle handled by AdminUI');
+      return;
+    }
+
     const headerActions = document.querySelector('.header-actions') || 
                           document.querySelector('header .user-actions') ||
                           document.querySelector('header');
@@ -392,7 +412,7 @@ const InlineEditor = {
       const token = localStorage.getItem('hostel_admin_token') || 
                     sessionStorage.getItem('hostel_admin_token');
 
-      const response = await fetch(`${window.CONFIG?.API_URL || ''}/content/${key}`, {
+      const response = await fetch(`${window.CONFIG?.API_PROXY_URL || ''}/content/${key}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -515,10 +535,23 @@ const InlineEditor = {
 };
 
 // Auto-init wenn DOM ready
+// NOTE: If AdminUI is present, it will call InlineEditor.init() when admin logs in
+// This auto-init is for backwards compatibility when AdminUI is not loaded
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => InlineEditor.init());
+  document.addEventListener('DOMContentLoaded', () => {
+    // Delay to let AdminUI initialize first
+    setTimeout(() => {
+      if (typeof AdminUI === 'undefined') {
+        InlineEditor.init();
+      }
+    }, 100);
+  });
 } else {
-  InlineEditor.init();
+  setTimeout(() => {
+    if (typeof AdminUI === 'undefined') {
+      InlineEditor.init();
+    }
+  }, 100);
 }
 
 // Export für Module
