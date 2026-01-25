@@ -88,7 +88,7 @@
             padding: 40px 24px 60px;
             padding-top: calc(env(safe-area-inset-top) + 40px);
             text-align: center;
-            position: sticky;
+            position: relative;
             top: 0;
             z-index: 100;
             overflow: hidden;
@@ -101,42 +101,11 @@
         }
 
         /* Kompakter Header beim Scrollen */
-        .header.collapsed {
-            padding: 16px 24px 16px;
-            padding-top: calc(env(safe-area-inset-top) + 65px);
-        }
 
-        .header.collapsed .header-logo {
-            width: 36px;
-            height: 36px;
-            padding: 5px;
-            margin-bottom: 0;
-            margin-right: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        }
 
-        .header.collapsed .header-content {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
 
-        .header.collapsed h1 {
-            font-size: 1.1rem;
-            margin-bottom: 0;
-            letter-spacing: 1px;
-        }
 
-        .header.collapsed .subtitle {
-            display: none;
-        }
 
-        .header.collapsed .header-actions {
-            position: absolute;
-            top: calc(env(safe-area-inset-top) + 8px);
-            right: 16px;
-        }
 
         .header::before {
             content: '';
@@ -2254,26 +2223,7 @@
             };
         }
 
-        // Collapsing Header on Scroll
-        (function() {
-            const header = document.querySelector('.header');
-            if (!header) return;
-
-            let lastScroll = 0;
-            const collapseThreshold = 100;
-
-            window.addEventListener('scroll', () => {
-                const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
-                
-                if (currentScroll > collapseThreshold) {
-                    header.classList.add('collapsed');
-                } else {
-                    header.classList.remove('collapsed');
-                }
-                
-                lastScroll = currentScroll;
-            }, { passive: true });
-        })();
+        // Collapsing Header DISABLED - scrolls normally now
     </script>
 </body>
 </html>
