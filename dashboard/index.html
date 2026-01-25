@@ -71,8 +71,8 @@
             min-height: 100vh;
             font-weight: 400;
             letter-spacing: 0.02em;
-            /* Safe Area for iPhone X+ */
-            padding-top: env(safe-area-inset-top);
+            /* Safe Area handled by sticky header */
+            padding-top: 0;
             padding-bottom: env(safe-area-inset-bottom);
             padding-left: env(safe-area-inset-left);
             padding-right: env(safe-area-inset-right);
@@ -85,9 +85,12 @@
             background-size: cover;
             background-position: center;
             color: white;
-            padding: 60px 24px 80px;
+            padding: 40px 24px 60px;
+            padding-top: calc(env(safe-area-inset-top) + 40px);
             text-align: center;
-            position: relative;
+            position: sticky;
+            top: 0;
+            z-index: 100;
             overflow: hidden;
         }
 

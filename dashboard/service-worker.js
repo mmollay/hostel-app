@@ -3,7 +3,7 @@
  * Ermöglicht Offline-Funktionalität
  */
 
-const CACHE_NAME = "hostel-hollenthon-v13";
+const CACHE_NAME = "hostel-hollenthon-v14";
 const urlsToCache = [
   "/",
   "/index.html",
