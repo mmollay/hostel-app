@@ -97,28 +97,30 @@
 
         /* Kompakter Header beim Scrollen */
         .header.collapsed {
-            padding: 12px 24px 12px;
-            padding-top: calc(env(safe-area-inset-top) + 12px);
+            padding: 16px 24px 16px;
+            padding-top: calc(env(safe-area-inset-top) + 50px);
         }
 
         .header.collapsed .header-logo {
-            width: 40px;
-            height: 40px;
-            padding: 6px;
+            width: 36px;
+            height: 36px;
+            padding: 5px;
             margin-bottom: 0;
-            margin-right: 12px;
+            margin-right: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
 
         .header.collapsed .header-content {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .header.collapsed h1 {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             margin-bottom: 0;
+            letter-spacing: 1px;
         }
 
         .header.collapsed .subtitle {
@@ -126,9 +128,9 @@
         }
 
         .header.collapsed .header-actions {
-            position: relative;
-            top: auto;
-            right: auto;
+            position: absolute;
+            top: calc(env(safe-area-inset-top) + 8px);
+            right: 16px;
         }
 
         .header::before {
