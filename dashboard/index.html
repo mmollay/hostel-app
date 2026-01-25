@@ -172,11 +172,28 @@
 
         .header-actions {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: calc(env(safe-area-inset-top) + 12px);
+            right: 16px;
             z-index: 10;
             display: flex;
-            gap: 12px;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Kompakter Status-Indicator */
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.offline {
+            background: #ef4444;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+            animation: none;
         }
 
         .guest-login-btn,
@@ -185,27 +202,28 @@
             border: 1px solid rgba(255,255,255,0.3);
             color: white;
             cursor: pointer;
-            padding: 10px 20px;
-            border-radius: 30px;
+            padding: 8px 16px;
+            border-radius: 24px;
             transition: all 0.3s;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             font-family: 'DM Sans', sans-serif;
             font-weight: 500;
+            min-height: 44px; /* Touch Target */
         }
 
         .guest-login-btn:hover,
         .status-btn:hover {
             background: rgba(255,255,255,0.3);
-            transform: translateY(-2px);
+            transform: translateY(-1px);
         }
 
         .guest-login-btn i,
         .status-btn i {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
         }
 
         .guest-login-btn.logged-in {
@@ -214,7 +232,7 @@
         }
 
         .status-btn {
-            padding: 10px 16px;
+            padding: 8px 12px;
             cursor: default;
         }
 
@@ -879,23 +897,46 @@
         }
 
         /* Responsive */
-        @media (max-width: 600px) {
+        @media (max-width: 640px) {
             .header {
                 padding: 48px 20px 70px;
+                padding-top: calc(env(safe-area-inset-top) + 16px);
             }
 
             .header h1 {
-                font-size: 2rem;
+                font-size: 1.8rem;
+            }
+
+            .header .subtitle {
+                font-size: 1rem;
+            }
+
+            .header-logo {
+                width: 100px;
+                height: 100px;
+                padding: 14px;
+                margin-bottom: 12px;
             }
 
             .main {
-            z-index: 1;
+                z-index: 1;
                 margin-top: -30px;
+                padding: 0 12px;
             }
 
+            /* Card Borders für Mobile entfernen */
             .card {
-                padding: 24px;
-                border-radius: 20px;
+                padding: 20px 16px;
+                border-radius: 16px;
+                border: none;
+                box-shadow: none;
+                margin-bottom: 12px;
+                background: var(--warm-white);
+            }
+
+            /* Subtile Trennung durch Background-Wechsel */
+            .card:nth-child(even) {
+                background: var(--cream);
             }
 
             .energy-value {
@@ -917,6 +958,48 @@
 
             .contact-grid {
                 grid-template-columns: 1fr;
+            }
+
+            /* Header Actions kompakter */
+            .header-actions {
+                top: calc(env(safe-area-inset-top) + 8px);
+                right: 12px;
+                gap: 8px;
+            }
+
+            .guest-login-btn,
+            .status-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+                border-radius: 20px;
+            }
+
+            .guest-login-btn i,
+            .status-btn i {
+                width: 14px;
+                height: 14px;
+            }
+
+            /* Quick Nav kompakter */
+            .quick-nav {
+                padding: 12px 8px;
+                gap: 6px;
+            }
+
+            .quick-nav-btn {
+                padding: 8px 10px;
+                min-width: 60px;
+                font-size: 0.75rem;
+            }
+
+            .quick-nav-btn i {
+                width: 18px;
+                height: 18px;
+            }
+
+            /* Footer für Mobile Bottom Nav Platz */
+            .footer {
+                padding-bottom: calc(80px + env(safe-area-inset-bottom));
             }
         }
 
@@ -1649,6 +1732,106 @@
             opacity: 1;
             background: rgba(255,255,255,0.25);
         }
+
+        /* ============================================
+           MOBILE BOTTOM NAVIGATION
+           ============================================ */
+        .mobile-bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--warm-white);
+            border-top: 1px solid var(--sand);
+            padding: 8px 0;
+            padding-bottom: calc(8px + env(safe-area-inset-bottom));
+            z-index: 1000;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+        }
+
+        .mobile-bottom-nav-inner {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 12px;
+            min-width: 60px;
+            font-family: inherit;
+        }
+
+        .mobile-nav-item:hover,
+        .mobile-nav-item:active {
+            color: var(--sage-dark);
+            background: var(--cream);
+        }
+
+        .mobile-nav-item.active {
+            color: var(--sage-dark);
+        }
+
+        .mobile-nav-item i {
+            width: 24px;
+            height: 24px;
+        }
+
+        .mobile-nav-item span {
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        /* Admin Button in Bottom Nav - größer und präsenter */
+        .mobile-nav-item.admin-btn {
+            background: linear-gradient(135deg, var(--forest) 0%, var(--sage-dark) 100%);
+            color: white;
+            padding: 10px 16px;
+            min-height: 48px;
+            min-width: 48px;
+        }
+
+        .mobile-nav-item.admin-btn:hover,
+        .mobile-nav-item.admin-btn:active {
+            background: linear-gradient(135deg, var(--sage-dark) 0%, var(--forest) 100%);
+            color: white;
+        }
+
+        @media (max-width: 640px) {
+            .mobile-bottom-nav {
+                display: block;
+            }
+        }
+
+        /* Desktop: Admin Button im Footer sichtbarer */
+        @media (min-width: 641px) {
+            .footer .admin-link {
+                opacity: 1 !important;
+                background: var(--forest);
+                color: white !important;
+                padding: 8px 16px;
+                border-radius: 8px;
+                display: inline-block;
+                margin-top: 8px;
+            }
+
+            .footer .admin-link:hover {
+                background: var(--sage-dark) !important;
+            }
+        }
     </style>
     <link rel="stylesheet" href="inline-editor.css">
     <link rel="stylesheet" href="admin-ui.css">
@@ -1657,10 +1840,8 @@
     <!-- Header -->
     <header class="header">
         <div class="header-actions">
-            <button class="status-btn offline" id="statusBtn" title="Verbindungsstatus">
-                <span class="status-dot error"></span>
-                <span id="statusText" data-i18n="header.offline">Offline</span>
-            </button>
+            <!-- Kompakter Status + Login -->
+            <span class="status-indicator offline" id="statusIndicatorHeader" title="Verbindungsstatus"></span>
             <button class="guest-login-btn" id="guestLoginBtn">
                 <i data-lucide="user"></i>
                 <span data-i18n="header.login">Anmelden</span>
@@ -2155,8 +2336,13 @@
                 <a href="/datenschutz.html" style="color: var(--text-muted); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--forest)'" onmouseout="this.style.color='var(--text-muted)'" data-i18n="footer.privacy">Datenschutz</a>
                 <span style="color: var(--text-muted);">•</span>
                 <a href="/kontakt.html" style="color: var(--text-muted); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--forest)'" onmouseout="this.style.color='var(--text-muted)'" data-i18n="footer.contact">Kontakt</a>
-                <span style="color: var(--text-muted);">•</span>
-                <a href="/admin.html" style="color: var(--text-muted); text-decoration: none; transition: color 0.2s; opacity: 0.5;" onmouseover="this.style.color='var(--forest)'; this.style.opacity='1'" onmouseout="this.style.color='var(--text-muted)'; this.style.opacity='0.5'" title="Admin">Admin</a>
+            </div>
+            <!-- Admin Button - größer für Desktop -->
+            <div style="margin-bottom: 16px;">
+                <a href="/admin.html" class="admin-link" style="color: var(--text-muted); text-decoration: none; transition: all 0.2s;" title="Admin-Bereich">
+                    <i data-lucide="settings" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i>
+                    Admin
+                </a>
             </div>
             <div style="font-size: 0.8rem; color: var(--text-muted);">
                 Powered by <a href="https://ssi.at" target="_blank" style="color: var(--sage-dark); text-decoration: none; font-weight: 500;" onmouseover="this.style.color='var(--forest)'" onmouseout="this.style.color='var(--sage-dark)'">SSI</a>
@@ -2165,6 +2351,28 @@
             </div>
         </div>
     </footer>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-bottom-nav" id="mobileBottomNav">
+        <div class="mobile-bottom-nav-inner">
+            <button class="mobile-nav-item" onclick="scrollToTop()" title="Nach oben">
+                <i data-lucide="home"></i>
+                <span data-i18n="nav.home">Start</span>
+            </button>
+            <button class="mobile-nav-item" onclick="scrollToSection('weatherCard')" title="Wetter">
+                <i data-lucide="cloud-sun"></i>
+                <span data-i18n="nav.weather">Wetter</span>
+            </button>
+            <button class="mobile-nav-item" onclick="scrollToSection('recommendationsCard')" title="Umgebung">
+                <i data-lucide="map-pin"></i>
+                <span data-i18n="nav.nearby">Umgebung</span>
+            </button>
+            <a href="/admin.html" class="mobile-nav-item admin-btn" title="Admin-Bereich">
+                <i data-lucide="settings"></i>
+                <span>Admin</span>
+            </a>
+        </div>
+    </nav>
 
     <!-- Guest Login Modal -->
     <div class="modal-overlay" id="guestLoginModal">
@@ -2299,6 +2507,32 @@
         }
 
         // Collapsing Header DISABLED - scrolls normally now
+
+        // Scroll to top function for mobile nav
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Scroll to section function
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                // Offset für Header berücksichtigen
+                const headerHeight = 80;
+                const elementPosition = section.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        // Re-initialize Lucide icons after DOM updates
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+        });
     </script>
 </body>
 </html>

@@ -538,25 +538,12 @@ function showConnected() {
   const errorEl = document.getElementById("errorMessage");
   const dashboardEl = document.getElementById("dashboard");
   const statusEl = document.getElementById("statusIndicator");
-  const statusBtn = document.getElementById("statusBtn");
-  const statusText = document.getElementById("statusText");
-  const statusDot = statusBtn?.querySelector(".status-dot");
+  const statusHeaderEl = document.getElementById("statusIndicatorHeader");
 
   if (errorEl) errorEl.style.display = "none";
   if (dashboardEl) dashboardEl.style.display = "block";
   if (statusEl) statusEl.classList.remove("error");
-
-  // Status-Button aktualisieren
-  if (statusBtn) {
-    statusBtn.classList.remove("offline");
-    statusBtn.classList.add("online");
-  }
-  if (statusText) {
-    statusText.textContent = "Online";
-  }
-  if (statusDot) {
-    statusDot.classList.remove("error");
-  }
+  if (statusHeaderEl) statusHeaderEl.classList.remove("offline");
 }
 
 /**
@@ -565,24 +552,11 @@ function showConnected() {
 function showError() {
   const errorEl = document.getElementById("errorMessage");
   const statusEl = document.getElementById("statusIndicator");
-  const statusBtn = document.getElementById("statusBtn");
-  const statusText = document.getElementById("statusText");
-  const statusDot = statusBtn?.querySelector(".status-dot");
+  const statusHeaderEl = document.getElementById("statusIndicatorHeader");
 
   if (errorEl) errorEl.style.display = "block";
   if (statusEl) statusEl.classList.add("error");
-
-  // Status-Button aktualisieren
-  if (statusBtn) {
-    statusBtn.classList.remove("online");
-    statusBtn.classList.add("offline");
-  }
-  if (statusText) {
-    statusText.textContent = "Offline";
-  }
-  if (statusDot) {
-    statusDot.classList.add("error");
-  }
+  if (statusHeaderEl) statusHeaderEl.classList.add("offline");
 }
 
 // ==========================================
@@ -693,17 +667,49 @@ function closeGuestLoginModal() {
  * Guest Login durchführen
  */
 async function handleGuestLogin() {
-  const username = document.getElementById("guestUsername").value;
-  const password = document.getElementById("guestPassword").value;
+  const usernameInput = document.getElementById("guestUsername");
+  const passwordInput = document.getElementById("guestPassword");
+  const errorEl = document.getElementById("loginError");
+  const loginBtn = document.getElementById("loginBtn");
+  
+  const username = usernameInput?.value?.trim();
+  const password = passwordInput?.value;
 
-  if (!username || !password) return;
+  // Validierung
+  if (!username || !password) {
+    if (errorEl) {
+      errorEl.textContent = "Bitte Zugangscode und Passwort eingeben";
+      errorEl.style.display = "block";
+    }
+    return;
+  }
+
+  // Loading-State
+  if (loginBtn) {
+    loginBtn.disabled = true;
+    loginBtn.textContent = "Wird geprüft...";
+  }
+  if (errorEl) {
+    errorEl.style.display = "none";
+  }
 
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s Timeout
+
     const response = await fetch(`${CONFIG.API_PROXY_URL}/guest/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
+
+    // HTTP-Fehler abfangen
+    if (!response.ok) {
+      throw new Error(`Server-Fehler: ${response.status}`);
+    }
 
     const result = await response.json();
 
@@ -721,18 +727,39 @@ async function handleGuestLogin() {
       // Willkommens-Nachricht
       showWelcomeMessage();
     } else {
-      const errorEl = document.getElementById("loginError");
       if (errorEl) {
-        errorEl.textContent = result.error || "Anmeldung fehlgeschlagen";
+        // Benutzerfreundliche Fehlermeldungen
+        let errorMessage = result.error || "Anmeldung fehlgeschlagen";
+        if (result.error?.includes("Invalid") || result.error?.includes("invalid")) {
+          errorMessage = "Zugangscode oder Passwort falsch";
+        } else if (result.error?.includes("not found")) {
+          errorMessage = "Zugangscode nicht gefunden";
+        }
+        errorEl.textContent = errorMessage;
         errorEl.style.display = "block";
       }
     }
   } catch (error) {
     console.error("Login error:", error);
-    const errorEl = document.getElementById("loginError");
     if (errorEl) {
-      errorEl.textContent = "Verbindungsfehler";
+      let errorMessage = "Verbindungsfehler - bitte erneut versuchen";
+      if (error.name === "AbortError") {
+        errorMessage = "Zeitüberschreitung - Server nicht erreichbar";
+      } else if (error.message?.includes("Failed to fetch")) {
+        errorMessage = "Keine Internetverbindung";
+      } else if (error.message?.includes("Server-Fehler")) {
+        errorMessage = error.message;
+      }
+      errorEl.textContent = errorMessage;
       errorEl.style.display = "block";
+    }
+  } finally {
+    // Loading-State zurücksetzen
+    if (loginBtn) {
+      loginBtn.disabled = false;
+      // Use i18n if available
+      const buttonText = (typeof I18N !== 'undefined' && I18N.t) ? I18N.t('login.submit') : 'Anmelden';
+      loginBtn.textContent = buttonText;
     }
   }
 }
