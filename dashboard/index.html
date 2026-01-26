@@ -255,7 +255,7 @@
             margin: -40px auto 40px;
             padding: 0 20px;
             position: relative;
-            z-index: 120; /* Höher als Header (100) */
+            /* Kein z-index hier, damit welcome-card ihren eigenen stacking context hat */
         }
 
         /* Cards */
@@ -1523,6 +1523,277 @@
         }
 
         /* ============================================
+           STAY ENERGY CARD STYLES (Gast-Aufenthalt)
+           ============================================ */
+        .stay-energy-overview {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .stay-energy-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 500px) {
+            .stay-energy-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .stay-stat {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 20px;
+            background: var(--warm-white);
+            border-radius: 16px;
+            border: 1px solid var(--sand);
+        }
+
+        .stay-stat.primary {
+            background: linear-gradient(135deg, rgba(156, 175, 136, 0.1) 0%, rgba(156, 175, 136, 0.05) 100%);
+            border-color: var(--sage-light);
+        }
+
+        .stay-stat-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--sage) 0%, var(--sage-dark) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .stay-stat-icon i {
+            width: 22px;
+            height: 22px;
+        }
+
+        .stay-stat-content {
+            flex: 1;
+        }
+
+        .stay-stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .stay-stat-value {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--forest);
+            line-height: 1.2;
+        }
+
+        .stay-stat-unit {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--text-light);
+            margin-left: 4px;
+        }
+
+        .stay-info-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding: 16px 20px;
+            background: var(--cream);
+            border-radius: 12px;
+        }
+
+        .stay-info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .stay-info-item i {
+            width: 18px;
+            height: 18px;
+            color: var(--sage-dark);
+        }
+
+        .stay-info-item strong {
+            color: var(--forest);
+        }
+
+        .stay-details-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            border: 2px dashed var(--sand);
+            border-radius: 12px;
+            color: var(--sage-dark);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .stay-details-toggle:hover {
+            background: var(--cream);
+            border-color: var(--sage-light);
+        }
+
+        .stay-details-toggle i {
+            width: 18px;
+            height: 18px;
+            transition: transform 0.3s;
+        }
+
+        .stay-details-toggle.open i {
+            transform: rotate(180deg);
+        }
+
+        /* Detail-Ansicht */
+        .stay-energy-details {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--sand);
+        }
+
+        .stay-details-header {
+            margin-bottom: 16px;
+        }
+
+        .stay-details-header h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--forest);
+            margin: 0;
+        }
+
+        .stay-days-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .stay-day-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--cream);
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+
+        .stay-day-item:nth-child(odd) {
+            background: var(--warm-white);
+        }
+
+        .stay-day-date {
+            font-weight: 500;
+            color: var(--text);
+            min-width: 100px;
+        }
+
+        .stay-day-energy {
+            color: var(--sage-dark);
+            font-weight: 600;
+        }
+
+        .stay-day-cost {
+            color: var(--earth);
+            font-weight: 500;
+            min-width: 60px;
+            text-align: right;
+        }
+
+        .stay-day-no-data {
+            color: var(--text-muted);
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .stay-day-item.today {
+            background: linear-gradient(135deg, rgba(156, 175, 136, 0.15) 0%, rgba(156, 175, 136, 0.08) 100%);
+            border: 1px solid var(--sage-light);
+        }
+
+        .stay-day-item.today .stay-day-date {
+            color: var(--sage-dark);
+        }
+
+        /* Live-Anzeige (klein unten) */
+        .stay-live-info {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--sand);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .stay-live-power {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .stay-live-power i {
+            width: 16px;
+            height: 16px;
+            color: var(--sage);
+        }
+
+        .stay-live-power strong {
+            font-size: 1.1rem;
+            color: var(--sage-dark);
+        }
+
+        .stay-live-status {
+            font-size: 0.8rem;
+            padding: 4px 12px;
+            background: rgba(156, 175, 136, 0.15);
+            border-radius: 16px;
+            color: var(--sage-dark);
+        }
+
+        .stay-live-status.feeding {
+            background: rgba(156, 175, 136, 0.25);
+            color: var(--sage);
+        }
+
+        /* Info-Hinweis für Heizkosten */
+        .energy-info-notice {
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: rgba(255, 193, 94, 0.12);
+            border-left: 3px solid var(--sun);
+            border-radius: 0 8px 8px 0;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        .energy-info-notice p {
+            margin: 0;
+        }
+
+        /* ============================================
            INLINE EDITOR STYLES
            ============================================ */
 
@@ -2106,49 +2377,81 @@
                 </div>
             </div>
 
-            <!-- Energy Card (nur für Admin sichtbar) -->
+            <!-- Energy Card - Gast-Aufenthalt fokussiert -->
             <div class="card energy-card" id="energyCard" style="display: none;">
                 <div class="card-header">
                     <div class="card-icon"><i data-lucide="zap"></i></div>
                     <div>
-                        <h3 class="card-title" data-i18n="energy.title">Energieverbrauch</h3>
-                        <p class="card-subtitle" data-i18n="energy.subtitle">Live-Anzeige</p>
+                        <h3 class="card-title" data-i18n="energy.title">Heizkostenzuschuss</h3>
+                        <p class="card-subtitle" data-i18n="energy.staySubtitle">Dein Aufenthalt</p>
                     </div>
                 </div>
 
-                <div class="energy-center">
-                    <div class="energy-display">
-                        <span class="energy-value" id="currentPower">--</span>
-                        <span class="energy-unit" data-i18n="energy.watt">Watt</span>
+                <!-- Hauptansicht: Aufenthalts-Übersicht -->
+                <div class="stay-energy-overview" id="stayEnergyOverview">
+                    <div class="stay-energy-stats">
+                        <div class="stay-stat primary">
+                            <div class="stay-stat-icon"><i data-lucide="zap"></i></div>
+                            <div class="stay-stat-content">
+                                <div class="stay-stat-label" data-i18n="energy.totalConsumption">Gesamtverbrauch seit Check-in</div>
+                                <div class="stay-stat-value">
+                                    <span id="stayTotalEnergy">--</span>
+                                    <span class="stay-stat-unit">kWh</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stay-stat primary">
+                            <div class="stay-stat-icon"><i data-lucide="euro"></i></div>
+                            <div class="stay-stat-content">
+                                <div class="stay-stat-label" data-i18n="energy.totalCost">Gesamtkosten</div>
+                                <div class="stay-stat-value">
+                                    <span id="stayTotalCost">--</span>
+                                    <span class="stay-stat-unit">€</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="energy-status" id="energyStatus" data-i18n="energy.current">Aktueller Verbrauch</div>
+                    
+                    <div class="stay-info-row">
+                        <div class="stay-info-item">
+                            <i data-lucide="calendar-days"></i>
+                            <span><span data-i18n="energy.stayDuration">Aufenthaltsdauer</span>: <strong id="stayDuration">--</strong> <span data-i18n="energy.days">Tage</span></span>
+                        </div>
+                        <div class="stay-info-item">
+                            <i data-lucide="bar-chart-3"></i>
+                            <span><span data-i18n="energy.avgPerDay">Durchschnitt pro Tag</span>: <strong id="stayAvgEnergy">--</strong> kWh</span>
+                        </div>
+                    </div>
+
+                    <!-- Details-Button -->
+                    <button class="stay-details-toggle" id="stayDetailsToggle" onclick="toggleStayDetails()">
+                        <span data-i18n="energy.showDetails">Tagesdetails anzeigen</span>
+                        <i data-lucide="chevron-down" id="stayDetailsIcon"></i>
+                    </button>
                 </div>
 
-                <div class="energy-stats">
-                    <div class="energy-stat">
-                        <div class="stat-label" data-i18n="energy.today">Heute</div>
-                        <div>
-                            <span class="stat-value" id="todayEnergy">--</span>
-                            <span class="stat-unit" data-i18n="energy.kwh">kWh</span>
-                        </div>
-                        <div class="stat-cost"><span id="todayCost">--</span> €</div>
+                <!-- Detail-Ansicht: Tages-Liste (aufklappbar) -->
+                <div class="stay-energy-details" id="stayEnergyDetails" style="display: none;">
+                    <div class="stay-details-header">
+                        <h4 data-i18n="energy.dailyBreakdown">Tägliche Aufschlüsselung</h4>
                     </div>
-                    <div class="energy-stat">
-                        <div class="stat-label" data-i18n="energy.yesterday">Gestern</div>
-                        <div>
-                            <span class="stat-value" id="yesterdayEnergy">--</span>
-                            <span class="stat-unit" data-i18n="energy.kwh">kWh</span>
-                        </div>
-                        <div class="stat-cost"><span id="yesterdayCost">--</span> €</div>
+                    <div class="stay-days-list" id="stayDaysList">
+                        <!-- Wird dynamisch gefüllt -->
                     </div>
-                    <div class="energy-stat">
-                        <div class="stat-label" data-i18n="energy.thisMonth">Dieser Monat</div>
-                        <div>
-                            <span class="stat-value" id="monthEnergy">--</span>
-                            <span class="stat-unit" data-i18n="energy.kwh">kWh</span>
-                        </div>
-                        <div class="stat-cost"><span id="monthCost">--</span> €</div>
+                </div>
+
+                <!-- Live-Anzeige (klein, unten) -->
+                <div class="stay-live-info">
+                    <div class="stay-live-power">
+                        <i data-lucide="activity"></i>
+                        <span data-i18n="energy.currentNow">Aktuell</span>: <strong id="currentPower">--</strong> <span data-i18n="energy.watt">W</span>
                     </div>
+                    <div class="stay-live-status" id="energyStatus" data-i18n="energy.current">Aktueller Verbrauch</div>
+                </div>
+
+                <!-- Info-Hinweis -->
+                <div class="energy-info-notice">
+                    <p data-i18n="energy.heatingInfo">ℹ️ Diese Anzeige zeigt nur die Heizkosten – nicht die normalen Betriebskosten (Licht, Wasserkocher, etc.). Da das Heizen mit den Wandheizstrahlern viel Strom verbraucht, bitten wir um einen fairen Beitrag zu diesen Zusatzkosten.</p>
                 </div>
             </div>
 
@@ -2481,7 +2784,7 @@
 
     <script src="/i18n.js"></script>
     <script src="/config.js"></script>
-    <script src="/app.js"></script>
+    <script src="/app.js?v=20260126-2245"></script>
     <script src="/inline-editor.js"></script>
     <script src="/admin-ui.js"></script>
     <script>
@@ -2542,21 +2845,10 @@
             window.updateUI = function(status) {
                 originalUpdateUI(status);
 
-                const totalPower = status.total_act_power || 0;
-                const isFeeding = totalPower < 0;
                 const statusEl = document.getElementById('energyStatus');
-                const powerEl = document.getElementById('currentPower');
-
                 if (statusEl) {
-                    // Use i18n if available
-                    const feedingText = window.I18N ? window.I18N.t('energy.feeding') : '↑ Einspeisung ins Netz';
                     const currentText = window.I18N ? window.I18N.t('energy.current') : 'Aktueller Verbrauch';
-                    statusEl.textContent = isFeeding ? ('↑ ' + feedingText) : currentText;
-                    statusEl.classList.toggle('feeding', isFeeding);
-                }
-
-                if (powerEl) {
-                    powerEl.classList.toggle('feeding', isFeeding);
+                    statusEl.textContent = currentText;
                 }
             };
         }

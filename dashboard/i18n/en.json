@@ -108,15 +108,27 @@
     }
   },
   "energy": {
-    "title": "Energy Consumption",
+    "title": "Heating Cost Supplement",
     "subtitle": "Live Display",
+    "staySubtitle": "Your Stay",
+    "heatingInfo": "ℹ️ This display shows only heating costs – not normal operating costs (lights, kettle, etc.). Since the wall-mounted heaters use a lot of electricity, we kindly ask for a fair contribution to these additional costs.",
     "current": "Current consumption",
+    "currentNow": "Now",
     "feeding": "Feeding to grid",
     "today": "Today",
     "yesterday": "Yesterday",
     "thisMonth": "This Month",
-    "watt": "Watt",
-    "kwh": "kWh"
+    "watt": "W",
+    "kwh": "kWh",
+    "totalConsumption": "Total consumption since check-in",
+    "totalCost": "Total cost",
+    "stayDuration": "Stay duration",
+    "avgPerDay": "Average per day",
+    "days": "days",
+    "showDetails": "Show daily details",
+    "hideDetails": "Hide daily details",
+    "dailyBreakdown": "Daily Breakdown",
+    "noData": "No consumption data yet"
   },
   "weather": {
     "title": "Weather in Hollenthon",
@@ -244,5 +256,10 @@
     "nightMode": "Toggle Night Mode",
     "logout": "Logout",
     "close": "Close"
+  },
+  "nav": {
+    "home": "Home",
+    "weather": "Weather",
+    "nearby": "Nearby"
   }
 }

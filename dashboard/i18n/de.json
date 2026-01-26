@@ -108,15 +108,27 @@
     }
   },
   "energy": {
-    "title": "Energieverbrauch",
+    "title": "Heizkostenzuschuss",
     "subtitle": "Live-Anzeige",
+    "staySubtitle": "Dein Aufenthalt",
+    "heatingInfo": "ℹ️ Diese Anzeige zeigt nur die Heizkosten – nicht die normalen Betriebskosten (Licht, Wasserkocher, etc.). Da das Heizen mit den Wandheizstrahlern viel Strom verbraucht, bitten wir um einen fairen Beitrag zu diesen Zusatzkosten.",
     "current": "Aktueller Verbrauch",
+    "currentNow": "Aktuell",
     "feeding": "Einspeisung ins Netz",
     "today": "Heute",
     "yesterday": "Gestern",
     "thisMonth": "Dieser Monat",
-    "watt": "Watt",
-    "kwh": "kWh"
+    "watt": "W",
+    "kwh": "kWh",
+    "totalConsumption": "Gesamtverbrauch seit Check-in",
+    "totalCost": "Gesamtkosten",
+    "stayDuration": "Aufenthaltsdauer",
+    "avgPerDay": "Durchschnitt pro Tag",
+    "days": "Tage",
+    "showDetails": "Tagesdetails anzeigen",
+    "hideDetails": "Tagesdetails ausblenden",
+    "dailyBreakdown": "Tägliche Aufschlüsselung",
+    "noData": "Noch keine Verbrauchsdaten"
   },
   "weather": {
     "title": "Wetter in Hollenthon",
@@ -244,5 +256,10 @@
     "nightMode": "Nachtmodus umschalten",
     "logout": "Abmelden",
     "close": "Schließen"
+  },
+  "nav": {
+    "home": "Start",
+    "weather": "Wetter",
+    "nearby": "Umgebung"
   }
 }

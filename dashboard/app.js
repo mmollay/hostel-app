@@ -133,6 +133,15 @@ async function init() {
   // Alle API-Calls parallel ausführen
   await Promise.allSettled(apiPromises);
   
+  // Nach dem Laden: UI nochmal aktualisieren (damit gestern/monat angezeigt werden)
+  // fetchData hat updateUI aufgerufen, aber loadEnergyFromDB war evtl. noch nicht fertig
+  updateHistoricalEnergyUI();
+  
+  // Aufenthalts-Energie laden (für eingeloggte Gäste)
+  if (guestToken && guestData) {
+    await loadStayEnergy();
+  }
+  
   // Intervals nach dem initialen Load starten
   setInterval(fetchData, CONFIG.UPDATE_INTERVAL);
   setInterval(updateGreeting, 60000);
@@ -205,6 +214,265 @@ async function loadEnergyFromDB() {
     console.error("Fehler beim Laden aus DB:", e);
   }
 }
+
+/**
+ * Historische Energie-Daten in UI aktualisieren (gestern, monat)
+ */
+function updateHistoricalEnergyUI() {
+  const pricePerKwh = settings.pricePerKwh || CONFIG.PRICE_PER_KWH;
+  
+  // Gestern
+  const yesterdayEnergyEl = document.getElementById("yesterdayEnergy");
+  if (yesterdayEnergyEl) {
+    yesterdayEnergyEl.textContent = formatNumber(
+      energyData.yesterdayEnergy,
+      CONFIG.DECIMALS_ENERGY,
+    );
+  }
+  const yesterdayCostEl = document.getElementById("yesterdayCost");
+  if (yesterdayCostEl) {
+    yesterdayCostEl.textContent = formatNumber(
+      energyData.yesterdayEnergy * pricePerKwh,
+      CONFIG.DECIMALS_COST,
+    );
+  }
+
+  // Monat (DB-Wert + heutiger Wert)
+  const monthTotal =
+    (energyData.monthEnergy || 0) + (energyData.todayEnergy || 0);
+  const monthEnergyEl = document.getElementById("monthEnergy");
+  if (monthEnergyEl) {
+    monthEnergyEl.textContent = formatNumber(
+      monthTotal,
+      CONFIG.DECIMALS_ENERGY,
+    );
+  }
+  const monthCostEl = document.getElementById("monthCost");
+  if (monthCostEl) {
+    monthCostEl.textContent = formatNumber(
+      monthTotal * pricePerKwh,
+      CONFIG.DECIMALS_COST,
+    );
+  }
+}
+
+// ==========================================
+// AUFENTHALTS-ENERGIE (GAST-FOKUS)
+// ==========================================
+
+// Speicher für Aufenthalts-Daten
+let stayEnergyData = {
+  days: [],
+  totalEnergy: 0,
+  totalCost: 0,
+  avgPerDay: 0,
+  stayDays: 0,
+};
+
+/**
+ * Energie-Daten für den Gast-Aufenthalt laden
+ */
+async function loadStayEnergy() {
+  // Nur für eingeloggte Gäste
+  if (!guestToken || !guestData) return;
+  
+  const checkIn = guestData.checkIn;
+  const checkOut = guestData.checkOut;
+  
+  if (!checkIn || !checkOut) {
+    console.warn("Keine Check-in/Check-out Daten verfügbar");
+    return;
+  }
+  
+  // Heute als Endpunkt, falls Check-out in der Zukunft liegt
+  const today = getDateString(new Date());
+  const effectiveEnd = checkOut < today ? checkOut : today;
+  
+  try {
+    const response = await fetch(
+      `${CONFIG.API_PROXY_URL}/energy/range?from=${checkIn}&to=${effectiveEnd}`,
+      {
+        cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+        },
+      }
+    );
+    
+    const data = await response.json();
+    
+    if (data.success && data.data) {
+      // Aufenthaltsdauer berechnen
+      const checkInDate = new Date(checkIn);
+      const todayDate = new Date();
+      const stayDays = Math.ceil((todayDate - checkInDate) / (1000 * 60 * 60 * 24)) + 1;
+      
+      // Daten speichern
+      stayEnergyData = {
+        days: data.data.days || [],
+        totalEnergy: data.data.totalEnergy || 0,
+        totalCost: data.data.totalCost || 0,
+        stayDays: stayDays,
+        avgPerDay: stayDays > 0 ? (data.data.totalEnergy || 0) / stayDays : 0,
+      };
+      
+      // Heute hinzufügen wenn noch nicht in DB (aktueller Verbrauch aus Live-Daten)
+      const todayInDays = stayEnergyData.days.find(d => d.date === today);
+      if (!todayInDays && energyData.todayEnergy > 0) {
+        // Heutigen Verbrauch zum Total addieren
+        stayEnergyData.totalEnergy += energyData.todayEnergy;
+        stayEnergyData.totalCost += energyData.todayEnergy * (settings.pricePerKwh || 0.29);
+        stayEnergyData.avgPerDay = stayEnergyData.stayDays > 0 
+          ? stayEnergyData.totalEnergy / stayEnergyData.stayDays 
+          : 0;
+      }
+      
+      // UI aktualisieren
+      updateStayEnergyUI();
+    }
+  } catch (error) {
+    console.error("Fehler beim Laden der Aufenthalts-Energie:", error);
+  }
+}
+
+/**
+ * Aufenthalts-Energie UI aktualisieren
+ */
+function updateStayEnergyUI() {
+  const pricePerKwh = settings.pricePerKwh || CONFIG.PRICE_PER_KWH;
+  
+  // Gesamtverbrauch
+  const totalEnergyEl = document.getElementById("stayTotalEnergy");
+  if (totalEnergyEl) {
+    totalEnergyEl.textContent = formatNumber(stayEnergyData.totalEnergy, 2);
+  }
+  
+  // Gesamtkosten
+  const totalCostEl = document.getElementById("stayTotalCost");
+  if (totalCostEl) {
+    totalCostEl.textContent = formatNumber(stayEnergyData.totalCost, 2);
+  }
+  
+  // Aufenthaltsdauer
+  const durationEl = document.getElementById("stayDuration");
+  if (durationEl) {
+    durationEl.textContent = stayEnergyData.stayDays;
+  }
+  
+  // Durchschnitt pro Tag
+  const avgEl = document.getElementById("stayAvgEnergy");
+  if (avgEl) {
+    avgEl.textContent = formatNumber(stayEnergyData.avgPerDay, 2);
+  }
+  
+  // Tages-Liste vorbereiten
+  displayStayDays();
+}
+
+/**
+ * Tages-Liste für Aufenthalt anzeigen
+ */
+function displayStayDays() {
+  const listEl = document.getElementById("stayDaysList");
+  if (!listEl) return;
+  
+  const pricePerKwh = settings.pricePerKwh || CONFIG.PRICE_PER_KWH;
+  const today = getDateString(new Date());
+  
+  // Alle Tage vom Check-in bis heute generieren
+  if (!guestData || !guestData.checkIn) {
+    listEl.innerHTML = '<div class="stay-day-no-data">Keine Daten verfügbar</div>';
+    return;
+  }
+  
+  const checkInDate = new Date(guestData.checkIn);
+  const todayDate = new Date();
+  const allDays = [];
+  
+  // Tage vom Check-in bis heute durchlaufen
+  const currentDate = new Date(checkInDate);
+  while (currentDate <= todayDate) {
+    const dateStr = getDateString(currentDate);
+    const dayData = stayEnergyData.days.find(d => d.date === dateStr);
+    
+    allDays.push({
+      date: dateStr,
+      energy: dayData ? dayData.energy_kwh : (dateStr === today ? energyData.todayEnergy : 0),
+      cost: dayData ? dayData.cost : (dateStr === today ? energyData.todayEnergy * pricePerKwh : 0),
+      hasData: !!dayData || dateStr === today,
+    });
+    
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+  
+  // Umgekehrte Reihenfolge (neueste zuerst)
+  allDays.reverse();
+  
+  if (allDays.length === 0) {
+    listEl.innerHTML = '<div class="stay-day-no-data" data-i18n="energy.noData">Noch keine Verbrauchsdaten</div>';
+    return;
+  }
+  
+  // Lokale Formatierung für Datum
+  const locale = (typeof I18N !== 'undefined' && I18N.currentLang === 'en') ? 'en-GB' : 'de-DE';
+  
+  listEl.innerHTML = allDays.map(day => {
+    const date = new Date(day.date);
+    const formattedDate = date.toLocaleDateString(locale, {
+      weekday: 'short',
+      day: '2-digit',
+      month: '2-digit',
+    });
+    
+    const isToday = day.date === today;
+    const todayLabel = isToday ? (typeof I18N !== 'undefined' && I18N.currentLang === 'en' ? ' (today)' : ' (heute)') : '';
+    
+    return `
+      <div class="stay-day-item${isToday ? ' today' : ''}">
+        <span class="stay-day-date">${formattedDate}${todayLabel}</span>
+        <span class="stay-day-energy">${formatNumber(day.energy, 2)} kWh</span>
+        <span class="stay-day-cost">${formatNumber(day.cost, 2)} €</span>
+      </div>
+    `;
+  }).join('');
+}
+
+/**
+ * Details aufklappen/zuklappen
+ */
+function toggleStayDetails() {
+  const detailsEl = document.getElementById("stayEnergyDetails");
+  const toggleBtn = document.getElementById("stayDetailsToggle");
+  const iconEl = document.getElementById("stayDetailsIcon");
+  
+  if (!detailsEl || !toggleBtn) return;
+  
+  const isOpen = detailsEl.style.display !== "none";
+  
+  detailsEl.style.display = isOpen ? "none" : "block";
+  toggleBtn.classList.toggle("open", !isOpen);
+  
+  // Button-Text aktualisieren
+  const textSpan = toggleBtn.querySelector("span");
+  if (textSpan) {
+    if (isOpen) {
+      textSpan.textContent = typeof I18N !== 'undefined' && I18N.currentLang === 'en' 
+        ? 'Show daily details' 
+        : 'Tagesdetails anzeigen';
+    } else {
+      textSpan.textContent = typeof I18N !== 'undefined' && I18N.currentLang === 'en' 
+        ? 'Hide daily details' 
+        : 'Tagesdetails ausblenden';
+    }
+  }
+  
+  // Icons neu initialisieren
+  lucide.createIcons();
+}
+
+// Global verfügbar machen
+window.toggleStayDetails = toggleStayDetails;
 
 /**
  * Auto-Refresh: Daten alle 5 Minuten neu laden
@@ -412,7 +680,8 @@ function updateUI(status) {
   }
 
   // Gesamtenergie vom Gerät
-  const totalEnergy = (status.total_act_energy || 0) / 1000;
+  // Shelly Pro 3EM liefert bereits kWh, NICHT Wh!
+  const totalEnergy = status.total_act_energy || 0;
 
   // Tagesenergie berechnen
   if (energyData.todayStart === null) {
@@ -737,6 +1006,9 @@ async function handleGuestLogin() {
       updateGuestUI();
       updateGreeting();
       fetchWeather();
+      
+      // Aufenthalts-Energie laden
+      loadStayEnergy();
 
       // Willkommens-Nachricht
       showWelcomeMessage();
@@ -822,6 +1094,7 @@ function updateGuestUI() {
   const recommendationsCard = document.getElementById("recommendationsCard");
   const wifiCard = document.getElementById("wifiCard");
   const quickNav = document.getElementById("quickNav");
+  const mobileBottomNav = document.getElementById("mobileBottomNav");
   const wifiInfoName = document.getElementById("wifiInfoName");
   const wifiInfoPassword = document.getElementById("wifiInfoPassword");
 
@@ -846,7 +1119,10 @@ function updateGuestUI() {
     wifiInfoPassword.style.display = guestToken ? "block" : "none";
 
   // Quick Navigation nur für eingeloggte Gäste anzeigen
-  if (quickNav) quickNav.style.display = "flex";
+  if (quickNav) quickNav.style.display = guestToken ? "flex" : "none";
+  
+  // Mobile Bottom Navigation nur für eingeloggte Gäste anzeigen
+  if (mobileBottomNav) mobileBottomNav.style.display = guestToken ? "flex" : "none";
 }
 
 /**

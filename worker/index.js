@@ -96,6 +96,11 @@ export default {
         return await getEnergyMonth(env, corsHeaders);
       }
 
+      // GET /energy/range - Energie-Daten für Zeitraum (Gast-Aufenthalt)
+      if (path === "/energy/range" && request.method === "GET") {
+        return await getEnergyRange(url, env, corsHeaders);
+      }
+
       // POST /energy/save - Energie-Daten speichern
       if (path === "/energy/save" && request.method === "POST") {
         return await saveEnergyData(request, env, corsHeaders);
@@ -828,6 +833,79 @@ async function saveEnergyData(request, env, corsHeaders) {
     });
   } catch (error) {
     console.error("[saveEnergyData] Error:", error);
+    return new Response(
+      JSON.stringify({ success: false, error: error.message || "Database error" }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+}
+
+/**
+ * Energie-Daten für Zeitraum abrufen (Gast-Aufenthalt)
+ * GET /energy/range?from=YYYY-MM-DD&to=YYYY-MM-DD
+ */
+async function getEnergyRange(url, env, corsHeaders) {
+  const fromDate = url.searchParams.get("from");
+  const toDate = url.searchParams.get("to");
+
+  if (!fromDate || !toDate) {
+    return new Response(
+      JSON.stringify({ success: false, error: "from and to parameters required" }),
+      {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+
+  try {
+    // Einzelne Tage abrufen
+    const daysResult = await env.DB.prepare(
+      `SELECT date, energy_kwh, cost, peak_power
+       FROM energy_data
+       WHERE hostel_id = ? AND date >= ? AND date <= ?
+       ORDER BY date ASC`,
+    )
+      .bind(HOSTEL_ID, fromDate, toDate)
+      .all();
+
+    const days = daysResult.results || [];
+
+    // Summen berechnen
+    let totalEnergy = 0;
+    let totalCost = 0;
+    let maxPeakPower = 0;
+
+    days.forEach((day) => {
+      totalEnergy += day.energy_kwh || 0;
+      totalCost += day.cost || 0;
+      if (day.peak_power > maxPeakPower) {
+        maxPeakPower = day.peak_power;
+      }
+    });
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        data: {
+          from: fromDate,
+          to: toDate,
+          totalEnergy: totalEnergy,
+          totalCost: totalCost,
+          peakPower: maxPeakPower,
+          daysCount: days.length,
+          days: days,
+        },
+      }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  } catch (error) {
+    console.error("[getEnergyRange] Error:", error);
     return new Response(
       JSON.stringify({ success: false, error: error.message || "Database error" }),
       {
