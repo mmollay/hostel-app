@@ -80,9 +80,9 @@
             min-height: 100vh;
             font-weight: 400;
             letter-spacing: 0.02em;
-            /* Safe Area handled by sticky header */
+            /* Safe Area: left/right nur für body, bottom wird vom fixed Footer gehandelt */
             padding-top: 0;
-            padding-bottom: env(safe-area-inset-bottom);
+            padding-bottom: 0;
             padding-left: env(safe-area-inset-left);
             padding-right: env(safe-area-inset-right);
         }
@@ -1758,6 +1758,7 @@
 
         /* ============================================
            MOBILE BOTTOM NAVIGATION
+           Professionelle Footer-Navigation (orientiert am SSI Dashboard)
            ============================================ */
         .mobile-bottom-nav {
             display: none;
@@ -1765,12 +1766,22 @@
             bottom: 0;
             left: 0;
             right: 0;
+            /* Solide Hintergrund-Konstruktion */
             background: var(--warm-white);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-top: 1px solid var(--sand);
-            padding: 8px 0;
-            padding-bottom: calc(8px + env(safe-area-inset-bottom));
-            z-index: 1000;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+            /* Professionelle Abstände - 12px innen + Safe Area unten */
+            padding: 6px 8px;
+            padding-bottom: calc(6px + env(safe-area-inset-bottom));
+            z-index: 9999;
+            box-shadow: 0 -2px 16px rgba(0,0,0,0.06);
+            /* GPU Acceleration - verhindert Scroll-Verschiebung */
+            transform: translate3d(0, 0, 0);
+            -webkit-transform: translate3d(0, 0, 0);
+            will-change: transform;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
         }
 
         .mobile-bottom-nav-inner {
@@ -1779,33 +1790,39 @@
             align-items: center;
             max-width: 500px;
             margin: 0 auto;
+            padding: 0 4px;
         }
 
         .mobile-nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            justify-content: center;
+            gap: 2px;
+            /* Größere Touch-Targets (mind. 44x44 für iOS) */
             padding: 8px 12px;
+            min-width: 56px;
+            min-height: 52px;
             color: var(--text-muted);
             text-decoration: none;
             border: none;
             background: none;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             border-radius: 12px;
-            min-width: 60px;
             font-family: inherit;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .mobile-nav-item:hover,
         .mobile-nav-item:active {
             color: var(--sage-dark);
-            background: var(--cream);
+            background: rgba(156, 175, 136, 0.1);
         }
 
         .mobile-nav-item.active {
             color: var(--sage-dark);
+            background: rgba(156, 175, 136, 0.1);
         }
 
         .mobile-nav-item i {
@@ -1814,15 +1831,16 @@
         }
 
         .mobile-nav-item span {
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             font-weight: 500;
+            letter-spacing: 0.01em;
         }
 
-        /* Admin Button in Bottom Nav - größer und präsenter */
+        /* Admin Button in Bottom Nav - deutlich aber nicht dominant */
         .mobile-nav-item.admin-btn {
             background: linear-gradient(135deg, var(--forest) 0%, var(--sage-dark) 100%);
             color: white;
-            padding: 10px 16px;
+            padding: 8px 14px;
             min-height: 48px;
             min-width: 48px;
         }
@@ -1833,17 +1851,15 @@
             color: white;
         }
 
+        /* Mobile: Footer aktivieren und fixiert halten */
         @media (max-width: 640px) {
             .mobile-bottom-nav {
                 display: block;
+                /* Doppelte Absicherung für position: fixed */
                 position: fixed !important;
                 bottom: 0 !important;
                 left: 0 !important;
                 right: 0 !important;
-                transform: none !important;
-                /* Verhindert Verschiebung durch iOS Safari Bounce */
-                -webkit-transform: translateZ(0);
-                transform: translateZ(0);
             }
         }
 
