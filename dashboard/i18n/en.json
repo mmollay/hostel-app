@@ -219,6 +219,7 @@
     "codePlaceholder": "e.g. GUEST-2024-001",
     "submit": "Login",
     "cancel": "Cancel",
+    "rememberMe": "Stay logged in",
     "error": "Invalid access code",
     "success": "Successfully logged in!"
   },

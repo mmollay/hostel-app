@@ -219,6 +219,7 @@
     "codePlaceholder": "z.B. GAST-2024-001",
     "submit": "Anmelden",
     "cancel": "Abbrechen",
+    "rememberMe": "Angemeldet bleiben",
     "error": "Ungültiger Zugangscode",
     "success": "Erfolgreich angemeldet!"
   },

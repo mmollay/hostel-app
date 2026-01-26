@@ -235,8 +235,9 @@ function startAutoRefresh() {
  */
 function loadGuestSession() {
   try {
-    guestToken = localStorage.getItem(GUEST_TOKEN_KEY);
-    const storedData = localStorage.getItem(GUEST_DATA_KEY);
+    // Prüfe localStorage zuerst (persistent), dann sessionStorage (temporär)
+    guestToken = localStorage.getItem(GUEST_TOKEN_KEY) || sessionStorage.getItem(GUEST_TOKEN_KEY);
+    const storedData = localStorage.getItem(GUEST_DATA_KEY) || sessionStorage.getItem(GUEST_DATA_KEY);
     if (guestToken && storedData) {
       guestData = JSON.parse(storedData);
       updateGuestUI();
@@ -716,8 +717,21 @@ async function handleGuestLogin() {
     if (result.success) {
       guestToken = result.token;
       guestData = result.guest;
-      localStorage.setItem(GUEST_TOKEN_KEY, guestToken);
-      localStorage.setItem(GUEST_DATA_KEY, JSON.stringify(guestData));
+      
+      // "Angemeldet bleiben" Checkbox prüfen
+      const rememberMe = document.getElementById("guestRememberMe")?.checked ?? true;
+      const storage = rememberMe ? localStorage : sessionStorage;
+      
+      // Bei "Angemeldet bleiben" in localStorage, sonst sessionStorage
+      // Zuerst beide clearen um Inkonsistenzen zu vermeiden
+      localStorage.removeItem(GUEST_TOKEN_KEY);
+      localStorage.removeItem(GUEST_DATA_KEY);
+      sessionStorage.removeItem(GUEST_TOKEN_KEY);
+      sessionStorage.removeItem(GUEST_DATA_KEY);
+      
+      // In gewähltem Storage speichern
+      storage.setItem(GUEST_TOKEN_KEY, guestToken);
+      storage.setItem(GUEST_DATA_KEY, JSON.stringify(guestData));
 
       closeGuestLoginModal();
       updateGuestUI();
@@ -786,8 +800,12 @@ function closeGuestMenu() {
 function handleGuestLogout() {
   guestToken = null;
   guestData = null;
+  
+  // Beide Storage-Typen löschen
   localStorage.removeItem(GUEST_TOKEN_KEY);
   localStorage.removeItem(GUEST_DATA_KEY);
+  sessionStorage.removeItem(GUEST_TOKEN_KEY);
+  sessionStorage.removeItem(GUEST_DATA_KEY);
 
   updateGuestUI();
   updateGreeting();

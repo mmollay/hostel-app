@@ -1,6 +1,6 @@
 const CONFIG = {
-  // App Version
-  VERSION: "v0.7.0",
+  // App Version - Deployed Mon 26 Jan 2026 - Remember Me Fix
+  VERSION: "v0.7.1",
 
   // API Proxy URL (Cloudflare Worker - hält Auth-Key sicher)
   API_PROXY_URL: "https://hostel-app-api.office-509.workers.dev",
