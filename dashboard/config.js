@@ -35,3 +35,4 @@ const CONFIG = {
   // Kostenlos: https://openweathermap.org/api (1000 calls/Tag gratis)
   OPENWEATHER_API_KEY: "00e7bb28c3877b28d2bbd88dfed06278",
 };
+/* Cache bust: 1769510777 */
