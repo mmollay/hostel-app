@@ -13,7 +13,8 @@
     "weather": "Weather",
     "recommendations": "Tips",
     "energy": "Energy",
-    "wifi": "WiFi"
+    "wifi": "WiFi",
+    "costs": "Costs"
   },
   "welcome": {
     "greeting": {
