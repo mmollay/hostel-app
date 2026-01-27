@@ -88,6 +88,8 @@
     "laundry": "Washing machine",
     "gas": "Gas",
     "water": "Water",
+    "hotWater": "Hot water",
+    "utilities": "Utilities",
     "notIncludedTitle": "Additional costs",
     "heatingTitle": "Electric wall heaters",
     "heatingDesc": "Charged based on usage (see energy display)",

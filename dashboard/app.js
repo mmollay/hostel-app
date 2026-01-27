@@ -96,6 +96,11 @@ const GUEST_DATA_KEY = "hostel_guest_data";
 const NIGHT_MODE_KEY = "hostel_night_mode";
 const CATEGORY_KEY = "hostel_recommendations_category";
 
+// Pagination für Empfehlungen
+let currentRecommendationsPage = 1;
+const ITEMS_PER_PAGE = 4;
+let allRecommendations = [];
+
 // Location wird dynamisch aus Adresse geocoded (Default: Hollenthon)
 let LOCATION = {
   lat: 47.5833,
@@ -1974,7 +1979,7 @@ async function fetchNearbyPlaces() {
     const sortedPlaces = filteredPlaces
       .filter((p) => p.drivingDistance && p.drivingDistance <= maxDistanceKm) // Umkreis-Filter
       .sort((a, b) => a.drivingDistance - b.drivingDistance)
-      .slice(0, 10); // Top 10 nächstgelegene
+      .slice(0, 20); // Top 20 nächstgelegene (für Pagination)
 
     if (sortedPlaces.length === 0) {
       showRecommendationsError(
@@ -2054,15 +2059,27 @@ async function enrichPlacesWithDrivingDistance(places) {
 }
 
 /**
- * Empfehlungen anzeigen
+ * Empfehlungen anzeigen (mit Pagination)
  */
-function displayRecommendations(places) {
+function displayRecommendations(places, resetPage = true) {
   const listEl = document.getElementById("recommendationsList");
   if (!listEl) return;
 
+  // Speichere alle Empfehlungen für Pagination
+  if (resetPage) {
+    allRecommendations = places;
+    currentRecommendationsPage = 1;
+  }
+
+  // Berechne Pagination
+  const totalPages = Math.ceil(allRecommendations.length / ITEMS_PER_PAGE);
+  const startIdx = (currentRecommendationsPage - 1) * ITEMS_PER_PAGE;
+  const endIdx = startIdx + ITEMS_PER_PAGE;
+  const pagePlaces = allRecommendations.slice(startIdx, endIdx);
+
   listEl.innerHTML = "";
 
-  places.forEach((place) => {
+  pagePlaces.forEach((place) => {
     const item = document.createElement("div");
     item.className = "recommendation-item";
 
@@ -2131,7 +2148,57 @@ function displayRecommendations(places) {
     listEl.appendChild(item);
   });
 
+  // Pagination Controls hinzufügen (totalPages bereits oben berechnet)
+  if (totalPages > 1) {
+    const paginationEl = document.createElement("div");
+    paginationEl.className = "recommendations-pagination";
+    paginationEl.style.cssText = "display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 16px; padding: 12px 0;";
+    
+    // Zurück-Button
+    const prevDisabled = currentRecommendationsPage === 1;
+    const prevBtn = `<button onclick="changeRecommendationsPage(-1)" ${prevDisabled ? 'disabled' : ''} 
+      style="padding: 8px 16px; border-radius: 8px; border: 1px solid ${prevDisabled ? 'var(--border-color)' : 'var(--forest)'}; 
+      background: ${prevDisabled ? 'transparent' : 'rgba(156, 175, 136, 0.1)'}; color: ${prevDisabled ? 'var(--text-muted)' : 'var(--forest)'}; 
+      cursor: ${prevDisabled ? 'not-allowed' : 'pointer'}; font-weight: 500; display: flex; align-items: center; gap: 4px;">
+      <i data-lucide="chevron-left" style="width: 16px; height: 16px;"></i>
+    </button>`;
+    
+    // Seiten-Info
+    const pageInfo = `<span style="font-size: 0.9rem; color: var(--text-muted);">${currentRecommendationsPage} / ${totalPages}</span>`;
+    
+    // Weiter-Button
+    const nextDisabled = currentRecommendationsPage === totalPages;
+    const nextBtn = `<button onclick="changeRecommendationsPage(1)" ${nextDisabled ? 'disabled' : ''} 
+      style="padding: 8px 16px; border-radius: 8px; border: 1px solid ${nextDisabled ? 'var(--border-color)' : 'var(--forest)'}; 
+      background: ${nextDisabled ? 'transparent' : 'rgba(156, 175, 136, 0.1)'}; color: ${nextDisabled ? 'var(--text-muted)' : 'var(--forest)'}; 
+      cursor: ${nextDisabled ? 'not-allowed' : 'pointer'}; font-weight: 500; display: flex; align-items: center; gap: 4px;">
+      <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
+    </button>`;
+    
+    paginationEl.innerHTML = prevBtn + pageInfo + nextBtn;
+    listEl.appendChild(paginationEl);
+  }
+
   lucide.createIcons();
+}
+
+/**
+ * Seite wechseln bei Empfehlungen (global für onclick)
+ */
+window.changeRecommendationsPage = function(delta) {
+  const totalPages = Math.ceil(allRecommendations.length / ITEMS_PER_PAGE);
+  const newPage = currentRecommendationsPage + delta;
+  
+  if (newPage >= 1 && newPage <= totalPages) {
+    currentRecommendationsPage = newPage;
+    displayRecommendations(null, false);
+    
+    // Scroll zur Empfehlungen-Karte
+    const card = document.getElementById("recommendationsCard");
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
 }
 
 /**

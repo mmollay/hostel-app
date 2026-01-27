@@ -1160,6 +1160,11 @@ async function updateHostelSettings(request, env, corsHeaders) {
     website: body.website || "",
     tagline: body.tagline || "",
     tagline_en: body.tagline_en || "",
+    // WLAN-Einstellungen
+    wifi1Name: body.wifi1Name || "Hostel Power",
+    wifi1Password: body.wifi1Password || "hostel21",
+    wifi2Name: body.wifi2Name || "Hostel",
+    wifi2Password: body.wifi2Password || "hostel21",
   };
 
   const settings_json = JSON.stringify(settingsObj);

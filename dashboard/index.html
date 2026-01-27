@@ -2348,6 +2348,14 @@
                                 <i data-lucide="droplets" style="width: 16px; height: 16px; color: var(--forest);"></i>
                                 <span style="font-size: 0.85rem;" data-i18n="costs.water">Wasser</span>
                             </div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: rgba(156, 175, 136, 0.1); border-radius: 8px;">
+                                <i data-lucide="thermometer" style="width: 16px; height: 16px; color: var(--forest);"></i>
+                                <span style="font-size: 0.85rem;" data-i18n="costs.hotWater">Warmwasser</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: rgba(156, 175, 136, 0.1); border-radius: 8px;">
+                                <i data-lucide="building-2" style="width: 16px; height: 16px; color: var(--forest);"></i>
+                                <span style="font-size: 0.85rem;" data-i18n="costs.utilities">Betriebskosten</span>
+                            </div>
                         </div>
                     </div>
                     
@@ -2499,41 +2507,70 @@
                     <div class="card-icon"><i data-lucide="wifi"></i></div>
                     <div>
                         <h3 class="card-title" data-i18n="wifi.cardTitle">WLAN-Zugang</h3>
-                        <p class="card-subtitle" style="font-size: 0.9rem; color: var(--text-muted);">Passwort: <strong style="color: var(--forest);">Hostel 21</strong></p>
+                        <p class="card-subtitle" style="font-size: 0.9rem; color: var(--text-muted);">Tippe für QR-Code zum Verbinden</p>
                     </div>
                 </div>
                 <div class="wifi-content" style="padding: 0;">
-                    <!-- Kompakte WLAN Liste -->
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <!-- WLAN 1: Hostel Power -->
-                        <div class="wifi-item" onclick="toggleWifiQR('wifi1')" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(156, 175, 136, 0.08); border-radius: 12px; cursor: pointer; transition: background 0.2s;">
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <i data-lucide="signal" style="width: 20px; height: 20px; color: var(--forest);"></i>
-                                <span style="font-weight: 500; color: var(--forest);">Hostel Power</span>
-                                <span style="font-size: 0.75rem; padding: 2px 8px; background: var(--forest); color: white; border-radius: 10px;">Empfohlen</span>
+                    <!-- Großzügige WLAN Buttons -->
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <!-- WLAN 1: Hostel Power (Empfohlen) -->
+                        <div class="wifi-button" onclick="toggleWifiQR('wifi1')" style="padding: 20px; background: linear-gradient(135deg, rgba(156, 175, 136, 0.15), rgba(156, 175, 136, 0.05)); border: 2px solid rgba(156, 175, 136, 0.3); border-radius: 16px; cursor: pointer; transition: all 0.3s;">
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                <div style="display: flex; align-items: center; gap: 16px;">
+                                    <div style="width: 48px; height: 48px; background: var(--forest); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                        <i data-lucide="wifi" style="width: 24px; height: 24px; color: white;"></i>
+                                    </div>
+                                    <div>
+                                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                            <span style="font-size: 1.1rem; font-weight: 600; color: var(--forest);">Hostel Power</span>
+                                            <span style="font-size: 0.7rem; padding: 3px 10px; background: var(--forest); color: white; border-radius: 12px; font-weight: 500;">Empfohlen</span>
+                                        </div>
+                                        <div style="font-size: 0.95rem; color: var(--text-muted);">
+                                            Passwort: <strong style="color: var(--text-main); letter-spacing: 0.5px;">hostel21</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; color: var(--forest);">
+                                    <i data-lucide="qr-code" style="width: 22px; height: 22px;"></i>
+                                    <i data-lucide="chevron-down" id="wifi1-chevron" style="width: 20px; height: 20px; transition: transform 0.3s;"></i>
+                                </div>
                             </div>
-                            <i data-lucide="chevron-down" id="wifi1-chevron" style="width: 20px; height: 20px; color: var(--text-muted); transition: transform 0.3s;"></i>
                         </div>
-                        <div id="wifi1-qr" style="display: none; text-align: center; padding: 16px; background: rgba(156, 175, 136, 0.05); border-radius: 12px; margin-top: -4px;">
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=WIFI:S:Hostel%20Power;T:WPA;P:Hostel%2021;;"
+                        <div id="wifi1-qr" style="display: none; text-align: center; padding: 24px; background: white; border-radius: 16px; margin-top: -8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=WIFI:S:Hostel%20Power;T:WPA;P:hostel21;;"
                                  alt="WiFi QR Code - Hostel Power"
-                                 style="width: 150px; height: 150px; border-radius: 8px; margin: 0 auto;">
-                            <p style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted);">Mit Kamera scannen</p>
+                                 style="width: 180px; height: 180px; border-radius: 12px; margin: 0 auto;">
+                            <p style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted);">📱 Mit Kamera scannen zum automatischen Verbinden</p>
                         </div>
 
-                        <!-- WLAN 2: Hostel -->
-                        <div class="wifi-item" onclick="toggleWifiQR('wifi2')" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(156, 175, 136, 0.08); border-radius: 12px; cursor: pointer; transition: background 0.2s;">
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <i data-lucide="signal" style="width: 20px; height: 20px; color: var(--sage-dark);"></i>
-                                <span style="font-weight: 500; color: var(--sage-dark);">Hostel</span>
+                        <!-- WLAN 2: Hostel (Alternativ) -->
+                        <div class="wifi-button" onclick="toggleWifiQR('wifi2')" style="padding: 20px; background: rgba(196, 164, 132, 0.08); border: 2px solid rgba(196, 164, 132, 0.2); border-radius: 16px; cursor: pointer; transition: all 0.3s;">
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                <div style="display: flex; align-items: center; gap: 16px;">
+                                    <div style="width: 48px; height: 48px; background: var(--sage-dark); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                        <i data-lucide="wifi" style="width: 24px; height: 24px; color: white;"></i>
+                                    </div>
+                                    <div>
+                                        <div style="margin-bottom: 4px;">
+                                            <span style="font-size: 1.1rem; font-weight: 600; color: var(--sage-dark);">Hostel</span>
+                                            <span style="font-size: 0.75rem; color: var(--text-muted); margin-left: 8px;">Alternativ</span>
+                                        </div>
+                                        <div style="font-size: 0.95rem; color: var(--text-muted);">
+                                            Passwort: <strong style="color: var(--text-main); letter-spacing: 0.5px;">hostel21</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; color: var(--sage-dark);">
+                                    <i data-lucide="qr-code" style="width: 22px; height: 22px;"></i>
+                                    <i data-lucide="chevron-down" id="wifi2-chevron" style="width: 20px; height: 20px; transition: transform 0.3s;"></i>
+                                </div>
                             </div>
-                            <i data-lucide="chevron-down" id="wifi2-chevron" style="width: 20px; height: 20px; color: var(--text-muted); transition: transform 0.3s;"></i>
                         </div>
-                        <div id="wifi2-qr" style="display: none; text-align: center; padding: 16px; background: rgba(156, 175, 136, 0.05); border-radius: 12px; margin-top: -4px;">
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=WIFI:S:Hostel;T:WPA;P:Hostel%2021;;"
+                        <div id="wifi2-qr" style="display: none; text-align: center; padding: 24px; background: white; border-radius: 16px; margin-top: -8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=WIFI:S:Hostel;T:WPA;P:hostel21;;"
                                  alt="WiFi QR Code - Hostel"
-                                 style="width: 150px; height: 150px; border-radius: 8px; margin: 0 auto;">
-                            <p style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted);">Mit Kamera scannen</p>
+                                 style="width: 180px; height: 180px; border-radius: 12px; margin: 0 auto;">
+                            <p style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted);">📱 Mit Kamera scannen zum automatischen Verbinden</p>
                         </div>
                     </div>
                 </div>

@@ -39,6 +39,9 @@ const AdminUI = {
     // Admin Button (link to /admin)
     this.createAdminButton();
     
+    // Edit Mode Toggle Button
+    this.createEditButton();
+    
     // Admin Login Modal (hidden link in footer)
     this.createAdminLoginModal();
     
@@ -69,6 +72,88 @@ const AdminUI = {
     
     // Insert at beginning
     headerActions.insertBefore(btn, headerActions.firstChild);
+    
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+  },
+
+  /**
+   * Create Edit Mode Toggle Button
+   */
+  createEditButton() {
+    const headerActions = document.querySelector('.header-actions');
+    if (!headerActions) return;
+
+    const btn = document.createElement('button');
+    btn.id = 'editModeBtn';
+    btn.className = 'guest-login-btn edit-mode';
+    btn.title = 'Inline-Bearbeitung aktivieren';
+    btn.style.display = 'none'; // Hidden by default
+    btn.style.background = 'rgba(59, 130, 246, 0.3)';
+    btn.style.borderColor = 'rgba(59, 130, 246, 0.5)';
+    btn.innerHTML = `
+      <i data-lucide="edit-3"></i>
+      <span>Bearbeiten</span>
+    `;
+    
+    btn.addEventListener('click', () => this.toggleEditMode());
+    
+    // Insert after admin button
+    const adminBtn = document.getElementById('adminAreaBtn');
+    if (adminBtn && adminBtn.nextSibling) {
+      headerActions.insertBefore(btn, adminBtn.nextSibling);
+    } else {
+      headerActions.insertBefore(btn, headerActions.firstChild);
+    }
+    
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+  },
+
+  /**
+   * Toggle Edit Mode for Inline Editor
+   */
+  toggleEditMode() {
+    // Initialize InlineEditor if not already
+    if (typeof InlineEditor !== 'undefined' && !InlineEditor.initialized) {
+      InlineEditor.init();
+    }
+    
+    // Toggle edit mode
+    if (typeof InlineEditor !== 'undefined') {
+      InlineEditor.toggleEditMode();
+      this.updateEditButton(InlineEditor.editMode);
+    }
+  },
+
+  /**
+   * Update Edit Button state
+   */
+  updateEditButton(isEditing) {
+    const btn = document.getElementById('editModeBtn');
+    if (!btn) return;
+    
+    if (isEditing) {
+      btn.classList.add('active');
+      btn.style.background = 'rgba(34, 197, 94, 0.4)';
+      btn.style.borderColor = 'rgba(34, 197, 94, 0.6)';
+      btn.innerHTML = `
+        <i data-lucide="eye"></i>
+        <span>Vorschau</span>
+      `;
+      btn.title = 'Zurück zur Vorschau';
+    } else {
+      btn.classList.remove('active');
+      btn.style.background = 'rgba(59, 130, 246, 0.3)';
+      btn.style.borderColor = 'rgba(59, 130, 246, 0.5)';
+      btn.innerHTML = `
+        <i data-lucide="edit-3"></i>
+        <span>Bearbeiten</span>
+      `;
+      btn.title = 'Inline-Bearbeitung aktivieren';
+    }
     
     if (typeof lucide !== 'undefined') {
       lucide.createIcons();
@@ -191,14 +276,21 @@ const AdminUI = {
    */
   showAdminUI() {
     const adminBtn = document.getElementById('adminAreaBtn');
+    const editBtn = document.getElementById('editModeBtn');
     // Don't show indicator bar - redundant with admin button
     // const indicator = document.getElementById('adminIndicator');
     
     if (adminBtn) adminBtn.style.display = 'flex';
+    if (editBtn) editBtn.style.display = 'flex';
     // Keep guest login button visible for testing
     // if (indicator) indicator.style.display = 'block';
     
     document.body.classList.add('admin-logged-in');
+    
+    // Initialize InlineEditor for admin
+    if (typeof InlineEditor !== 'undefined') {
+      InlineEditor.init();
+    }
     
     if (typeof lucide !== 'undefined') {
       lucide.createIcons();
@@ -210,10 +302,12 @@ const AdminUI = {
    */
   hideAdminUI() {
     const adminBtn = document.getElementById('adminAreaBtn');
+    const editBtn = document.getElementById('editModeBtn');
     const indicator = document.getElementById('adminIndicator');
     const guestBtn = document.getElementById('guestLoginBtn');
     
     if (adminBtn) adminBtn.style.display = 'none';
+    if (editBtn) editBtn.style.display = 'none';
     if (indicator) indicator.style.display = 'none';
     // Show guest login button again
     if (guestBtn) guestBtn.style.display = 'flex';

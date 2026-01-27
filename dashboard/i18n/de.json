@@ -88,6 +88,8 @@
     "laundry": "Waschmaschine",
     "gas": "Gas",
     "water": "Wasser",
+    "hotWater": "Warmwasser",
+    "utilities": "Betriebskosten",
     "notIncludedTitle": "Zusatzkosten",
     "heatingTitle": "Elektro-Wandheizung",
     "heatingDesc": "Wird nach Verbrauch berechnet (siehe Energie-Anzeige)",
