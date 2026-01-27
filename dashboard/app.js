@@ -805,6 +805,12 @@ function updatePriceDisplay() {
   if (priceEl) {
     priceEl.textContent = cents;
   }
+  
+  // Kurtaxe-Betrag aktualisieren
+  const kurtaxeEl = document.getElementById("kurtaxeAmount");
+  if (kurtaxeEl && settings.kurtaxePerPersonDay) {
+    kurtaxeEl.textContent = `€${settings.kurtaxePerPersonDay.toFixed(2).replace('.', ',')}`;
+  }
 }
 
 /**

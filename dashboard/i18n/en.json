@@ -261,5 +261,10 @@
     "home": "Home",
     "weather": "Weather",
     "nearby": "Nearby"
+  },
+  "kurtaxe": {
+    "title": "Local Tax",
+    "description": "The local tax (Kurtaxe) is a statutory levy and is paid directly to the municipality.",
+    "perPersonNight": "per person / night"
   }
 }

@@ -261,5 +261,13 @@
     "home": "Start",
     "weather": "Wetter",
     "nearby": "Umgebung"
+  },
+  "kurtaxe": {
+    "title": "Ortstaxe",
+    "description": {
+      "du": "Die Ortstaxe (Kurtaxe) ist eine gesetzliche Abgabe und wird direkt an die Gemeinde abgeführt.",
+      "sie": "Die Ortstaxe (Kurtaxe) ist eine gesetzliche Abgabe und wird direkt an die Gemeinde abgeführt."
+    },
+    "perPersonNight": "pro Person / Nacht"
   }
 }
