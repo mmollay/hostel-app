@@ -557,6 +557,10 @@ async function checkDayReset() {
   const today = new Date().toDateString();
 
   if (energyData.lastReset !== today) {
+    // NEUER TAG: todayStart zurücksetzen damit er beim nächsten fetchData neu gesetzt wird
+    energyData.todayStart = null;
+    energyData.todayEnergy = 0;
+    energyData.lastReset = today;
     // Daten aus DB neu laden (neuer Tag)
     await loadEnergyFromDB();
   }
