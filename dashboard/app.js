@@ -360,10 +360,19 @@ function updateStayEnergyUI() {
     durationEl.textContent = stayEnergyData.stayDays;
   }
   
-  // Durchschnitt pro Tag
+  // Durchschnitt pro Tag (kWh)
   const avgEl = document.getElementById("stayAvgEnergy");
   if (avgEl) {
     avgEl.textContent = formatNumber(stayEnergyData.avgPerDay, 2);
+  }
+  
+  // Durchschnitt Kosten pro Tag (€)
+  const avgCostEl = document.getElementById("stayAvgCost");
+  if (avgCostEl) {
+    const avgCostPerDay = stayEnergyData.stayDays > 0 
+      ? stayEnergyData.totalCost / stayEnergyData.stayDays 
+      : 0;
+    avgCostEl.textContent = formatNumber(avgCostPerDay, 2);
   }
   
   // Durchschnitt auch im Info-Bereich anzeigen
