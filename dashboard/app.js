@@ -688,11 +688,23 @@ function updateUI(status) {
   const totalEnergy = status.total_act_energy || 0;
 
   // Tagesenergie berechnen
+  // WICHTIG: Plausibilitätsprüfung - max. 100 kWh/Tag für Tiny House realistisch
+  const MAX_DAILY_KWH = 100;
+  
   if (energyData.todayStart === null) {
     energyData.todayStart = totalEnergy;
   }
+  
+  let calculatedEnergy = totalEnergy - energyData.todayStart;
+  
+  // Plausibilitätsprüfung: Wenn Wert negativ oder unrealistisch hoch, todayStart resetten
+  if (calculatedEnergy < 0 || calculatedEnergy > MAX_DAILY_KWH) {
+    console.warn(`[Energy] Unrealistischer Wert: ${calculatedEnergy.toFixed(2)} kWh - Reset todayStart`);
+    energyData.todayStart = totalEnergy;
+    calculatedEnergy = 0;
+  }
 
-  energyData.todayEnergy = Math.max(0, totalEnergy - energyData.todayStart);
+  energyData.todayEnergy = calculatedEnergy;
 
   // Kosten berechnen mit Server-Preis
   const pricePerKwh = settings.pricePerKwh;
