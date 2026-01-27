@@ -375,33 +375,21 @@ export default {
       
       const cost = energyKwh * pricePerKwh;
       
-      // In DB speichern - NUR wenn noch kein manueller Wert vorhanden
-      // (energy_kwh = 0 bedeutet: noch keine Daten, darf überschrieben werden)
-      if (!existing || existing.energy_kwh === 0) {
-        await env.DB.prepare(
-          `INSERT INTO energy_data (hostel_id, date, energy_kwh, cost, peak_power, shelly_total_start, updated_at)
-           VALUES (?, ?, ?, ?, ?, ?, unixepoch())
-           ON CONFLICT(hostel_id, date)
-           DO UPDATE SET
-             energy_kwh = excluded.energy_kwh,
-             cost = excluded.cost,
-             peak_power = CASE WHEN excluded.peak_power > peak_power THEN excluded.peak_power ELSE peak_power END,
-             shelly_total_start = COALESCE(shelly_total_start, excluded.shelly_total_start),
-             updated_at = unixepoch()`
-        ).bind(HOSTEL_ID, today, energyKwh, cost, totalPower, todayStart).run();
-        
-        console.log(`[Cron] Saved: ${today} - ${energyKwh.toFixed(2)} kWh, €${cost.toFixed(2)}, peak ${totalPower}W`);
-      } else {
-        // Nur Peak Power updaten, Rest bleibt
-        await env.DB.prepare(
-          `UPDATE energy_data SET 
-             peak_power = CASE WHEN ? > peak_power THEN ? ELSE peak_power END,
-             updated_at = unixepoch()
-           WHERE hostel_id = ? AND date = ?`
-        ).bind(totalPower, totalPower, HOSTEL_ID, today).run();
-        
-        console.log(`[Cron] Existing data kept: ${today} - only peak_power updated`);
-      }
+      // In DB speichern - IMMER aktuellen Wert updaten!
+      // Der aktuelle Tagesverbrauch muss bei jedem Cron-Lauf aktualisiert werden.
+      await env.DB.prepare(
+        `INSERT INTO energy_data (hostel_id, date, energy_kwh, cost, peak_power, shelly_total_start, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, unixepoch())
+         ON CONFLICT(hostel_id, date)
+         DO UPDATE SET
+           energy_kwh = excluded.energy_kwh,
+           cost = excluded.cost,
+           peak_power = CASE WHEN excluded.peak_power > peak_power THEN excluded.peak_power ELSE peak_power END,
+           shelly_total_start = COALESCE(shelly_total_start, excluded.shelly_total_start),
+           updated_at = unixepoch()`
+      ).bind(HOSTEL_ID, today, energyKwh, cost, totalPower, todayStart).run();
+      
+      console.log(`[Cron] Saved: ${today} - ${energyKwh.toFixed(2)} kWh, €${cost.toFixed(2)}, peak ${totalPower}W`);
       
       // NEU: Stündlichen Snapshot speichern (wird nie überschrieben!)
       const timestamp = Math.floor(now.getTime() / 1000);
