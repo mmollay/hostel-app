@@ -360,6 +360,9 @@ function updateStayEnergyUI() {
     totalCostEl.textContent = formatNumber(stayEnergyData.totalCost, 2);
   }
   
+  // Info-Bar unter Header aktualisieren
+  updateEnergyInfoBar();
+  
   // Aufenthaltsdauer
   const durationEl = document.getElementById("stayDuration");
   if (durationEl) {
@@ -389,6 +392,52 @@ function updateStayEnergyUI() {
   
   // Tages-Liste vorbereiten
   displayStayDays();
+}
+
+/**
+ * Energie-Info-Bar unter Header aktualisieren
+ */
+function updateEnergyInfoBar() {
+  const infoBar = document.getElementById("energyInfoBar");
+  const energyEl = document.getElementById("infoBarEnergy");
+  const costEl = document.getElementById("infoBarCost");
+  
+  if (!infoBar || !guestToken) return;
+  
+  // Nur anzeigen wenn Gast eingeloggt
+  infoBar.style.display = "block";
+  
+  // Werte aktualisieren
+  if (energyEl) {
+    energyEl.textContent = formatNumber(stayEnergyData.totalEnergy || 0, 1);
+  }
+  if (costEl) {
+    costEl.textContent = formatNumber(stayEnergyData.totalCost || 0, 2);
+  }
+  
+  // Lucide Icons neu initialisieren
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+}
+
+/**
+ * Zu den Energie-Details navigieren (bei Klick auf Info-Bar)
+ */
+function showEnergyDetails() {
+  // Auf Mobile: Zum Contact-Tab wechseln (wo Energy-Card ist)
+  if (window.innerWidth <= 640 && typeof switchTab === 'function') {
+    switchTab('contact');
+  }
+  
+  // Zur Energy-Card scrollen
+  const energyCard = document.getElementById("energyCard");
+  if (energyCard) {
+    energyCard.style.display = "block"; // Sicherstellen dass sichtbar
+    setTimeout(() => {
+      energyCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  }
 }
 
 /**
@@ -1240,6 +1289,10 @@ function updateGuestUI() {
   if (recommendationsCard)
     recommendationsCard.style.display = guestToken ? "block" : "none";
   if (wifiCard) wifiCard.style.display = guestToken ? "block" : "none";
+  
+  // Energie-Info-Bar unter Header
+  const energyInfoBar = document.getElementById("energyInfoBar");
+  if (energyInfoBar) energyInfoBar.style.display = guestToken ? "block" : "none";
 
   // WiFi-Infos in "Wichtige Infos" nur für eingeloggte Gäste anzeigen
   if (wifiInfoName) wifiInfoName.style.display = guestToken ? "block" : "none";

@@ -735,6 +735,54 @@
             color: var(--text);
         }
 
+        /* Energie-Info-Bar */
+        .energy-info-bar {
+            background: linear-gradient(135deg, var(--sage) 0%, var(--sage-dark) 100%);
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+        
+        .energy-info-bar:hover {
+            background: linear-gradient(135deg, var(--sage-dark) 0%, var(--forest) 100%);
+        }
+        
+        .energy-info-bar:active {
+            transform: scale(0.99);
+        }
+        
+        .energy-info-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .energy-info-content > i:first-child {
+            width: 18px;
+            height: 18px;
+            opacity: 0.9;
+        }
+        
+        .energy-info-text {
+            letter-spacing: 0.3px;
+        }
+        
+        .energy-info-arrow {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+            margin-left: 4px;
+        }
+
         /* Footer */
         .footer {
             text-align: center;
@@ -2358,6 +2406,17 @@
             </button>
         </div>
     </header>
+
+    <!-- Energie-Info-Bar (nur für eingeloggte Gäste) -->
+    <div class="energy-info-bar" id="energyInfoBar" style="display: none;" onclick="showEnergyDetails()">
+        <div class="energy-info-content">
+            <i data-lucide="zap"></i>
+            <span class="energy-info-text">
+                <span id="infoBarEnergy">--</span> kWh • <span id="infoBarCost">--</span> €
+            </span>
+            <i data-lucide="chevron-right" class="energy-info-arrow"></i>
+        </div>
+    </div>
 
     <!-- Main Content -->
     <main class="main">
