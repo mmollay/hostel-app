@@ -78,6 +78,21 @@
     "parking": "Parken",
     "parkingValue": "Kostenlos"
   },
+  "costs": {
+    "title": "Was ist inklusive?",
+    "subtitle": "Transparente Kostenübersicht",
+    "includedTitle": "Im Preis inklusive",
+    "pellets": "Pellets",
+    "wood": "Holz",
+    "electricity": "Haushaltsstrom",
+    "laundry": "Waschmaschine",
+    "gas": "Gas",
+    "water": "Wasser",
+    "notIncludedTitle": "Zusatzkosten",
+    "heatingTitle": "Elektro-Wandheizung",
+    "heatingDesc": "Wird nach Verbrauch berechnet (siehe Energie-Anzeige)",
+    "airbnbNote": "Diese Informationen sind auch in unserer Airbnb-Beschreibung aufgeführt – keine Überraschungen!"
+  },
   "amenities": {
     "title": "Annehmlichkeiten",
     "subtitle": {

@@ -2290,16 +2290,6 @@
                         <div class="value" data-i18n="info.petsValue">Erlaubt</div>
                     </div>
                     <div class="info-item">
-                        <span class="icon"><i data-lucide="washing-machine"></i></span>
-                        <div class="label" data-i18n="info.laundry">Waschmaschine</div>
-                        <div class="value" data-i18n="info.laundryValue">Kostenlos</div>
-                    </div>
-                    <div class="info-item">
-                        <span class="icon"><i data-lucide="package-check"></i></span>
-                        <div class="label" data-i18n="info.included">Inklusive</div>
-                        <div class="value" data-i18n="info.includedValue">Betriebskosten, Gas, Holz & Pellets</div>
-                    </div>
-                    <div class="info-item">
                         <span class="icon"><i data-lucide="cigarette-off"></i></span>
                         <div class="label" data-i18n="info.smoking">Rauchen</div>
                         <div class="value" data-i18n="info.smokingValue">Verboten</div>
@@ -2308,6 +2298,75 @@
                         <span class="icon"><i data-lucide="car"></i></span>
                         <div class="label" data-i18n="info.parking">Parken</div>
                         <div class="value" data-i18n="info.parkingValue">Kostenlos</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kosten-Übersicht Card -->
+            <div class="card" id="costsOverviewCard">
+                <div class="card-header">
+                    <div class="card-icon"><i data-lucide="wallet"></i></div>
+                    <div>
+                        <h3 class="card-title" data-i18n="costs.title">Was ist inklusive?</h3>
+                        <p class="card-subtitle" data-i18n="costs.subtitle">Transparente Kostenübersicht</p>
+                    </div>
+                </div>
+                <div style="padding: 0 20px 20px;">
+                    <!-- Inklusive -->
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-size: 0.85rem; font-weight: 600; color: var(--forest); margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                            <i data-lucide="check-circle" style="width: 16px; height: 16px;"></i>
+                            <span data-i18n="costs.includedTitle">Im Preis inklusive</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: rgba(156, 175, 136, 0.1); border-radius: 8px;">
+                                <i data-lucide="flame" style="width: 16px; height: 16px; color: var(--forest);"></i>
+                                <span style="font-size: 0.85rem;" data-i18n="costs.pellets">Pellets</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: rgba(156, 175, 136, 0.1); border-radius: 8px;">
+                                <i data-lucide="tree-pine" style="width: 16px; height: 16px; color: var(--forest);"></i>
+                                <span style="font-size: 0.85rem;" data-i18n="costs.wood">Holz</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: rgba(156, 175, 136, 0.1); border-radius: 8px;">
+                                <i data-lucide="plug" style="width: 16px; height: 16px; color: var(--forest);"></i>
+                                <span style="font-size: 0.85rem;" data-i18n="costs.electricity">Haushaltsstrom</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: rgba(156, 175, 136, 0.1); border-radius: 8px;">
+                                <i data-lucide="washing-machine" style="width: 16px; height: 16px; color: var(--forest);"></i>
+                                <span style="font-size: 0.85rem;" data-i18n="costs.laundry">Waschmaschine</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: rgba(156, 175, 136, 0.1); border-radius: 8px;">
+                                <i data-lucide="fuel" style="width: 16px; height: 16px; color: var(--forest);"></i>
+                                <span style="font-size: 0.85rem;" data-i18n="costs.gas">Gas</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: rgba(156, 175, 136, 0.1); border-radius: 8px;">
+                                <i data-lucide="droplets" style="width: 16px; height: 16px; color: var(--forest);"></i>
+                                <span style="font-size: 0.85rem;" data-i18n="costs.water">Wasser</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Nicht inklusive -->
+                    <div style="margin-bottom: 16px;">
+                        <div style="font-size: 0.85rem; font-weight: 600; color: var(--accent); margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                            <i data-lucide="info" style="width: 16px; height: 16px;"></i>
+                            <span data-i18n="costs.notIncludedTitle">Zusatzkosten</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; padding: 12px; background: rgba(196, 164, 132, 0.1); border-radius: 8px; border-left: 3px solid var(--accent);">
+                            <i data-lucide="heater" style="width: 18px; height: 18px; color: var(--accent);"></i>
+                            <div>
+                                <span style="font-size: 0.85rem; font-weight: 500;" data-i18n="costs.heatingTitle">Elektro-Wandheizung</span>
+                                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;" data-i18n="costs.heatingDesc">Wird nach Verbrauch berechnet (siehe Energie-Anzeige)</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Airbnb Hinweis -->
+                    <div style="padding: 12px; background: rgba(0,0,0,0.02); border-radius: 8px; display: flex; align-items: flex-start; gap: 8px;">
+                        <i data-lucide="home" style="width: 16px; height: 16px; color: var(--text-muted); flex-shrink: 0; margin-top: 2px;"></i>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; margin: 0;" data-i18n="costs.airbnbNote">
+                            Diese Informationen sind auch in unserer Airbnb-Beschreibung aufgeführt – keine Überraschungen!
+                        </p>
                     </div>
                 </div>
             </div>
