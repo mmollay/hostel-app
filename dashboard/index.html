@@ -954,19 +954,19 @@
             
             /* Header: Logo + Titel zentriert */
             .header {
+                padding-top: calc(env(safe-area-inset-top) + 56px) !important;
                 padding-bottom: 24px !important;
             }
             
-            /* Zweite Zeile: Buttons unter dem Logo */
+            /* Buttons ganz oben im Safe-Area Bereich */
             .header-actions {
-                position: relative !important;
-                top: auto !important;
-                right: auto !important;
+                position: absolute !important;
+                top: calc(env(safe-area-inset-top) + 8px) !important;
+                left: 12px !important;
+                right: 12px !important;
                 display: flex !important;
-                justify-content: center;
+                justify-content: space-between;
                 align-items: center;
-                gap: 12px;
-                margin-top: 16px;
                 z-index: 200;
             }
 
@@ -2152,11 +2152,12 @@
 
         .mobile-bottom-nav-inner {
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
             align-items: center;
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 0 4px;
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            padding: 0 8px;
         }
 
         .mobile-nav-item {
@@ -2165,9 +2166,9 @@
             align-items: center;
             justify-content: center;
             gap: 2px;
-            /* Größere Touch-Targets (mind. 44x44 für iOS) */
-            padding: 8px 12px;
-            min-width: 56px;
+            /* Gleichmäßig verteilt */
+            flex: 1;
+            padding: 8px 4px;
             min-height: 52px;
             color: var(--text-muted);
             text-decoration: none;
@@ -2175,7 +2176,7 @@
             background: none;
             cursor: pointer;
             transition: all 0.2s ease;
-            border-radius: 12px;
+            border-radius: 10px;
             font-family: inherit;
             -webkit-tap-highlight-color: transparent;
         }
@@ -2202,33 +2203,29 @@
             letter-spacing: 0.01em;
         }
 
-        /* Admin Button in Bottom Nav - deutlich und gut sichtbar */
+        /* Admin Button in Bottom Nav - gleiches Layout wie andere */
         .mobile-nav-item.admin-btn {
             background: linear-gradient(135deg, var(--forest) 0%, var(--sage-dark) 100%);
             color: white;
-            padding: 10px 18px;
-            min-height: 52px;
-            min-width: 52px;
-            border-radius: 14px;
-            box-shadow: 0 2px 8px rgba(45, 74, 62, 0.3);
-            font-weight: 600;
+            flex: 1;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(45, 74, 62, 0.25);
         }
 
         .mobile-nav-item.admin-btn i {
-            width: 26px;
-            height: 26px;
+            width: 22px;
+            height: 22px;
         }
 
         .mobile-nav-item.admin-btn span {
-            font-size: 0.72rem;
-            font-weight: 600;
+            font-size: 0.68rem;
+            font-weight: 500;
         }
 
         .mobile-nav-item.admin-btn:hover,
         .mobile-nav-item.admin-btn:active {
             background: linear-gradient(135deg, var(--sage-dark) 0%, var(--forest) 100%);
             color: white;
-            transform: scale(1.02);
         }
 
         /* Mobile: Bottom Nav IMMER sichtbar auf Mobile */
@@ -2318,12 +2315,20 @@
     <!-- Header -->
     <header class="header">
         <div class="header-actions">
-            <!-- Kompakter Status + Login -->
-            <span class="status-indicator offline" id="statusIndicatorHeader" title="Verbindungsstatus"></span>
+            <!-- Links: Sprachauswahl -->
+            <div class="language-switcher" id="language-switcher">
+                <button class="lang-btn active" data-lang="de" title="Deutsch">DE</button>
+                <button class="lang-btn" data-lang="en" title="English">EN</button>
+            </div>
+            
+            <!-- Rechts: Login -->
             <button class="guest-login-btn" id="guestLoginBtn">
                 <i data-lucide="user"></i>
                 <span data-i18n="header.login">Anmelden</span>
             </button>
+            
+            <!-- Status Indicator (versteckt auf Mobile) -->
+            <span class="status-indicator offline" id="statusIndicatorHeader" title="Verbindungsstatus" style="display: none;"></span>
         </div>
         <div class="header-content">
             <img src="/logo-neu.png" alt="Logo" class="header-logo" loading="lazy" decoding="async">
