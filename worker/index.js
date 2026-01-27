@@ -937,6 +937,7 @@ async function saveEnergyData(request, env, corsHeaders) {
     }
 
     // Upsert: Insert or Update
+    // WICHTIG: shelly_total_start nur setzen wenn noch nicht vorhanden (COALESCE)!
     await env.DB.prepare(
       `INSERT INTO energy_data (hostel_id, date, energy_kwh, cost, peak_power, shelly_total_start, updated_at)
        VALUES (?, ?, ?, ?, ?, ?, unixepoch())
@@ -945,7 +946,7 @@ async function saveEnergyData(request, env, corsHeaders) {
          energy_kwh = excluded.energy_kwh,
          cost = excluded.cost,
          peak_power = CASE WHEN excluded.peak_power > peak_power THEN excluded.peak_power ELSE peak_power END,
-         shelly_total_start = excluded.shelly_total_start,
+         shelly_total_start = COALESCE(shelly_total_start, excluded.shelly_total_start),
          updated_at = unixepoch()`,
     )
       .bind(
