@@ -515,7 +515,9 @@ function loadGuestSession() {
     if (guestToken && storedData) {
       guestData = JSON.parse(storedData);
       updateGuestUI();
+      updateGreeting();
       updateKurtaxeCalculation();
+      console.log('[Guest] Session restored for:', guestData.name);
     }
   } catch (e) {
     guestToken = null;
