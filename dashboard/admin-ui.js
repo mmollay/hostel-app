@@ -56,12 +56,12 @@ const AdminUI = {
     const btn = document.createElement('a');
     btn.id = 'adminAreaBtn';
     btn.href = '/admin';
-    btn.className = 'settings-btn';
+    btn.className = 'admin-btn';
     btn.title = 'Admin-Bereich';
     btn.style.display = 'none'; // Hidden by default
     btn.style.textDecoration = 'none';
     btn.innerHTML = `
-      <i data-lucide="layout-dashboard"></i>
+      <i data-lucide="arrow-left"></i>
       <span>Admin</span>
     `;
     
