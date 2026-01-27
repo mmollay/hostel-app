@@ -1580,20 +1580,21 @@ function updateRecommendationsByWeather(currentWeather) {
   const isSnow = weatherId >= 600 && weatherId < 700;
   const isCold = temp < 10;
 
-  // Kategorie basierend auf Wetter anpassen
-  if (isBadWeather || isSnow || isCold) {
-    // Schlechtes/Kaltes Wetter → Indoor-Aktivitäten
-    currentCategory = "spa"; // Thermen bevorzugen
-    console.log(
-      "☔ Schlechtes Wetter erkannt → Thermen & Indoor-Aktivitäten empfehlen",
-    );
-  } else if (temp >= 20) {
-    // Gutes Wetter → Outdoor-Aktivitäten
-    currentCategory = "tourist_attraction"; // Sehenswürdigkeiten bevorzugen
-    console.log("☀️ Gutes Wetter erkannt → Outdoor-Aktivitäten empfehlen");
+  // Kategorie basierend auf Wetter anpassen - NUR wenn User keine manuelle Auswahl getroffen hat
+  const savedCategory = localStorage.getItem(CATEGORY_KEY);
+  if (!savedCategory || savedCategory === "all") {
+    // User hat keine spezifische Kategorie gewählt → wetterbasierte Empfehlung
+    if (isBadWeather || isSnow || isCold) {
+      // Schlechtes/Kaltes Wetter → Indoor-Aktivitäten empfehlen (aber nicht erzwingen)
+      console.log("☔ Schlechtes Wetter erkannt → Thermen-Empfehlung anzeigen");
+      // Hinweis anzeigen aber Kategorie nicht überschreiben
+    } else if (temp >= 20) {
+      // Gutes Wetter → Outdoor-Aktivitäten empfehlen
+      console.log("☀️ Gutes Wetter erkannt → Outdoor-Empfehlung anzeigen");
+    }
   }
 
-  // Empfehlungen neu laden mit angepasster Kategorie
+  // Empfehlungen neu laden (mit der vom User gewählten Kategorie)
   if (guestToken && CONFIG.GOOGLE_MAPS_API_KEY) {
     fetchNearbyPlaces();
   }
