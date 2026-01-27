@@ -510,24 +510,51 @@ function startAutoRefresh() {
 function loadGuestSession() {
   try {
     // Prüfe localStorage zuerst (persistent), dann sessionStorage (temporär)
-    guestToken = localStorage.getItem(GUEST_TOKEN_KEY) || sessionStorage.getItem(GUEST_TOKEN_KEY);
+    const storedToken = localStorage.getItem(GUEST_TOKEN_KEY) || sessionStorage.getItem(GUEST_TOKEN_KEY);
     const storedData = localStorage.getItem(GUEST_DATA_KEY) || sessionStorage.getItem(GUEST_DATA_KEY);
     
-    console.log('[Guest] loadGuestSession - token exists:', !!guestToken, 'data exists:', !!storedData);
+    console.log('[Guest] loadGuestSession - token exists:', !!storedToken, 'data exists:', !!storedData);
     
-    if (guestToken && storedData) {
-      guestData = JSON.parse(storedData);
-      updateGuestUI();
-      updateGreeting();
-      updateKurtaxeCalculation();
-      console.log('[Guest] Session restored for:', guestData.name);
+    if (storedToken && storedData) {
+      const parsedData = JSON.parse(storedData);
+      // Nur wenn sowohl Token als auch gültige Daten existieren
+      if (parsedData && parsedData.name) {
+        guestToken = storedToken;
+        guestData = parsedData;
+        updateGuestUI();
+        updateGreeting();
+        updateKurtaxeCalculation();
+        console.log('[Guest] Session restored for:', guestData.name);
+      } else {
+        // Ungültige Daten - aufräumen
+        console.log('[Guest] Invalid stored data, clearing session');
+        clearGuestStorage();
+      }
+    } else if (storedToken && !storedData) {
+      // Token ohne Daten = inkonsistenter Zustand
+      console.log('[Guest] Token without data found, clearing');
+      clearGuestStorage();
     } else {
       console.log('[Guest] No stored session found');
     }
   } catch (e) {
+    console.error('[Guest] Error loading session:', e);
     guestToken = null;
     guestData = null;
+    clearGuestStorage();
   }
+}
+
+/**
+ * Guest Storage komplett löschen
+ */
+function clearGuestStorage() {
+  guestToken = null;
+  guestData = null;
+  localStorage.removeItem(GUEST_TOKEN_KEY);
+  localStorage.removeItem(GUEST_DATA_KEY);
+  sessionStorage.removeItem(GUEST_TOKEN_KEY);
+  sessionStorage.removeItem(GUEST_DATA_KEY);
 }
 
 /**
