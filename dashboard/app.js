@@ -1300,7 +1300,7 @@ function updateGreeting() {
     greetingIcon = "moon";
   }
 
-  if (guestToken && guestData) {
+  if (guestToken && guestData && guestData.name) {
     // Personalisierte Anrede mit Titel und Gender
     let salutation = "";
     if (guestData.gender === "weiblich") {
@@ -1314,9 +1314,12 @@ function updateGreeting() {
     const greeting = salutation
       ? `${timeGreeting}, ${salutation} ${name}`
       : `${timeGreeting}, ${name}`;
+    
+    console.log('[Greeting] Personalized:', greeting, 'guestData:', guestData);
 
     // Sicher: Icon via DOM, Text via textContent
     greetingEl.innerHTML = "";
+    greetingEl.removeAttribute("data-i18n"); // Prevent i18n from overriding personalized greeting
     const icon = document.createElement("i");
     icon.setAttribute("data-lucide", greetingIcon);
     icon.style.verticalAlign = "middle";
@@ -1352,6 +1355,7 @@ function updateGreeting() {
   } else {
     // Nicht eingeloggt
     greetingEl.innerHTML = "";
+    greetingEl.setAttribute("data-i18n", "welcome.default"); // Restore i18n for non-logged-in state
     const icon = document.createElement("i");
     icon.setAttribute("data-lucide", greetingIcon);
     icon.style.verticalAlign = "middle";
