@@ -268,6 +268,11 @@
       "du": "Die Ortstaxe (Kurtaxe) ist eine gesetzliche Abgabe und wird direkt an die Gemeinde abgeführt.",
       "sie": "Die Ortstaxe (Kurtaxe) ist eine gesetzliche Abgabe und wird direkt an die Gemeinde abgeführt."
     },
-    "perPersonNight": "pro Person / Nacht"
+    "perPersonNight": "pro Person / Nacht",
+    "yourStay": {
+      "du": "Für deinen Aufenthalt:",
+      "sie": "Für Ihren Aufenthalt:"
+    },
+    "total": "Gesamt:"
   }
 }

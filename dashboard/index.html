@@ -2637,9 +2637,20 @@
                     <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 12px;" data-i18n="kurtaxe.description">
                         Die Ortstaxe (Kurtaxe) ist eine gesetzliche Abgabe und wird direkt an die Gemeinde abgeführt.
                     </p>
-                    <div style="display: flex; align-items: baseline; gap: 6px;">
+                    <div style="display: flex; align-items: baseline; gap: 6px; margin-bottom: 16px;">
                         <span style="font-size: 1.2rem; font-weight: 600; color: var(--forest);" id="kurtaxeAmount">€2,50</span>
                         <span style="font-size: 0.85rem; color: var(--text-muted);" data-i18n="kurtaxe.perPersonNight">pro Person / Nacht</span>
+                    </div>
+                    <!-- Gast-spezifische Berechnung (nur wenn eingeloggt) -->
+                    <div id="kurtaxeCalculation" style="display: none; padding-top: 16px; border-top: 1px solid rgba(0,0,0,0.06);">
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;" data-i18n="kurtaxe.yourStay">Für Ihren Aufenthalt:</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <span style="font-size: 0.85rem; color: var(--text-light);" id="kurtaxeDetails">-- Nächte × -- Personen</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                            <span style="font-size: 0.9rem; font-weight: 500; color: var(--text);" data-i18n="kurtaxe.total">Gesamt:</span>
+                            <span style="font-size: 1.4rem; font-weight: 700; color: var(--forest);" id="kurtaxeTotal">€--,--</span>
+                        </div>
                     </div>
                 </div>
             </div>

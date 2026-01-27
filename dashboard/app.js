@@ -509,6 +509,7 @@ function loadGuestSession() {
     if (guestToken && storedData) {
       guestData = JSON.parse(storedData);
       updateGuestUI();
+      updateKurtaxeCalculation();
     }
   } catch (e) {
     guestToken = null;
@@ -811,6 +812,44 @@ function updatePriceDisplay() {
   if (kurtaxeEl && settings.kurtaxePerPersonDay) {
     kurtaxeEl.textContent = `€${settings.kurtaxePerPersonDay.toFixed(2).replace('.', ',')}`;
   }
+  
+  // Kurtaxe-Berechnung für eingeloggten Gast
+  updateKurtaxeCalculation();
+}
+
+/**
+ * Kurtaxe-Berechnung für eingeloggten Gast
+ */
+function updateKurtaxeCalculation() {
+  const calcSection = document.getElementById("kurtaxeCalculation");
+  if (!calcSection) return;
+  
+  // Nur anzeigen wenn Gast eingeloggt
+  if (!guestData || !guestData.checkIn || !guestData.checkOut) {
+    calcSection.style.display = "none";
+    return;
+  }
+  
+  const checkIn = new Date(guestData.checkIn);
+  const checkOut = new Date(guestData.checkOut);
+  const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+  const persons = guestData.numberOfPersons || 1;
+  const kurtaxeRate = settings.kurtaxePerPersonDay || 2.50;
+  const total = nights * persons * kurtaxeRate;
+  
+  // Details anzeigen
+  const detailsEl = document.getElementById("kurtaxeDetails");
+  if (detailsEl) {
+    detailsEl.textContent = `${nights} ${nights === 1 ? 'Nacht' : 'Nächte'} × ${persons} ${persons === 1 ? 'Person' : 'Personen'}`;
+  }
+  
+  // Gesamtbetrag anzeigen
+  const totalEl = document.getElementById("kurtaxeTotal");
+  if (totalEl) {
+    totalEl.textContent = `€${total.toFixed(2).replace('.', ',')}`;
+  }
+  
+  calcSection.style.display = "block";
 }
 
 /**
@@ -1027,6 +1066,7 @@ async function handleGuestLogin() {
       closeGuestLoginModal();
       updateGuestUI();
       updateGreeting();
+      updateKurtaxeCalculation();
       fetchWeather();
       
       // Aufenthalts-Energie laden
