@@ -296,6 +296,104 @@ export default {
       });
     }
   },
+
+  /**
+   * Scheduled Handler - Cron Job für automatische Datenerfassung
+   * Läuft stündlich und um 23:59 für korrekten Tageswechsel
+   */
+  async scheduled(event, env, ctx) {
+    const now = new Date();
+    const hour = now.getUTCHours();
+    const minute = now.getUTCMinutes();
+    
+    console.log(`[Cron] Running at ${now.toISOString()}`);
+    
+    try {
+      // Shelly-Daten holen
+      const shellyData = await fetchShellyDataForCron(env);
+      if (!shellyData.success) {
+        console.error('[Cron] Failed to fetch Shelly data:', shellyData.error);
+        return;
+      }
+      
+      const totalEnergy = shellyData.total_act_energy || 0;
+      const totalPower = shellyData.total_act_power || 0;
+      
+      // Datum für Europe/Vienna (UTC+1 im Winter, UTC+2 im Sommer)
+      const viennaOffset = 1; // Vereinfacht: Winter = UTC+1
+      const viennaDate = new Date(now.getTime() + viennaOffset * 60 * 60 * 1000);
+      const today = viennaDate.toISOString().split('T')[0];
+      const viennaHour = (hour + viennaOffset) % 24;
+      
+      // Einstellungen laden für Preis
+      const settings = await loadSettings(env);
+      const pricePerKwh = settings.pricePerKwh || 0.30;
+      
+      // Heutigen Eintrag aus DB holen
+      const existing = await env.DB.prepare(
+        "SELECT * FROM energy_data WHERE hostel_id = ? AND date = ?"
+      ).bind(HOSTEL_ID, today).first();
+      
+      let todayStart = existing?.shelly_total_start;
+      let energyKwh = 0;
+      
+      // Um Mitternacht (23:59 Vienna = 22:59 UTC im Winter): 
+      // Den aktuellen Wert als todayStart für MORGEN vorbereiten
+      if (viennaHour === 23 && minute >= 55) {
+        // Speichere den aktuellen Wert - wird morgen als todayStart verwendet
+        const tomorrow = new Date(viennaDate);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowStr = tomorrow.toISOString().split('T')[0];
+        
+        // Morgen mit aktuellem Zählerstand als Start anlegen
+        await env.DB.prepare(
+          `INSERT INTO energy_data (hostel_id, date, energy_kwh, cost, peak_power, shelly_total_start, updated_at)
+           VALUES (?, ?, 0, 0, 0, ?, unixepoch())
+           ON CONFLICT(hostel_id, date) DO UPDATE SET
+             shelly_total_start = CASE WHEN shelly_total_start IS NULL THEN excluded.shelly_total_start ELSE shelly_total_start END,
+             updated_at = unixepoch()`
+        ).bind(HOSTEL_ID, tomorrowStr, totalEnergy).run();
+        
+        console.log(`[Cron] Set tomorrow's todayStart: ${totalEnergy} kWh`);
+      }
+      
+      // Tagesenergie berechnen
+      if (todayStart !== null && todayStart !== undefined) {
+        energyKwh = Math.max(0, totalEnergy - todayStart);
+      } else {
+        // Kein todayStart -> setze aktuellen Wert als Start
+        todayStart = totalEnergy;
+        energyKwh = 0;
+      }
+      
+      // Plausibilitätsprüfung: max 200 kWh/Tag
+      if (energyKwh > 200) {
+        console.warn(`[Cron] Unrealistic value: ${energyKwh} kWh - resetting`);
+        todayStart = totalEnergy;
+        energyKwh = 0;
+      }
+      
+      const cost = energyKwh * pricePerKwh;
+      
+      // In DB speichern
+      await env.DB.prepare(
+        `INSERT INTO energy_data (hostel_id, date, energy_kwh, cost, peak_power, shelly_total_start, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, unixepoch())
+         ON CONFLICT(hostel_id, date)
+         DO UPDATE SET
+           energy_kwh = excluded.energy_kwh,
+           cost = excluded.cost,
+           peak_power = CASE WHEN excluded.peak_power > peak_power THEN excluded.peak_power ELSE peak_power END,
+           shelly_total_start = COALESCE(shelly_total_start, excluded.shelly_total_start),
+           updated_at = unixepoch()`
+      ).bind(HOSTEL_ID, today, energyKwh, cost, totalPower, todayStart).run();
+      
+      console.log(`[Cron] Saved: ${today} - ${energyKwh.toFixed(2)} kWh, €${cost.toFixed(2)}, peak ${totalPower}W`);
+      
+    } catch (error) {
+      console.error('[Cron] Error:', error.message);
+    }
+  },
 };
 
 /**
@@ -318,6 +416,37 @@ async function getShellyData(env, corsHeaders) {
   return new Response(JSON.stringify({ ...data, settings }), {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
+}
+
+/**
+ * Shelly Daten für Cron abrufen (ohne Response-Wrapper)
+ */
+async function fetchShellyDataForCron(env) {
+  try {
+    const response = await fetch(`${env.SHELLY_CLOUD_SERVER}/device/status`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `auth_key=${encodeURIComponent(env.SHELLY_AUTH_KEY)}&id=${encodeURIComponent(env.SHELLY_DEVICE_ID)}`,
+    });
+
+    const data = await response.json();
+    
+    if (!data.isok || !data.data?.device_status) {
+      return { success: false, error: 'Invalid Shelly response' };
+    }
+    
+    const status = data.data.device_status;
+    const emData = status['em:0'] || {};
+    const emDataEnergy = status['emdata:0'] || {};
+    
+    return {
+      success: true,
+      total_act_power: emData.total_act_power || 0,
+      total_act_energy: emDataEnergy.total_act || 0, // Shelly Pro 3EM gibt kWh zurück
+    };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
 }
 
 /**

@@ -23,3 +23,10 @@ id = "58c3a9f2bb9448608271ddef91c4752f"
 binding = "DB"
 database_name = "hostel-app-db"
 database_id = "a0c42bc6-ace1-4254-a0ae-9515ac51532a"
+
+# Cron Triggers für automatische Datenerfassung
+[triggers]
+crons = [
+  "0 * * * *",    # Jede Stunde um :00
+  "59 23 * * *"   # 23:59 Uhr - kurz vor Mitternacht für korrekten todayStart
+]
