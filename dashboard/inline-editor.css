@@ -222,19 +222,45 @@ body.inline-edit-mode .inline-editable:hover::before {
     border-bottom: none;
     justify-content: center;
     padding: 10px 16px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
     gap: 8px;
+    background: white;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.1);
   }
 
   .inline-editor-toolbar button {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
+  }
+
+  /* Edit Toggle Button - besser sichtbar auf Mobile */
+  .edit-mode-toggle {
+    padding: 10px 14px;
+    min-width: 48px;
+    min-height: 48px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
 
   .edit-mode-toggle span {
     display: none;
   }
 
-  .edit-mode-toggle {
-    padding: 8px;
+  .edit-mode-toggle i {
+    width: 22px;
+    height: 22px;
+  }
+
+  .edit-mode-toggle.active {
+    background: var(--forest, #4a5d23);
+    color: white;
+    box-shadow: 0 2px 12px rgba(74, 93, 35, 0.3);
   }
 }

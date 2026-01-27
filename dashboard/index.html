@@ -909,47 +909,116 @@
         /* Responsive */
         @media (max-width: 640px) {
             .header {
-                padding: 12px 16px;
-                padding-top: calc(env(safe-area-inset-top) + 8px);
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                gap: 12px;
+                /* Sauberer Mobile Header - zentriert, mit mehr Abstand nach unten */
+                position: relative;
+                margin: 0;
+                padding: 20px 20px 48px;
+                padding-top: calc(env(safe-area-inset-top) + 24px);
+                display: block;
+                text-align: center;
             }
 
-            /* Mobile App-Style: Logo + Text nebeneinander */
+            /* Logo zentriert */
+            .header-logo {
+                width: 80px;
+                height: 80px;
+                padding: 14px;
+                margin: 0 auto 16px auto;
+                display: block;
+            }
+
+            /* Text zentriert */
             .header-content {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                gap: 12px;
-                text-align: left;
-                flex: 1;
+                display: block;
+                text-align: center;
+            }
+
+            .header-text {
+                display: block;
             }
 
             .header h1 {
-                font-size: 1.2rem;
-                margin-bottom: 2px;
-                letter-spacing: 0.5px;
+                font-size: 1.5rem;
+                margin-bottom: 6px;
+                letter-spacing: 0.3px;
+                font-weight: 600;
             }
 
             .header .subtitle {
-                font-size: 0.75rem;
-                letter-spacing: 0.5px;
+                font-size: 0.9rem;
+                letter-spacing: 0.3px;
+                opacity: 0.9;
             }
 
-            .header-logo {
-                width: 52px;
-                height: 52px;
-                padding: 8px;
-                margin-bottom: 0;
-                flex-shrink: 0;
+            /* Login-Button oben rechts - optimiert für Mobile */
+            .header-actions {
+                position: absolute;
+                top: calc(env(safe-area-inset-top) + 12px);
+                right: 12px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                z-index: 200;
             }
 
+            /* Sprach-Switcher und Status verstecken */
+            .header-actions .language-switcher,
+            .header-actions .status-indicator {
+                display: none !important;
+            }
+
+            /* Login Button - größer und besser sichtbar */
+            .guest-login-btn {
+                padding: 0;
+                font-size: 0;
+                border-radius: 50%;
+                width: 48px;
+                height: 48px;
+                min-width: 48px;
+                min-height: 48px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: rgba(255,255,255,0.25);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border: 2px solid rgba(255,255,255,0.3);
+                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            }
+
+            .guest-login-btn:active {
+                transform: scale(0.95);
+                background: rgba(255,255,255,0.35);
+            }
+
+            .guest-login-btn span {
+                display: none;
+            }
+
+            .guest-login-btn i {
+                width: 24px;
+                height: 24px;
+                color: white;
+            }
+
+            /* Main Container - mehr Abstand zum Header! */
             .main {
                 z-index: 1;
-                margin-top: 0;
-                padding: 12px 12px 0;
+                margin-top: 16px;
+                padding: 16px 12px 0;
+            }
+
+            /* Welcome Card - mehr Platz und Abstand */
+            .welcome-card {
+                padding: 28px 20px !important;
+                margin-top: 0 !important;
+                margin-bottom: 16px !important;
+            }
+
+            .welcome-card .greeting {
+                font-size: 1.7rem !important;
+                margin-bottom: 12px;
+                white-space: nowrap;
             }
 
             /* Card Borders für Mobile entfernen */
@@ -965,6 +1034,18 @@
             /* Subtile Trennung durch Background-Wechsel */
             .card:nth-child(even) {
                 background: var(--cream);
+            }
+
+            /* Kontakt-Card behält eigene Farben */
+            .contact-card,
+            .contact-card.card:nth-child(even) {
+                background: linear-gradient(135deg, var(--forest) 0%, var(--sage-dark) 100%) !important;
+                color: white !important;
+            }
+
+            .contact-card .contact-label,
+            .contact-card .contact-value {
+                color: white !important;
             }
 
             .energy-value {
@@ -988,38 +1069,18 @@
                 grid-template-columns: 1fr;
             }
 
-            /* Header Actions kompakter - nur Icon-Buttons */
-            .header-actions {
-                position: static;
-                order: 2;
-                gap: 6px;
-            }
-            
-            .header-content {
-                order: 1;
+            /* ENTFERNT: Duplizierte header-actions wurden konsolidiert (siehe oben) */
+
+            /* Language Switcher kompakter */
+            .language-switcher {
+                background: rgba(255,255,255,0.15);
+                border-radius: 16px;
+                padding: 2px;
             }
 
-            .guest-login-btn {
-                padding: 8px;
-                font-size: 0;
-                border-radius: 50%;
-                width: 36px;
-                height: 36px;
-                justify-content: center;
-            }
-
-            .guest-login-btn span {
-                display: none;
-            }
-
-            .guest-login-btn i {
-                width: 18px;
-                height: 18px;
-            }
-            
-            .status-indicator {
-                width: 8px;
-                height: 8px;
+            .lang-btn {
+                padding: 4px 8px;
+                font-size: 14px;
             }
 
             /* Quick Nav auf Mobile verstecken - Footer übernimmt Navigation */
@@ -2114,19 +2175,33 @@
             letter-spacing: 0.01em;
         }
 
-        /* Admin Button in Bottom Nav - deutlich aber nicht dominant */
+        /* Admin Button in Bottom Nav - deutlich und gut sichtbar */
         .mobile-nav-item.admin-btn {
             background: linear-gradient(135deg, var(--forest) 0%, var(--sage-dark) 100%);
             color: white;
-            padding: 8px 14px;
-            min-height: 48px;
-            min-width: 48px;
+            padding: 10px 18px;
+            min-height: 52px;
+            min-width: 52px;
+            border-radius: 14px;
+            box-shadow: 0 2px 8px rgba(45, 74, 62, 0.3);
+            font-weight: 600;
+        }
+
+        .mobile-nav-item.admin-btn i {
+            width: 26px;
+            height: 26px;
+        }
+
+        .mobile-nav-item.admin-btn span {
+            font-size: 0.72rem;
+            font-weight: 600;
         }
 
         .mobile-nav-item.admin-btn:hover,
         .mobile-nav-item.admin-btn:active {
             background: linear-gradient(135deg, var(--sage-dark) 0%, var(--forest) 100%);
             color: white;
+            transform: scale(1.02);
         }
 
         /* Mobile: Footer aktivieren und fixiert halten - NUR wenn eingeloggt */
@@ -2181,12 +2256,14 @@
         </div>
         <div class="header-content">
             <img src="/logo-neu.png" alt="Logo" class="header-logo" loading="lazy" decoding="async">
-            <h1 id="mainTitle" data-editable="site-title">gastauferden.at</h1>
-            <p class="subtitle" data-editable="site-tagline">Ein magischer Ort zum Sein • Hollenthon</p>
+            <div class="header-text">
+                <h1 id="mainTitle" data-editable="site-title">Gast auf Erden</h1>
+                <p class="subtitle" data-editable="site-tagline">Ein magischer Ort zum Sein</p>
+            </div>
         </div>
 
-        <!-- Quick Navigation (nur für eingeloggte Gäste) -->
-        <div class="quick-nav" id="quickNav" style="display: flex;">
+        <!-- Quick Navigation (nur für eingeloggte Gäste, auf Mobile versteckt via CSS) -->
+        <div class="quick-nav" id="quickNav">
             <button class="quick-nav-btn" onclick="scrollToSection('weatherCard')" title="Zum Wetter">
                 <i data-lucide="cloud-sun"></i>
                 <span data-i18n="header.weather">Wetter</span>

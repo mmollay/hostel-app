@@ -24,9 +24,9 @@ binding = "DB"
 database_name = "hostel-app-db"
 database_id = "a0c42bc6-ace1-4254-a0ae-9515ac51532a"
 
-# Cron Triggers für automatische Datenerfassung
+# Cron Triggers für Energie-Tracking
 [triggers]
 crons = [
-  "0 * * * *",    # Jede Stunde um :00
-  "59 23 * * *"   # 23:59 Uhr - kurz vor Mitternacht für korrekten todayStart
+  "0 * * * *",    # Jede Stunde - aktualisiert heutigen Verbrauch
+  "55 22 * * *"   # 22:55 UTC = 23:55 CET - setzt morgen's Start
 ]

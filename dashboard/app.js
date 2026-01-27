@@ -190,8 +190,8 @@ async function loadEnergyFromDB() {
     if (todayData.success) {
       energyData.todayEnergy = todayData.data.energy_kwh || 0;
       energyData.peakPower = todayData.data.peak_power || 0;
-      // NICHT todayStart aus DB laden! Der wird in fetchData() vom aktuellen Shelly-Wert gesetzt.
-      // So vermeiden wir dass ein alter todayStart von gestern Abend verwendet wird.
+      // todayStart aus DB laden - der Worker schützt ihn jetzt mit COALESCE vor Überschreiben
+      energyData.todayStart = todayData.data.shelly_total_start;
     }
 
     // Gestrige Daten
@@ -752,26 +752,9 @@ function updateUI(status) {
 
   // Gesamtenergie vom Gerät
   // Shelly Pro 3EM liefert bereits kWh, NICHT Wh!
-  const totalEnergy = status.total_act_energy || 0;
-
-  // Tagesenergie berechnen
-  // WICHTIG: Plausibilitätsprüfung - max. 100 kWh/Tag für Tiny House realistisch
-  const MAX_DAILY_KWH = 100;
-  
-  if (energyData.todayStart === null) {
-    energyData.todayStart = totalEnergy;
-  }
-  
-  let calculatedEnergy = totalEnergy - energyData.todayStart;
-  
-  // Plausibilitätsprüfung: Wenn Wert negativ oder unrealistisch hoch, todayStart resetten
-  if (calculatedEnergy < 0 || calculatedEnergy > MAX_DAILY_KWH) {
-    console.warn(`[Energy] Unrealistischer Wert: ${calculatedEnergy.toFixed(2)} kWh - Reset todayStart`);
-    energyData.todayStart = totalEnergy;
-    calculatedEnergy = 0;
-  }
-
-  energyData.todayEnergy = calculatedEnergy;
+  // Tagesenergie kommt aus der DB (wird von loadEnergyFromDB geladen)
+  // Hier zeigen wir nur den DB-Wert an - KEINE eigene Berechnung mehr!
+  // Der Cron-Job im Worker aktualisiert die DB stündlich mit korrekten Werten.
 
   // Kosten berechnen mit Server-Preis
   const pricePerKwh = settings.pricePerKwh;
@@ -840,7 +823,7 @@ function updateUI(status) {
     lastUpdateEl.textContent = new Date().toLocaleTimeString(locale);
   }
 
-  saveData();
+  // saveData() DEAKTIVIERT - DB wird nur noch vom Cron beschrieben
 }
 
 /**
