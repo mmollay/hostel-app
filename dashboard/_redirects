@@ -2,7 +2,7 @@
 # https://developers.cloudflare.com/pages/configuration/redirects/
 
 # Admin page
-/admin   /_admin.html   200
+/admin   /pages/admin-panel.html   200
 
 # English language - serve same index.html, i18n.js detects /en/ path
 /en/   /index.html   200
