@@ -950,75 +950,102 @@
                 opacity: 0.9;
             }
 
-            /* Login-Button oben rechts - optimiert für Mobile */
+            /* ===== NEUES MOBILE HEADER LAYOUT ===== */
+            
+            /* Header: Logo + Titel zentriert */
+            .header {
+                padding-bottom: 24px !important;
+            }
+            
+            /* Zweite Zeile: Buttons unter dem Logo */
             .header-actions {
-                position: absolute;
-                top: calc(env(safe-area-inset-top) + 12px);
-                right: 12px;
-                display: flex;
+                position: relative !important;
+                top: auto !important;
+                right: auto !important;
+                display: flex !important;
+                justify-content: center;
                 align-items: center;
-                gap: 8px;
+                gap: 12px;
+                margin-top: 16px;
                 z-index: 200;
             }
 
-            /* Sprach-Switcher und Status verstecken */
-            .header-actions .language-switcher,
+            /* Sprach-Switcher SICHTBAR */
+            .header-actions .language-switcher {
+                display: flex !important;
+                background: rgba(255,255,255,0.2);
+                border-radius: 20px;
+                padding: 4px;
+            }
+            
+            .header-actions .language-switcher .lang-btn {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+                color: white;
+                border-radius: 16px;
+            }
+            
+            .header-actions .language-switcher .lang-btn.active {
+                background: rgba(255,255,255,0.3);
+            }
+            
+            /* Status verstecken */
             .header-actions .status-indicator {
                 display: none !important;
             }
 
-            /* Login Button - größer und besser sichtbar */
+            /* Login Button - Pill-Style */
             .guest-login-btn {
-                padding: 0;
-                font-size: 0;
-                border-radius: 50%;
-                width: 48px;
-                height: 48px;
-                min-width: 48px;
-                min-height: 48px;
+                padding: 10px 20px;
+                font-size: 0.85rem;
+                border-radius: 24px;
+                height: 44px;
+                min-height: 44px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                gap: 8px;
                 background: rgba(255,255,255,0.25);
                 backdrop-filter: blur(10px);
                 -webkit-backdrop-filter: blur(10px);
                 border: 2px solid rgba(255,255,255,0.3);
                 box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                color: white;
+                font-weight: 500;
             }
 
             .guest-login-btn:active {
-                transform: scale(0.95);
+                transform: scale(0.97);
                 background: rgba(255,255,255,0.35);
             }
 
             .guest-login-btn span {
-                display: none;
+                display: inline !important;
             }
 
             .guest-login-btn i {
-                width: 24px;
-                height: 24px;
+                width: 18px;
+                height: 18px;
                 color: white;
             }
 
-            /* Main Container - mehr Abstand zum Header! */
+            /* Main Container */
             .main {
                 z-index: 1;
-                margin-top: 16px;
+                margin-top: 0;
                 padding: 16px 12px 0;
             }
 
-            /* Welcome Card - mehr Platz und Abstand */
+            /* Welcome Card */
             .welcome-card {
-                padding: 28px 20px !important;
+                padding: 24px 20px !important;
                 margin-top: 0 !important;
                 margin-bottom: 16px !important;
             }
 
             .welcome-card .greeting {
-                font-size: 1.7rem !important;
+                font-size: 1.6rem !important;
                 margin-bottom: 12px;
-                white-space: nowrap;
             }
 
             /* Card Borders für Mobile entfernen */
@@ -2204,21 +2231,65 @@
             transform: scale(1.02);
         }
 
-        /* Mobile: Footer aktivieren und fixiert halten - NUR wenn eingeloggt */
+        /* Mobile: Bottom Nav IMMER sichtbar auf Mobile */
         @media (max-width: 640px) {
-            .mobile-bottom-nav.logged-in {
-                display: flex;
-                /* Doppelte Absicherung für position: fixed */
+            .mobile-bottom-nav {
+                display: flex !important;
                 position: fixed !important;
                 bottom: 0 !important;
                 left: 0 !important;
                 right: 0 !important;
+            }
+            
+            /* Screen System für Tab-Navigation */
+            .mobile-screen {
+                display: none;
+            }
+            
+            .mobile-screen.active {
+                display: block;
+                animation: fadeIn 0.2s ease;
+            }
+            
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(8px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            
+            /* Active Tab Styling */
+            .mobile-nav-item.active:not(.admin-btn) {
+                color: var(--forest) !important;
+                background: rgba(156, 175, 136, 0.2) !important;
+            }
+            
+            .mobile-nav-item.active i {
+                stroke-width: 2.5;
+            }
+            
+            /* Footer auf Mobile verstecken (Content ist in Contact-Tab) */
+            .footer {
+                display: none !important;
+            }
+            
+            /* Mehr Platz unten für Bottom Nav */
+            .main {
+                padding-bottom: calc(90px + env(safe-area-inset-bottom)) !important;
             }
         }
         
         /* Desktop: Footer IMMER versteckt */
         @media (min-width: 641px) {
             .mobile-bottom-nav {
+                display: none !important;
+            }
+            
+            /* Desktop zeigt alle Screens */
+            .mobile-screen {
+                display: block !important;
+            }
+            
+            /* Mobile Quick Links auf Desktop verstecken */
+            .mobile-quick-links {
                 display: none !important;
             }
         }
@@ -2286,6 +2357,9 @@
     <!-- Main Content -->
     <main class="main">
         <div id="dashboard">
+            <!-- ===== SCREEN: HOME ===== -->
+            <div class="mobile-screen active" id="screen-home">
+            
             <!-- Welcome Card -->
             <div class="card welcome-card">
                 <h2 class="greeting" id="greeting" data-i18n="welcome.default" data-editable="welcome-title">Herzlich Willkommen!</h2>
@@ -2330,7 +2404,12 @@
                     </p>
                 </div>
             </div>
+            
+            </div><!-- END screen-home -->
 
+            <!-- ===== SCREEN: INFO ===== -->
+            <div class="mobile-screen" id="screen-info">
+            
             <!-- Quick Info -->
             <div class="card">
                 <div class="card-header">
@@ -2542,6 +2621,11 @@
                     </div>
                 </div>
             </div>
+            
+            </div><!-- END screen-info -->
+
+            <!-- ===== SCREEN: EXPLORE ===== -->
+            <div class="mobile-screen" id="screen-explore">
 
             <!-- Weather Card (nur für Gäste sichtbar) -->
             <div class="card" id="weatherCard" style="display: none;">
@@ -2688,6 +2772,11 @@
                     </div>
                 </div>
             </div>
+            
+            </div><!-- END screen-explore -->
+
+            <!-- ===== SCREEN: CONTACT ===== -->
+            <div class="mobile-screen" id="screen-contact">
 
             <!-- Contact Card -->
             <div class="card contact-card">
@@ -2734,6 +2823,18 @@
                             <div class="contact-value">112</div>
                         </div>
                     </div>
+                </div>
+            </div>
+            
+            <!-- Mobile-Only: Quick Links (da Footer versteckt) -->
+            <div class="card mobile-quick-links" style="background: var(--cream); text-align: center; padding: 20px;">
+                <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 16px;">
+                    <a href="/impressum.html" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">Impressum</a>
+                    <a href="/datenschutz.html" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">Datenschutz</a>
+                    <a href="/kontakt.html" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">Kontakt</a>
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">
+                    Powered by <a href="https://ssi.at" target="_blank" style="color: var(--sage-dark); text-decoration: none; font-weight: 500;">SSI</a>
                 </div>
             </div>
 
@@ -2915,6 +3016,9 @@
                     </div>
                 </div>
             </div>
+            
+            </div><!-- END screen-contact -->
+            
         </div>
     </main>
 
@@ -2948,20 +3052,24 @@
         </div>
     </footer>
 
-    <!-- Mobile Bottom Navigation -->
+    <!-- Mobile Bottom Navigation - Tab System -->
     <nav class="mobile-bottom-nav" id="mobileBottomNav">
         <div class="mobile-bottom-nav-inner">
-            <button class="mobile-nav-item" onclick="scrollToTop()" title="Nach oben">
+            <button class="mobile-nav-item active" onclick="switchTab('home')" data-tab="home" title="Start">
                 <i data-lucide="home"></i>
-                <span data-i18n="nav.home">Start</span>
+                <span>Start</span>
             </button>
-            <button class="mobile-nav-item" onclick="scrollToSection('weatherCard')" title="Wetter">
-                <i data-lucide="cloud-sun"></i>
-                <span data-i18n="nav.weather">Wetter</span>
+            <button class="mobile-nav-item" onclick="switchTab('info')" data-tab="info" title="Infos">
+                <i data-lucide="info"></i>
+                <span>Infos</span>
             </button>
-            <button class="mobile-nav-item" onclick="scrollToSection('recommendationsCard')" title="Umgebung">
-                <i data-lucide="map-pin"></i>
-                <span data-i18n="nav.nearby">Umgebung</span>
+            <button class="mobile-nav-item" onclick="switchTab('explore')" data-tab="explore" title="Erkunden">
+                <i data-lucide="compass"></i>
+                <span>Erkunden</span>
+            </button>
+            <button class="mobile-nav-item" onclick="switchTab('contact')" data-tab="contact" title="Kontakt">
+                <i data-lucide="phone"></i>
+                <span>Kontakt</span>
             </button>
             <a href="/admin" class="mobile-nav-item admin-btn" title="Admin-Bereich">
                 <i data-lucide="layout-dashboard"></i>
@@ -3137,6 +3245,46 @@
         // Re-initialize Lucide icons after DOM updates
         document.addEventListener('DOMContentLoaded', function() {
             lucide.createIcons();
+        });
+        
+        // ===== MOBILE TAB NAVIGATION =====
+        function switchTab(tabName) {
+            // Alle Screens verstecken
+            document.querySelectorAll('.mobile-screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Alle Tab-Buttons deaktivieren
+            document.querySelectorAll('.mobile-nav-item[data-tab]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Gewählten Screen aktivieren
+            const targetScreen = document.getElementById('screen-' + tabName);
+            if (targetScreen) {
+                targetScreen.classList.add('active');
+            }
+            
+            // Tab-Button aktivieren
+            const targetBtn = document.querySelector('.mobile-nav-item[data-tab="' + tabName + '"]');
+            if (targetBtn) {
+                targetBtn.classList.add('active');
+            }
+            
+            // Nach oben scrollen beim Tab-Wechsel
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Lucide Icons neu initialisieren (falls nötig)
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+        
+        // Beim Laden: Home-Tab aktivieren (falls auf Mobile)
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.innerWidth <= 640) {
+                switchTab('home');
+            }
         });
     </script>
 </body>
