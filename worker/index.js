@@ -46,7 +46,7 @@ export default {
       }
 
       // POST /login - Admin Login prüfen
-      if (path === "/login" && request.method === "POST") {
+      if ((path === "/login" || path === "/admin/login") && request.method === "POST") {
         return await checkLogin(request, env, corsHeaders);
       }
 
