@@ -2124,15 +2124,22 @@
             color: white;
         }
 
-        /* Mobile: Footer aktivieren und fixiert halten */
+        /* Mobile: Footer aktivieren und fixiert halten - NUR wenn eingeloggt */
         @media (max-width: 640px) {
-            .mobile-bottom-nav {
-                display: block;
+            .mobile-bottom-nav.logged-in {
+                display: flex;
                 /* Doppelte Absicherung für position: fixed */
                 position: fixed !important;
                 bottom: 0 !important;
                 left: 0 !important;
                 right: 0 !important;
+            }
+        }
+        
+        /* Desktop: Footer IMMER versteckt */
+        @media (min-width: 641px) {
+            .mobile-bottom-nav {
+                display: none !important;
             }
         }
 

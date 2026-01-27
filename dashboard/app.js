@@ -1122,7 +1122,14 @@ function updateGuestUI() {
   if (quickNav) quickNav.style.display = guestToken ? "flex" : "none";
   
   // Mobile Bottom Navigation nur für eingeloggte Gäste anzeigen
-  if (mobileBottomNav) mobileBottomNav.style.display = guestToken ? "flex" : "none";
+  // Klasse statt inline-style damit CSS Media Query respektiert wird
+  if (mobileBottomNav) {
+    if (guestToken) {
+      mobileBottomNav.classList.add('logged-in');
+    } else {
+      mobileBottomNav.classList.remove('logged-in');
+    }
+  }
 }
 
 /**
