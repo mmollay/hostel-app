@@ -130,7 +130,8 @@
     "hideDetails": "Hide daily details",
     "dailyBreakdown": "Daily Breakdown",
     "noData": "No consumption data yet",
-    "priceInfo": "Current electricity price:"
+    "priceInfo": "Current electricity price:",
+    "avgInfo": "Ø Daily usage:"
   },
   "weather": {
     "title": "Weather in Hollenthon",

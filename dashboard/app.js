@@ -366,6 +366,12 @@ function updateStayEnergyUI() {
     avgEl.textContent = formatNumber(stayEnergyData.avgPerDay, 2);
   }
   
+  // Durchschnitt auch im Info-Bereich anzeigen
+  const avgDisplayEl = document.getElementById("energyAvgDisplay");
+  if (avgDisplayEl) {
+    avgDisplayEl.textContent = `${formatNumber(stayEnergyData.avgPerDay, 1)} kWh`;
+  }
+  
   // Tages-Liste vorbereiten
   displayStayDays();
 }
