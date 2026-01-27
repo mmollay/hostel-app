@@ -1339,11 +1339,11 @@
             <div class="kurtaxe-grid">
                 <div class="kurtaxe-item">
                     <div class="kurtaxe-label">Tarif pro Person/Tag</div>
-                    <div class="kurtaxe-value">€2,50</div>
+                    <div class="kurtaxe-value" id="kurtaxeDisplay">€2,50</div>
                 </div>
                 <div class="kurtaxe-item">
                     <div class="kurtaxe-label">Berechnung</div>
-                    <div class="kurtaxe-value" style="font-size: 1rem;">Tage × Personen × €2,50</div>
+                    <div class="kurtaxe-value" style="font-size: 1rem;">Tage × Personen × <span id="kurtaxeFormulaDisplay">€2,50</span></div>
                 </div>
             </div>
 
@@ -1537,6 +1537,14 @@
                 <div class="form-hint">Umsatzsteuer-Identifikationsnummer (wird im Impressum angezeigt)</div>
             </div>
 
+            <h4 style="margin-top: 32px; margin-bottom: 16px; color: var(--forest);">Kurtaxe</h4>
+
+            <div class="form-group">
+                <label>Kurtaxe (€/Person/Tag)</label>
+                <input type="number" id="kurtaxePerPersonDay" step="0.10" min="0" placeholder="2.50">
+                <div class="form-hint">Wird für die Kurtaxe-Berechnung verwendet</div>
+            </div>
+
             <h4 style="margin-top: 32px; margin-bottom: 16px; color: var(--forest);">Strompreis & CO₂</h4>
 
             <div class="form-group">
@@ -1575,7 +1583,7 @@
             const versionEl = document.getElementById('adminVersion');
             if (versionEl) versionEl.textContent = '• ' + CONFIG.VERSION;
         }
-        const KURTAXE_PER_PERSON_DAY = 2.50;
+        let KURTAXE_PER_PERSON_DAY = 2.50; // Default, wird aus Settings geladen
         const ADMIN_TOKEN_KEY = 'hostel_admin_token';
         let authToken = null;
 
@@ -2342,6 +2350,15 @@
                     if (s.accountHolder) document.getElementById('hostelAccountHolder').value = s.accountHolder;
                     if (s.uid) document.getElementById('hostelUid').value = s.uid;
 
+                    // Kurtaxe
+                    if (s.kurtaxePerPersonDay !== undefined) {
+                        document.getElementById('kurtaxePerPersonDay').value = s.kurtaxePerPersonDay;
+                        KURTAXE_PER_PERSON_DAY = s.kurtaxePerPersonDay;
+                        // Update display
+                        document.getElementById('kurtaxeDisplay').textContent = '€' + s.kurtaxePerPersonDay.toFixed(2).replace('.', ',');
+                        document.getElementById('kurtaxeFormulaDisplay').textContent = '€' + s.kurtaxePerPersonDay.toFixed(2).replace('.', ',');
+                    }
+
                     // Energy
                     if (s.pricePerKwh) document.getElementById('pricePerKwh').value = s.pricePerKwh;
                     if (s.co2PerKwh) document.getElementById('co2PerKwh').value = s.co2PerKwh;
@@ -2375,6 +2392,7 @@
                 bic: document.getElementById('hostelBic').value,
                 accountHolder: document.getElementById('hostelAccountHolder').value,
                 uid: document.getElementById('hostelUid').value,
+                kurtaxePerPersonDay: parseFloat(document.getElementById('kurtaxePerPersonDay').value) || 2.50,
                 pricePerKwh: parseFloat(document.getElementById('pricePerKwh').value) || 0.29,
                 co2PerKwh: parseFloat(document.getElementById('co2PerKwh').value) || 0.20
             };
