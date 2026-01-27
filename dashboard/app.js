@@ -813,6 +813,12 @@ function updatePriceDisplay() {
     kurtaxeEl.textContent = `€${settings.kurtaxePerPersonDay.toFixed(2).replace('.', ',')}`;
   }
   
+  // Strompreis in Energy Card anzeigen
+  const energyPriceEl = document.getElementById("energyPriceDisplay");
+  if (energyPriceEl && settings.pricePerKwh) {
+    energyPriceEl.textContent = `${settings.pricePerKwh.toFixed(2).replace('.', ',')} €/kWh`;
+  }
+  
   // Kurtaxe-Berechnung für eingeloggten Gast
   updateKurtaxeCalculation();
 }

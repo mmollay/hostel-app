@@ -129,7 +129,8 @@
     "showDetails": "Tagesdetails anzeigen",
     "hideDetails": "Tagesdetails ausblenden",
     "dailyBreakdown": "Tägliche Aufschlüsselung",
-    "noData": "Noch keine Verbrauchsdaten"
+    "noData": "Noch keine Verbrauchsdaten",
+    "priceInfo": "Aktueller Strompreis:"
   },
   "weather": {
     "title": "Wetter in Hollenthon",
