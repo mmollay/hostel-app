@@ -190,7 +190,8 @@ async function loadEnergyFromDB() {
     if (todayData.success) {
       energyData.todayEnergy = todayData.data.energy_kwh || 0;
       energyData.peakPower = todayData.data.peak_power || 0;
-      energyData.todayStart = todayData.data.shelly_total_start;
+      // NICHT todayStart aus DB laden! Der wird in fetchData() vom aktuellen Shelly-Wert gesetzt.
+      // So vermeiden wir dass ein alter todayStart von gestern Abend verwendet wird.
     }
 
     // Gestrige Daten
