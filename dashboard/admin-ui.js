@@ -191,13 +191,12 @@ const AdminUI = {
    */
   showAdminUI() {
     const adminBtn = document.getElementById('adminAreaBtn');
-    const indicator = document.getElementById('adminIndicator');
-    const guestBtn = document.getElementById('guestLoginBtn');
+    // Don't show indicator bar - redundant with admin button
+    // const indicator = document.getElementById('adminIndicator');
     
     if (adminBtn) adminBtn.style.display = 'flex';
-    if (indicator) indicator.style.display = 'block';
-    // Hide guest login button when admin is logged in
-    if (guestBtn) guestBtn.style.display = 'none';
+    // Keep guest login button visible for testing
+    // if (indicator) indicator.style.display = 'block';
     
     document.body.classList.add('admin-logged-in');
     
