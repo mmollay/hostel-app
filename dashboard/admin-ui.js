@@ -683,7 +683,7 @@ const AdminUI = {
     if (!this.adminToken) return;
     
     try {
-      const response = await fetch(`${CONFIG.API_PROXY_URL}/admin/settings`, {
+      const response = await fetch(`${CONFIG.API_PROXY_URL}/hostel/settings`, {
         headers: {
           'Authorization': `Bearer ${this.adminToken}`
         }
@@ -803,7 +803,7 @@ const AdminUI = {
     if (!settings.shellyKey) delete settings.shellyKey;
     
     try {
-      const response = await fetch(`${CONFIG.API_PROXY_URL}/admin/settings`, {
+      const response = await fetch(`${CONFIG.API_PROXY_URL}/hostel/settings`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
