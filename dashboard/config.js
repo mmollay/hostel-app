@@ -1,6 +1,6 @@
 const CONFIG = {
   // App Version
-  VERSION: "v0.10.0",
+  VERSION: "v0.10.1",
 
   // API Proxy URL (Cloudflare Worker - hält Auth-Key sicher)
   API_PROXY_URL: "https://hostel-app-api.office-509.workers.dev",
@@ -35,4 +35,4 @@ const CONFIG = {
   // Kostenlos: https://openweathermap.org/api (1000 calls/Tag gratis)
   OPENWEATHER_API_KEY: "00e7bb28c3877b28d2bbd88dfed06278",
 };
-/* Cache bust: 1769510777 */
+/* Cache bust: 1769516395 */
