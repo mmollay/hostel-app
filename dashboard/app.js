@@ -510,8 +510,19 @@ function startAutoRefresh() {
 function loadGuestSession() {
   try {
     // Prüfe localStorage zuerst (persistent), dann sessionStorage (temporär)
-    const storedToken = localStorage.getItem(GUEST_TOKEN_KEY) || sessionStorage.getItem(GUEST_TOKEN_KEY);
-    const storedData = localStorage.getItem(GUEST_DATA_KEY) || sessionStorage.getItem(GUEST_DATA_KEY);
+    const lsToken = localStorage.getItem(GUEST_TOKEN_KEY);
+    const ssToken = sessionStorage.getItem(GUEST_TOKEN_KEY);
+    const lsData = localStorage.getItem(GUEST_DATA_KEY);
+    const ssData = sessionStorage.getItem(GUEST_DATA_KEY);
+    
+    console.log('[Guest] DEBUG loadGuestSession:');
+    console.log('  - localStorage token:', lsToken ? 'EXISTS' : 'null');
+    console.log('  - sessionStorage token:', ssToken ? 'EXISTS' : 'null');
+    console.log('  - localStorage data:', lsData ? lsData.substring(0, 50) + '...' : 'null');
+    console.log('  - sessionStorage data:', ssData ? ssData.substring(0, 50) + '...' : 'null');
+    
+    const storedToken = lsToken || ssToken;
+    const storedData = lsData || ssData;
     
     console.log('[Guest] loadGuestSession - token exists:', !!storedToken, 'data exists:', !!storedData);
     
