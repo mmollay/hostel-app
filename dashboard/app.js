@@ -1233,7 +1233,15 @@ function updateGuestUI() {
     btn.classList.toggle("logged-in", !!guestToken);
     const btnText = btn.querySelector("span");
     if (btnText) {
-      btnText.textContent = guestToken ? guestData.name : "Anmelden";
+      const displayName = guestToken && guestData ? guestData.name : "Anmelden";
+      btnText.textContent = displayName;
+      // Remove i18n attribute when logged in to prevent translation override
+      if (guestToken && guestData) {
+        btnText.removeAttribute("data-i18n");
+      } else {
+        btnText.setAttribute("data-i18n", "header.login");
+      }
+      console.log('[Guest] Button text updated to:', displayName);
     }
   }
 
