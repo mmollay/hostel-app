@@ -512,12 +512,17 @@ function loadGuestSession() {
     // Prüfe localStorage zuerst (persistent), dann sessionStorage (temporär)
     guestToken = localStorage.getItem(GUEST_TOKEN_KEY) || sessionStorage.getItem(GUEST_TOKEN_KEY);
     const storedData = localStorage.getItem(GUEST_DATA_KEY) || sessionStorage.getItem(GUEST_DATA_KEY);
+    
+    console.log('[Guest] loadGuestSession - token exists:', !!guestToken, 'data exists:', !!storedData);
+    
     if (guestToken && storedData) {
       guestData = JSON.parse(storedData);
       updateGuestUI();
       updateGreeting();
       updateKurtaxeCalculation();
       console.log('[Guest] Session restored for:', guestData.name);
+    } else {
+      console.log('[Guest] No stored session found');
     }
   } catch (e) {
     guestToken = null;
@@ -1076,6 +1081,9 @@ async function handleGuestLogin() {
       // In gewähltem Storage speichern
       storage.setItem(GUEST_TOKEN_KEY, guestToken);
       storage.setItem(GUEST_DATA_KEY, JSON.stringify(guestData));
+      
+      console.log('[Guest] Login saved to', rememberMe ? 'localStorage' : 'sessionStorage');
+      console.log('[Guest] Verify - token in storage:', !!localStorage.getItem(GUEST_TOKEN_KEY) || !!sessionStorage.getItem(GUEST_TOKEN_KEY));
 
       closeGuestLoginModal();
       updateGuestUI();
