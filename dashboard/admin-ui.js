@@ -56,12 +56,14 @@ const AdminUI = {
     const btn = document.createElement('a');
     btn.id = 'adminAreaBtn';
     btn.href = '/admin';
-    btn.className = 'admin-btn';
-    btn.title = 'Admin-Bereich';
+    btn.className = 'guest-login-btn admin-mode';
+    btn.title = 'Zurück zum Admin-Bereich';
     btn.style.display = 'none'; // Hidden by default
     btn.style.textDecoration = 'none';
+    btn.style.background = 'rgba(34, 197, 94, 0.3)';
+    btn.style.borderColor = 'rgba(34, 197, 94, 0.5)';
     btn.innerHTML = `
-      <i data-lucide="arrow-left"></i>
+      <i data-lucide="layout-dashboard"></i>
       <span>Admin</span>
     `;
     
@@ -190,9 +192,12 @@ const AdminUI = {
   showAdminUI() {
     const adminBtn = document.getElementById('adminAreaBtn');
     const indicator = document.getElementById('adminIndicator');
+    const guestBtn = document.getElementById('guestLoginBtn');
     
     if (adminBtn) adminBtn.style.display = 'flex';
     if (indicator) indicator.style.display = 'block';
+    // Hide guest login button when admin is logged in
+    if (guestBtn) guestBtn.style.display = 'none';
     
     document.body.classList.add('admin-logged-in');
     
@@ -207,9 +212,12 @@ const AdminUI = {
   hideAdminUI() {
     const adminBtn = document.getElementById('adminAreaBtn');
     const indicator = document.getElementById('adminIndicator');
+    const guestBtn = document.getElementById('guestLoginBtn');
     
     if (adminBtn) adminBtn.style.display = 'none';
     if (indicator) indicator.style.display = 'none';
+    // Show guest login button again
+    if (guestBtn) guestBtn.style.display = 'flex';
     
     document.body.classList.remove('admin-logged-in');
   },
