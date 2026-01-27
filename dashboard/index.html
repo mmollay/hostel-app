@@ -2384,84 +2384,6 @@
                 </div>
             </div>
 
-            <!-- Energy Card - Gast-Aufenthalt fokussiert -->
-            <div class="card energy-card" id="energyCard" style="display: none;">
-                <div class="card-header">
-                    <div class="card-icon"><i data-lucide="zap"></i></div>
-                    <div>
-                        <h3 class="card-title" data-i18n="energy.title">Heizkostenzuschuss</h3>
-                        <p class="card-subtitle" data-i18n="energy.staySubtitle">Dein Aufenthalt</p>
-                    </div>
-                </div>
-
-                <!-- Hauptansicht: Aufenthalts-Übersicht -->
-                <div class="stay-energy-overview" id="stayEnergyOverview">
-                    <div class="stay-energy-stats">
-                        <div class="stay-stat primary">
-                            <div class="stay-stat-icon"><i data-lucide="zap"></i></div>
-                            <div class="stay-stat-content">
-                                <div class="stay-stat-label" data-i18n="energy.totalConsumption">Gesamtverbrauch seit Check-in</div>
-                                <div class="stay-stat-value">
-                                    <span id="stayTotalEnergy">--</span>
-                                    <span class="stay-stat-unit">kWh</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="stay-stat primary">
-                            <div class="stay-stat-icon"><i data-lucide="euro"></i></div>
-                            <div class="stay-stat-content">
-                                <div class="stay-stat-label" data-i18n="energy.totalCost">Gesamtkosten</div>
-                                <div class="stay-stat-value">
-                                    <span id="stayTotalCost">--</span>
-                                    <span class="stay-stat-unit">€</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="stay-info-row">
-                        <div class="stay-info-item">
-                            <i data-lucide="calendar-days"></i>
-                            <span><span data-i18n="energy.stayDuration">Aufenthaltsdauer</span>: <strong id="stayDuration">--</strong> <span data-i18n="energy.days">Tage</span></span>
-                        </div>
-                        <div class="stay-info-item">
-                            <i data-lucide="bar-chart-3"></i>
-                            <span><span data-i18n="energy.avgPerDay">Durchschnitt pro Tag</span>: <strong id="stayAvgEnergy">--</strong> kWh</span>
-                        </div>
-                    </div>
-
-                    <!-- Details-Button -->
-                    <button class="stay-details-toggle" id="stayDetailsToggle" onclick="toggleStayDetails()">
-                        <span data-i18n="energy.showDetails">Tagesdetails anzeigen</span>
-                        <i data-lucide="chevron-down" id="stayDetailsIcon"></i>
-                    </button>
-                </div>
-
-                <!-- Detail-Ansicht: Tages-Liste (aufklappbar) -->
-                <div class="stay-energy-details" id="stayEnergyDetails" style="display: none;">
-                    <div class="stay-details-header">
-                        <h4 data-i18n="energy.dailyBreakdown">Tägliche Aufschlüsselung</h4>
-                    </div>
-                    <div class="stay-days-list" id="stayDaysList">
-                        <!-- Wird dynamisch gefüllt -->
-                    </div>
-                </div>
-
-                <!-- Live-Anzeige (klein, unten) -->
-                <div class="stay-live-info">
-                    <div class="stay-live-power">
-                        <i data-lucide="activity"></i>
-                        <span data-i18n="energy.currentNow">Aktuell</span>: <strong id="currentPower">--</strong> <span data-i18n="energy.watt">W</span>
-                    </div>
-                    <div class="stay-live-status" id="energyStatus" data-i18n="energy.current">Aktueller Verbrauch</div>
-                </div>
-
-                <!-- Info-Hinweis -->
-                <div class="energy-info-notice">
-                    <p data-i18n="energy.heatingInfo">ℹ️ Diese Anzeige zeigt nur die Heizkosten – nicht die normalen Betriebskosten (Licht, Wasserkocher, etc.). Da das Heizen mit den Wandheizstrahlern viel Strom verbraucht, bitten wir um einen fairen Beitrag zu diesen Zusatzkosten.</p>
-                </div>
-            </div>
-
             <!-- Weather Card (nur für Gäste sichtbar) -->
             <div class="card" id="weatherCard" style="display: none;">
                 <div class="card-header">
@@ -2624,6 +2546,84 @@
                             <div class="contact-value">112</div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Energy Card - Gast-Aufenthalt fokussiert -->
+            <div class="card energy-card" id="energyCard" style="display: none;">
+                <div class="card-header">
+                    <div class="card-icon"><i data-lucide="zap"></i></div>
+                    <div>
+                        <h3 class="card-title" data-i18n="energy.title">Heizkostenzuschuss</h3>
+                        <p class="card-subtitle" data-i18n="energy.staySubtitle">Dein Aufenthalt</p>
+                    </div>
+                </div>
+
+                <!-- Hauptansicht: Aufenthalts-Übersicht -->
+                <div class="stay-energy-overview" id="stayEnergyOverview">
+                    <div class="stay-energy-stats">
+                        <div class="stay-stat primary">
+                            <div class="stay-stat-icon"><i data-lucide="zap"></i></div>
+                            <div class="stay-stat-content">
+                                <div class="stay-stat-label" data-i18n="energy.totalConsumption">Gesamtverbrauch seit Check-in</div>
+                                <div class="stay-stat-value">
+                                    <span id="stayTotalEnergy">--</span>
+                                    <span class="stay-stat-unit">kWh</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stay-stat primary">
+                            <div class="stay-stat-icon"><i data-lucide="euro"></i></div>
+                            <div class="stay-stat-content">
+                                <div class="stay-stat-label" data-i18n="energy.totalCost">Gesamtkosten</div>
+                                <div class="stay-stat-value">
+                                    <span id="stayTotalCost">--</span>
+                                    <span class="stay-stat-unit">€</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stay-info-row">
+                        <div class="stay-info-item">
+                            <i data-lucide="calendar-days"></i>
+                            <span><span data-i18n="energy.stayDuration">Aufenthaltsdauer</span>: <strong id="stayDuration">--</strong> <span data-i18n="energy.days">Tage</span></span>
+                        </div>
+                        <div class="stay-info-item">
+                            <i data-lucide="bar-chart-3"></i>
+                            <span><span data-i18n="energy.avgPerDay">Durchschnitt pro Tag</span>: <strong id="stayAvgEnergy">--</strong> kWh</span>
+                        </div>
+                    </div>
+
+                    <!-- Details-Button -->
+                    <button class="stay-details-toggle" id="stayDetailsToggle" onclick="toggleStayDetails()">
+                        <span data-i18n="energy.showDetails">Tagesdetails anzeigen</span>
+                        <i data-lucide="chevron-down" id="stayDetailsIcon"></i>
+                    </button>
+                </div>
+
+                <!-- Detail-Ansicht: Tages-Liste (aufklappbar) -->
+                <div class="stay-energy-details" id="stayEnergyDetails" style="display: none;">
+                    <div class="stay-details-header">
+                        <h4 data-i18n="energy.dailyBreakdown">Tägliche Aufschlüsselung</h4>
+                    </div>
+                    <div class="stay-days-list" id="stayDaysList">
+                        <!-- Wird dynamisch gefüllt -->
+                    </div>
+                </div>
+
+                <!-- Live-Anzeige (klein, unten) -->
+                <div class="stay-live-info">
+                    <div class="stay-live-power">
+                        <i data-lucide="activity"></i>
+                        <span data-i18n="energy.currentNow">Aktuell</span>: <strong id="currentPower">--</strong> <span data-i18n="energy.watt">W</span>
+                    </div>
+                    <div class="stay-live-status" id="energyStatus" data-i18n="energy.current">Aktueller Verbrauch</div>
+                </div>
+
+                <!-- Info-Hinweis -->
+                <div class="energy-info-notice">
+                    <p data-i18n="energy.heatingInfo">ℹ️ Diese Anzeige zeigt nur die Heizkosten – nicht die normalen Betriebskosten (Licht, Wasserkocher, etc.). Da das Heizen mit den Wandheizstrahlern viel Strom verbraucht, bitten wir um einen fairen Beitrag zu diesen Zusatzkosten.</p>
                 </div>
             </div>
 
