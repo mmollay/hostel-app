@@ -71,6 +71,8 @@
     "petsValue": "Allowed",
     "laundry": "Washing Machine",
     "laundryValue": "Free",
+    "included": "Included",
+    "includedValue": "Utilities, Gas, Wood & Pellets",
     "smoking": "Smoking",
     "smokingValue": "Prohibited",
     "parking": "Parking",

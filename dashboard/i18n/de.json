@@ -71,6 +71,8 @@
     "petsValue": "Erlaubt",
     "laundry": "Waschmaschine",
     "laundryValue": "Kostenlos",
+    "included": "Inklusive",
+    "includedValue": "Betriebskosten, Gas, Holz & Pellets",
     "smoking": "Rauchen",
     "smokingValue": "Verboten",
     "parking": "Parken",
