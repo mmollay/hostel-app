@@ -735,20 +735,18 @@
             color: var(--text);
         }
 
-        /* Energie-Info-Bar */
+        /* Energie-Info-Bar - dezent, nur Icon + Durchschnitt */
         .energy-info-bar {
-            background: linear-gradient(135deg, var(--sage) 0%, var(--sage-dark) 100%);
-            color: white;
-            padding: 10px 20px;
+            background: var(--sand);
+            color: var(--text);
+            padding: 8px 16px;
             cursor: pointer;
             transition: all 0.2s ease;
-            position: sticky;
-            top: 0;
-            z-index: 99;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
         
         .energy-info-bar:hover {
-            background: linear-gradient(135deg, var(--sage-dark) 0%, var(--forest) 100%);
+            background: var(--sage-light);
         }
         
         .energy-info-bar:active {
@@ -762,24 +760,28 @@
             gap: 8px;
             max-width: 600px;
             margin: 0 auto;
-            font-size: 0.9rem;
-            font-weight: 500;
+            font-size: 0.85rem;
         }
         
         .energy-info-content > i:first-child {
-            width: 18px;
-            height: 18px;
-            opacity: 0.9;
+            width: 16px;
+            height: 16px;
+            color: var(--sage-dark);
         }
         
         .energy-info-text {
-            letter-spacing: 0.3px;
+            color: var(--text-light);
+        }
+        
+        .energy-info-text strong {
+            color: var(--forest);
+            font-weight: 600;
         }
         
         .energy-info-arrow {
-            width: 16px;
-            height: 16px;
-            opacity: 0.7;
+            width: 14px;
+            height: 14px;
+            color: var(--text-muted);
             margin-left: 4px;
         }
 
@@ -1002,11 +1004,11 @@
             
             /* Header: Logo + Titel zentriert */
             .header {
-                padding-top: calc(env(safe-area-inset-top) + 56px) !important;
+                padding-top: calc(env(safe-area-inset-top) + 52px) !important;
                 padding-bottom: 24px !important;
             }
             
-            /* Buttons ganz oben im Safe-Area Bereich */
+            /* Header-Actions Container */
             .header-actions {
                 position: absolute !important;
                 top: calc(env(safe-area-inset-top) + 8px) !important;
@@ -1017,18 +1019,65 @@
                 align-items: center;
                 z-index: 200;
             }
+            
+            /* Links: Admin-Tools */
+            .header-left {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            /* Rechts: User-Tools */
+            .header-right {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            /* Icon-Buttons im Header (Admin, Edit) */
+            .header-icon-btn {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: rgba(255,255,255,0.2);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border: none;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                cursor: pointer;
+                transition: all 0.2s;
+                text-decoration: none;
+            }
+            
+            .header-icon-btn:hover,
+            .header-icon-btn:active {
+                background: rgba(255,255,255,0.35);
+                transform: scale(0.95);
+            }
+            
+            .header-icon-btn i {
+                width: 20px;
+                height: 20px;
+            }
+            
+            .header-icon-btn.active {
+                background: var(--forest);
+            }
 
-            /* Sprach-Switcher SICHTBAR */
+            /* Sprach-Switcher kompakt */
             .header-actions .language-switcher {
                 display: flex !important;
                 background: rgba(255,255,255,0.2);
                 border-radius: 20px;
-                padding: 4px;
+                padding: 3px;
             }
             
             .header-actions .language-switcher .lang-btn {
-                padding: 8px 12px;
-                font-size: 0.85rem;
+                padding: 6px 10px;
+                font-size: 0.8rem;
                 color: white;
                 border-radius: 16px;
             }
@@ -1042,39 +1091,39 @@
                 display: none !important;
             }
 
-            /* Login Button - Pill-Style */
+            /* Login Button - Icon-Only auf Mobile */
             .guest-login-btn {
-                padding: 10px 20px;
-                font-size: 0.85rem;
-                border-radius: 24px;
-                height: 44px;
-                min-height: 44px;
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                gap: 8px;
                 background: rgba(255,255,255,0.25);
                 backdrop-filter: blur(10px);
                 -webkit-backdrop-filter: blur(10px);
-                border: 2px solid rgba(255,255,255,0.3);
-                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                border: none;
                 color: white;
-                font-weight: 500;
             }
 
             .guest-login-btn:active {
-                transform: scale(0.97);
+                transform: scale(0.95);
                 background: rgba(255,255,255,0.35);
             }
 
             .guest-login-btn span {
-                display: inline !important;
+                display: none !important;
             }
 
             .guest-login-btn i {
-                width: 18px;
-                height: 18px;
+                width: 20px;
+                height: 20px;
                 color: white;
+            }
+            
+            .guest-login-btn.logged-in {
+                background: rgba(156, 175, 136, 0.4);
             }
 
             /* Main Container */
@@ -2363,17 +2412,27 @@
     <!-- Header -->
     <header class="header">
         <div class="header-actions">
-            <!-- Links: Sprachauswahl -->
-            <div class="language-switcher" id="language-switcher">
-                <button class="lang-btn active" data-lang="de" title="Deutsch">DE</button>
-                <button class="lang-btn" data-lang="en" title="English">EN</button>
+            <!-- LINKS: Admin-Tools (nur für eingeloggte Admins sichtbar) -->
+            <div class="header-left" id="headerAdminTools" style="display: none;">
+                <a href="/admin" class="header-icon-btn" title="Admin-Bereich">
+                    <i data-lucide="layout-dashboard"></i>
+                </a>
+                <button class="header-icon-btn edit-mode-toggle" id="editModeToggle" title="Bearbeiten">
+                    <i data-lucide="pencil"></i>
+                </button>
             </div>
             
-            <!-- Rechts: Login -->
-            <button class="guest-login-btn" id="guestLoginBtn">
-                <i data-lucide="user"></i>
-                <span data-i18n="header.login">Anmelden</span>
-            </button>
+            <!-- RECHTS: User-Tools -->
+            <div class="header-right">
+                <div class="language-switcher" id="language-switcher">
+                    <button class="lang-btn active" data-lang="de" title="Deutsch">DE</button>
+                    <button class="lang-btn" data-lang="en" title="English">EN</button>
+                </div>
+                <button class="guest-login-btn" id="guestLoginBtn">
+                    <i data-lucide="user"></i>
+                    <span data-i18n="header.login">Anmelden</span>
+                </button>
+            </div>
             
             <!-- Status Indicator (versteckt auf Mobile) -->
             <span class="status-indicator offline" id="statusIndicatorHeader" title="Verbindungsstatus" style="display: none;"></span>
@@ -2407,12 +2466,12 @@
         </div>
     </header>
 
-    <!-- Energie-Info-Bar (nur für eingeloggte Gäste) -->
+    <!-- Energie-Info-Bar (nur für eingeloggte Gäste) - dezent mit Durchschnitt -->
     <div class="energy-info-bar" id="energyInfoBar" style="display: none;" onclick="showEnergyDetails()">
         <div class="energy-info-content">
             <i data-lucide="zap"></i>
             <span class="energy-info-text">
-                <span id="infoBarEnergy">--</span> kWh • <span id="infoBarCost">--</span> €
+                Ø <strong><span id="infoBarAvg">--</span> kWh</strong>/Tag
             </span>
             <i data-lucide="chevron-right" class="energy-info-arrow"></i>
         </div>
@@ -3116,7 +3175,7 @@
         </div>
     </footer>
 
-    <!-- Mobile Bottom Navigation - Tab System -->
+    <!-- Mobile Bottom Navigation - Tab System (4 Tabs, kein Admin - der ist im Header) -->
     <nav class="mobile-bottom-nav" id="mobileBottomNav">
         <div class="mobile-bottom-nav-inner">
             <button class="mobile-nav-item active" onclick="switchTab('home')" data-tab="home" title="Start">
@@ -3135,10 +3194,6 @@
                 <i data-lucide="phone"></i>
                 <span>Kontakt</span>
             </button>
-            <a href="/admin" class="mobile-nav-item admin-btn" title="Admin-Bereich">
-                <i data-lucide="layout-dashboard"></i>
-                <span>Admin</span>
-            </a>
         </div>
     </nav>
 

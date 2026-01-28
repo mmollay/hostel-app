@@ -412,24 +412,20 @@ function updateStayEnergyUI() {
 }
 
 /**
- * Energie-Info-Bar unter Header aktualisieren
+ * Energie-Info-Bar unter Header aktualisieren - zeigt nur Durchschnitt/Tag
  */
 function updateEnergyInfoBar() {
   const infoBar = document.getElementById("energyInfoBar");
-  const energyEl = document.getElementById("infoBarEnergy");
-  const costEl = document.getElementById("infoBarCost");
+  const avgEl = document.getElementById("infoBarAvg");
   
   if (!infoBar || !guestToken) return;
   
   // Nur anzeigen wenn Gast eingeloggt
   infoBar.style.display = "block";
   
-  // Werte aktualisieren
-  if (energyEl) {
-    energyEl.textContent = formatNumber(stayEnergyData.totalEnergy || 0, 1);
-  }
-  if (costEl) {
-    costEl.textContent = formatNumber(stayEnergyData.totalCost || 0, 2);
+  // Durchschnitt/Tag anzeigen
+  if (avgEl) {
+    avgEl.textContent = formatNumber(stayEnergyData.avgPerDay || 0, 1);
   }
   
   // Lucide Icons neu initialisieren
@@ -1310,6 +1306,10 @@ function updateGuestUI() {
   // Energie-Info-Bar unter Header
   const energyInfoBar = document.getElementById("energyInfoBar");
   if (energyInfoBar) energyInfoBar.style.display = guestToken ? "block" : "none";
+  
+  // Admin-Tools im Header (Admin + Edit Button) nur für eingeloggte Gäste
+  const headerAdminTools = document.getElementById("headerAdminTools");
+  if (headerAdminTools) headerAdminTools.style.display = guestToken ? "flex" : "none";
 
   // WiFi-Infos in "Wichtige Infos" nur für eingeloggte Gäste anzeigen
   if (wifiInfoName) wifiInfoName.style.display = guestToken ? "block" : "none";
