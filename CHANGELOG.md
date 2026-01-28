@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.0] - 2025-02-01
+
+### Added
+- **Admin-Panel Mobile Bottom Navigation**: Neue Tab-Bar für Mobile mit 5 Tabs (Dashboard, Gäste, Apartments, Features, Settings)
+- Gleiche Navigation wie Hauptseite, nur für Admin-Bereich angepasst
+
+### Changed
+- **Admin Header Mobile optimiert**: Kompakterer Header mit Icon-Buttons statt Text-Buttons auf Mobile
+- **Durchschnittswert-Anzeige rechtsbündig**: Energy-Info-Bar ist jetzt rechtsbündig für dezentere Darstellung
+- Desktop Tab-Navigation wird auf Mobile durch Bottom-Nav ersetzt
+
+### Fixed
+- Buttons im Admin-Header haben nun konsistenten Abstand
+- Mobile Admin-Bereich hat nun gleiche UX wie die Hauptseite
+
 ## [0.8.0] - 2026-01-27
 
 ### Added

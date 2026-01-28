@@ -1111,6 +1111,224 @@
         #tab-settings .card {
             padding-bottom: 100px;
         }
+
+        /* ============================================
+           ADMIN HEADER - MOBILE OPTIMIZED
+           ============================================ */
+        .admin-header-actions {
+            position: absolute;
+            top: calc(env(safe-area-inset-top) + 12px);
+            left: 12px;
+            right: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 200;
+        }
+
+        .admin-header-left,
+        .admin-header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .admin-header-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            font-family: inherit;
+        }
+
+        .admin-header-btn:hover,
+        .admin-header-btn:active {
+            background: rgba(255,255,255,0.35);
+            transform: scale(0.98);
+        }
+
+        .admin-header-btn i {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Mobile: Kompaktere Header-Buttons */
+        @media (max-width: 768px) {
+            .admin-header {
+                padding-top: calc(env(safe-area-inset-top) + 52px) !important;
+                padding-bottom: 24px !important;
+            }
+
+            .admin-header-btn {
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                border-radius: 50%;
+                justify-content: center;
+            }
+
+            .admin-header-btn .btn-label {
+                display: none;
+            }
+
+            .admin-header-btn i {
+                width: 20px;
+                height: 20px;
+            }
+
+            .header-logo {
+                width: 80px;
+                height: 80px;
+                padding: 14px;
+                margin-bottom: 12px;
+            }
+
+            .header h1 {
+                font-size: 1.6rem;
+                margin-bottom: 4px;
+            }
+
+            .header .subtitle {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* ============================================
+           MOBILE BOTTOM NAVIGATION FOR ADMIN
+           ============================================ */
+        .admin-bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--warm-white);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid var(--sand);
+            padding: 4px 4px;
+            padding-bottom: calc(4px + env(safe-area-inset-bottom));
+            z-index: 9999;
+            box-shadow: 0 -2px 16px rgba(0,0,0,0.06);
+            transform: translate3d(0, 0, 0);
+            -webkit-transform: translate3d(0, 0, 0);
+            will-change: transform;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+
+        .admin-bottom-nav-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            padding: 0 2px;
+        }
+
+        .admin-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            flex: 1;
+            padding: 6px 2px;
+            min-height: 48px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            font-family: inherit;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .admin-nav-item:hover,
+        .admin-nav-item:active {
+            color: var(--sage-dark);
+            background: rgba(156, 175, 136, 0.1);
+        }
+
+        .admin-nav-item.active {
+            color: var(--forest);
+            background: rgba(156, 175, 136, 0.2);
+        }
+
+        .admin-nav-item.active i {
+            stroke-width: 2.5;
+        }
+
+        .admin-nav-item i {
+            width: 20px;
+            height: 20px;
+        }
+
+        .admin-nav-item span {
+            font-size: 0.62rem;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+            white-space: nowrap;
+        }
+
+        /* Mobile: Bottom Nav sichtbar, Tabs versteckt */
+        @media (max-width: 768px) {
+            .admin-bottom-nav {
+                display: flex !important;
+            }
+
+            /* Desktop Tab-Navigation auf Mobile verstecken */
+            .tabs-container {
+                display: none !important;
+            }
+
+            /* Main Container Padding für Bottom Nav */
+            .main {
+                margin-bottom: 0 !important;
+                padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+            }
+
+            /* Cards kompakter auf Mobile */
+            .card {
+                padding: 20px 16px;
+                border-radius: 16px;
+            }
+
+            /* Stats Grid auf Mobile */
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .stat-card {
+                padding: 14px;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Desktop: Bottom Nav versteckt */
+        @media (min-width: 769px) {
+            .admin-bottom-nav {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1227,26 +1445,29 @@
     </div>
 
     <!-- Header -->
-    <header class="header">
-        <!-- Zurück Button - Links -->
-        <div style="position: absolute; top: 20px; left: 20px; z-index: 10;">
-            <a href="/" style="display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: var(--sage); border: 1px solid var(--sage); color: white; border-radius: 12px; font-size: 0.9rem; font-weight: 500; text-decoration: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                <i data-lucide="arrow-left" style="width: 18px; height: 18px;"></i>
-                <span>Zurück</span>
-            </a>
-        </div>
+    <header class="header admin-header">
+        <!-- Header Actions - Like Main Page -->
+        <div class="admin-header-actions">
+            <!-- LINKS: Zurück Button -->
+            <div class="admin-header-left">
+                <a href="/" class="admin-header-btn" title="Zurück zur Hauptseite">
+                    <i data-lucide="arrow-left" style="width: 18px; height: 18px;"></i>
+                    <span class="btn-label">Zurück</span>
+                </a>
+            </div>
 
-        <!-- Abmelden Button - Rechts -->
-        <div style="position: absolute; top: 20px; right: 20px; z-index: 10;">
-            <button onclick="logout()" style="display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 12px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                <i data-lucide="log-out" style="width: 18px; height: 18px;"></i>
-                <span>Abmelden</span>
-            </button>
+            <!-- RECHTS: Abmelden Button -->
+            <div class="admin-header-right">
+                <button onclick="logout()" class="admin-header-btn logout-btn" title="Abmelden">
+                    <i data-lucide="log-out" style="width: 18px; height: 18px;"></i>
+                    <span class="btn-label">Abmelden</span>
+                </button>
+            </div>
         </div>
         <div class="header-content">
             <img src="logo-neu.png" alt="Logo" class="header-logo">
             <h1>Admin-Bereich</h1>
-            <p class="subtitle">Gast auf Erden <span style="opacity: 0.6; font-size: 0.9rem;" id="adminVersion">• v0.7.0</span></p>
+            <p class="subtitle">Gast auf Erden <span style="opacity: 0.6; font-size: 0.9rem;" id="adminVersion">• v0.12.0</span></p>
         </div>
     </header>
 
@@ -2774,12 +2995,72 @@
 
         // Load apartments on tab switch
         const originalSwitchTab = switchTab;
-        switchTab = function(tab) {
-            originalSwitchTab(tab);
+        switchTab = function(tab, skipSave) {
+            // Deactivate all tabs and buttons (including bottom nav)
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.admin-nav-item').forEach(btn => btn.classList.remove('active'));
+
+            // Activate selected tab content
+            const tabContent = document.getElementById(`tab-${tab}`);
+            if (tabContent) {
+                tabContent.classList.add('active');
+            }
+            
+            // Find and activate the correct desktop tab button
+            const tabBtn = document.querySelector(`.tab-btn[onclick*="'${tab}'"]`);
+            if (tabBtn) {
+                tabBtn.classList.add('active');
+            }
+
+            // Activate mobile bottom nav button
+            const mobileBtn = document.querySelector(`.admin-nav-item[data-tab="${tab}"]`);
+            if (mobileBtn) {
+                mobileBtn.classList.add('active');
+            }
+
+            // Save to localStorage (unless skipSave)
+            if (!skipSave) {
+                localStorage.setItem('admin_active_tab', tab);
+            }
+
+            // Re-initialize Lucide icons
+            lucide.createIcons();
+
+            // Load apartments if that tab
             if (tab === 'apartments') {
                 loadApartments();
             }
+
+            // Scroll to top on tab change
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         };
     </script>
+
+    <!-- Mobile Admin Bottom Navigation -->
+    <nav class="admin-bottom-nav" id="adminBottomNav">
+        <div class="admin-bottom-nav-inner">
+            <button class="admin-nav-item active" onclick="switchTab('dashboard')" data-tab="dashboard" title="Dashboard">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Dashboard</span>
+            </button>
+            <button class="admin-nav-item" onclick="switchTab('guests')" data-tab="guests" title="Gäste">
+                <i data-lucide="users"></i>
+                <span>Gäste</span>
+            </button>
+            <button class="admin-nav-item" onclick="switchTab('apartments')" data-tab="apartments" title="Apartments">
+                <i data-lucide="building"></i>
+                <span>Apartments</span>
+            </button>
+            <button class="admin-nav-item" onclick="switchTab('amenities')" data-tab="amenities" title="Annehmlichkeiten">
+                <i data-lucide="sparkles"></i>
+                <span>Features</span>
+            </button>
+            <button class="admin-nav-item" onclick="switchTab('settings')" data-tab="settings" title="Einstellungen">
+                <i data-lucide="settings"></i>
+                <span>Settings</span>
+            </button>
+        </div>
+    </nav>
 </body>
 </html>
