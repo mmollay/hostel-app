@@ -320,7 +320,7 @@ async function loadStayEnergy() {
         totalEnergy: data.data.totalEnergy || 0,
         totalCost: data.data.totalCost || 0,
         stayDays: stayDays,
-        avgPerDay: stayDays > 0 ? (data.data.totalEnergy || 0) / stayDays : 0,
+        avgPerDay: 0, // Wird unten berechnet
       };
       
       // Heute hinzufügen wenn noch nicht in DB (aktueller Verbrauch aus Live-Daten)
@@ -329,9 +329,26 @@ async function loadStayEnergy() {
         // Heutigen Verbrauch zum Total addieren
         stayEnergyData.totalEnergy += energyData.todayEnergy;
         stayEnergyData.totalCost += energyData.todayEnergy * (settings.pricePerKwh || 0.29);
-        stayEnergyData.avgPerDay = stayEnergyData.stayDays > 0 
-          ? stayEnergyData.totalEnergy / stayEnergyData.stayDays 
-          : 0;
+      }
+      
+      // DURCHSCHNITT: Nur vollständige Tage (ohne ersten und letzten Tag)
+      // Das vermeidet Verzerrung durch unvollständige Check-in/Check-out Tage
+      const allDays = stayEnergyData.days || [];
+      if (allDays.length >= 3) {
+        // Mindestens 3 Tage: Ersten und letzten ausschließen
+        const middleDays = allDays.slice(1, -1); // Ohne ersten und letzten
+        const middleEnergy = middleDays.reduce((sum, d) => sum + (d.energy_kwh || 0), 0);
+        stayEnergyData.avgPerDay = middleDays.length > 0 ? middleEnergy / middleDays.length : 0;
+      } else if (allDays.length === 2) {
+        // 2 Tage: Durchschnitt beider
+        const totalMiddle = allDays.reduce((sum, d) => sum + (d.energy_kwh || 0), 0);
+        stayEnergyData.avgPerDay = totalMiddle / 2;
+      } else if (allDays.length === 1) {
+        // 1 Tag: Diesen Wert nehmen
+        stayEnergyData.avgPerDay = allDays[0]?.energy_kwh || 0;
+      } else {
+        // Keine Daten
+        stayEnergyData.avgPerDay = 0;
       }
       
       // UI aktualisieren
