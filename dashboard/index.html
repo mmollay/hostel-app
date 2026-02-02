@@ -685,13 +685,13 @@
             transform: scale(0.95);
         }
 
-        /* Quick Navigation */
+        /* Quick Navigation - Desktop/Tablet Only */
         .quick-nav {
-            z-index: 10;
-            display: flex;
+            display: none; /* Hidden on mobile, shown on desktop/tablet */
             justify-content: center;
-            gap: 12px;
-            padding: 20px;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 20px 0;
             flex-wrap: wrap;
             position: relative;
             z-index: 10;
@@ -699,40 +699,97 @@
 
         .quick-nav-btn {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 6px;
-            padding: 12px 16px;
-            background: var(--warm-white);
+            gap: 10px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, var(--warm-white) 0%, var(--cream) 100%);
             border: 2px solid var(--sand);
-            border-radius: 12px;
+            border-radius: 16px;
             color: var(--forest);
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.85rem;
+            transition: all 0.25s ease;
+            font-size: 0.9rem;
             font-weight: 500;
-            min-width: 80px;
+            min-height: 48px; /* Touch-friendly */
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
         }
 
         .quick-nav-btn:hover {
-            background: var(--cream);
-            border-color: var(--sage);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(113, 140, 128, 0.15);
+            background: linear-gradient(135deg, var(--sage-light) 0%, var(--sage) 100%);
+            border-color: var(--sage-dark);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(156, 175, 136, 0.25);
+        }
+
+        .quick-nav-btn:hover i {
+            color: white;
         }
 
         .quick-nav-btn:active {
-            transform: translateY(0);
+            transform: translateY(-1px);
         }
 
         .quick-nav-btn i {
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             color: var(--sage-dark);
+            flex-shrink: 0;
         }
 
         .quick-nav-btn span {
-            color: var(--text);
+            color: inherit;
+            white-space: nowrap;
+        }
+        
+        /* Tablet: Show Quick Nav with Compact Layout */
+        @media (min-width: 768px) {
+            .quick-nav {
+                display: flex !important;
+                padding: 12px 16px 0;
+            }
+            
+            .quick-nav-btn {
+                padding: 10px 16px;
+                font-size: 0.85rem;
+            }
+            
+            .quick-nav-btn i {
+                width: 20px;
+                height: 20px;
+            }
+        }
+        
+        /* Desktop: Full Layout with Icons + Text */
+        @media (min-width: 1024px) {
+            .quick-nav {
+                gap: 12px;
+                padding: 20px 20px 8px;
+            }
+            
+            .quick-nav-btn {
+                padding: 14px 24px;
+                font-size: 0.95rem;
+                min-width: auto;
+            }
+            
+            .quick-nav-btn i {
+                width: 24px;
+                height: 24px;
+            }
+        }
+        
+        /* Extra Large Screens: More Breathing Room */
+        @media (min-width: 1440px) {
+            .quick-nav {
+                gap: 16px;
+                padding: 24px 32px 12px;
+            }
+            
+            .quick-nav-btn {
+                padding: 16px 32px;
+                font-size: 1rem;
+            }
         }
 
         /* Energie-Info-Bar - dezent, nur Icon + Durchschnitt */
@@ -957,7 +1014,42 @@
             display: none;
         }
 
-        /* Responsive */
+        /* ============================================
+           RESPONSIVE BREAKPOINTS
+           ============================================ */
+        
+        /* Tablet: 768px - 1023px */
+        @media (min-width: 641px) and (max-width: 1023px) {
+            .header {
+                padding: 32px 24px 48px;
+            }
+            
+            .header-logo {
+                width: 100px;
+                height: 100px;
+                padding: 16px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+                letter-spacing: 1.5px;
+            }
+            
+            .header .subtitle {
+                font-size: 1.05rem;
+            }
+            
+            .header-actions {
+                gap: 10px;
+            }
+            
+            .guest-login-btn {
+                padding: 8px 14px;
+                font-size: 0.85rem;
+            }
+        }
+        
+        /* Mobile: max-width 640px */
         @media (max-width: 640px) {
             .header {
                 /* Sauberer Mobile Header - zentriert, mit mehr Abstand nach unten */
@@ -1208,9 +1300,29 @@
                 font-size: 14px;
             }
 
-            /* Quick Nav auf Mobile verstecken - Footer übernimmt Navigation */
+            /* Quick Nav auf Mobile verstecken - Bottom Nav übernimmt Navigation */
             .quick-nav {
                 display: none !important;
+            }
+            
+            /* Header Navigation auf Mobile: Nur essentials */
+            .header-actions {
+                gap: 8px !important;
+                padding: 0 4px;
+            }
+            
+            .header-icon-btn {
+                min-width: 44px;
+                min-height: 44px;
+                flex-shrink: 0;
+            }
+            
+            .language-switcher {
+                flex-shrink: 0;
+            }
+            
+            .guest-login-btn {
+                flex-shrink: 0;
             }
 
             /* Footer für Mobile Bottom Nav Platz */
