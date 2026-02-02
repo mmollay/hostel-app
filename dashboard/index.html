@@ -177,81 +177,208 @@
             letter-spacing: 2px;
         }
 
+        /* ============================================
+           MINIMALISTISCHER HEADER - User Dropdown
+           ============================================ */
+        
         .header-actions {
             position: absolute;
             top: calc(env(safe-area-inset-top) + 12px);
             right: 16px;
-            z-index: 10;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        
+        /* User Menu Button - Primary Action */
+        .header-user-btn {
             display: flex;
             align-items: center;
             gap: 8px;
-        }
-
-        /* Kompakter Status-Indicator */
-        .status-indicator {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #22c55e;
-            box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
-            animation: pulse 2s infinite;
-        }
-
-        .status-indicator.offline {
-            background: #ef4444;
-            box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
-            animation: none;
-        }
-
-        .guest-login-btn,
-        .status-btn {
-            background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.3);
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 24px;
             color: white;
             cursor: pointer;
-            padding: 8px 16px;
-            border-radius: 24px;
-            transition: all 0.3s;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            transition: all 0.3s ease;
             font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
             font-weight: 500;
-            min-height: 44px; /* Touch Target */
+            min-height: 44px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-
-        .guest-login-btn:hover,
-        .status-btn:hover {
-            background: rgba(255,255,255,0.3);
-            transform: translateY(-1px);
+        
+        .header-user-btn:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
-
-        .guest-login-btn i,
-        .status-btn i {
+        
+        .header-user-btn:active {
+            transform: translateY(0);
+        }
+        
+        .header-user-btn i {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+        
+        .header-user-btn .dropdown-icon {
             width: 16px;
             height: 16px;
+            transition: transform 0.3s ease;
         }
-
-        .guest-login-btn.logged-in {
-            background: rgba(156, 175, 136, 0.3);
+        
+        .header-user-btn.active .dropdown-icon {
+            transform: rotate(180deg);
+        }
+        
+        .header-user-btn.logged-in {
+            background: rgba(156, 175, 136, 0.4);
             border-color: rgba(156, 175, 136, 0.5);
         }
-
-        .status-btn {
-            padding: 8px 12px;
-            cursor: default;
+        
+        .user-name {
+            white-space: nowrap;
+        }
+        
+        /* User Dropdown Menu */
+        .header-user-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            min-width: 240px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
+            transition: all 0.3s ease;
+            z-index: 300;
+        }
+        
+        .header-user-dropdown.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+        }
+        
+        .dropdown-section {
+            padding: 12px 8px;
+        }
+        
+        .dropdown-section:not(:last-child) {
+            border-bottom: 1px solid var(--sand);
+        }
+        
+        .dropdown-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 4px 12px 8px;
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 12px 12px;
+            background: transparent;
+            border: none;
+            border-radius: 10px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        
+        .dropdown-item:hover {
+            background: var(--cream);
+            color: var(--forest);
+        }
+        
+        .dropdown-item i {
+            width: 20px;
+            height: 20px;
+            color: var(--sage-dark);
+            flex-shrink: 0;
+        }
+        
+        .dropdown-item:hover i {
+            color: var(--forest);
+        }
+        
+        .dropdown-item.logout-item {
+            color: var(--rose);
+        }
+        
+        .dropdown-item.logout-item:hover {
+            background: rgba(212, 165, 165, 0.15);
+            color: #8B3A3A;
+        }
+        
+        .dropdown-item.logout-item i {
+            color: var(--rose);
+        }
+        
+        .dropdown-divider {
+            height: 1px;
+            background: var(--sand);
+            margin: 8px 0;
+        }
+        
+        /* Language Buttons in Dropdown */
+        .dropdown-lang-buttons {
+            display: flex;
+            gap: 6px;
+            padding: 0 8px;
+        }
+        
+        .dropdown-lang-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 12px;
+            background: var(--cream);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .dropdown-lang-btn:hover {
+            background: var(--sand);
+            color: var(--text);
+        }
+        
+        .dropdown-lang-btn.active {
+            background: white;
+            border-color: var(--sage);
+            color: var(--forest);
+            font-weight: 600;
+            box-shadow: 0 2px 6px rgba(156, 175, 136, 0.2);
         }
 
-        .status-btn.online {
-            background: rgba(156, 175, 136, 0.3);
-            border-color: rgba(156, 175, 136, 0.5);
-        }
-
-        .status-btn.offline {
-            background: rgba(212, 165, 165, 0.3);
-            border-color: rgba(212, 165, 165, 0.5);
-        }
+        /* ALTE STYLES ENTFERNT - Alles jetzt im User Dropdown */
 
         /* Main Content */
         .main {
@@ -1093,7 +1220,7 @@
                 opacity: 0.9;
             }
 
-            /* ===== NEUES MOBILE HEADER LAYOUT ===== */
+            /* ===== MINIMALISTISCHER MOBILE HEADER ===== */
             
             /* Header: Logo + Titel zentriert */
             .header {
@@ -1101,122 +1228,43 @@
                 padding-bottom: 24px !important;
             }
             
-            /* Header-Actions Container */
+            /* Header-Actions: Nur User-Button rechts oben */
             .header-actions {
                 position: absolute !important;
                 top: calc(env(safe-area-inset-top) + 8px) !important;
-                left: 12px !important;
                 right: 12px !important;
-                display: flex !important;
-                justify-content: space-between;
-                align-items: center;
+                left: auto !important;
                 z-index: 200;
             }
             
-            /* Links: Admin-Tools */
-            .header-left {
-                display: flex;
-                align-items: center;
-                gap: 8px;
+            /* User Button auf Mobile: Kompakt aber erkennbar */
+            .header-user-btn {
+                padding: 8px 12px !important;
+                min-height: 44px;
             }
             
-            /* Rechts: User-Tools */
-            .header-right {
-                display: flex;
-                align-items: center;
-                gap: 8px;
+            /* Name auf Mobile verstecken (nur Icon + Dropdown-Icon) */
+            .header-user-btn .user-name {
+                display: none !important;
             }
             
-            /* Icon-Buttons im Header (Admin, Edit) */
-            .header-icon-btn {
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                background: rgba(255,255,255,0.2);
-                backdrop-filter: blur(10px);
-                -webkit-backdrop-filter: blur(10px);
-                border: none;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: white;
-                cursor: pointer;
-                transition: all 0.2s;
-                text-decoration: none;
+            /* Dropdown auf Mobile: Full Width mit kleinerem Abstand */
+            .header-user-dropdown {
+                left: auto;
+                right: 0;
+                min-width: 200px;
+                max-width: calc(100vw - 24px);
             }
             
-            .header-icon-btn:hover,
-            .header-icon-btn:active {
-                background: rgba(255,255,255,0.35);
-                transform: scale(0.95);
+            /* Dropdown Items auf Mobile: Etwas kompakter */
+            .dropdown-item {
+                padding: 10px 12px;
+                font-size: 0.85rem;
             }
             
-            .header-icon-btn i {
-                width: 20px;
-                height: 20px;
-            }
-            
-            .header-icon-btn.active {
-                background: var(--forest);
-            }
-
-            /* Sprach-Switcher kompakt */
-            .header-actions .language-switcher {
-                display: flex !important;
-                background: rgba(255,255,255,0.2);
-                border-radius: 20px;
-                padding: 3px;
-            }
-            
-            .header-actions .language-switcher .lang-btn {
-                padding: 6px 10px;
+            .dropdown-lang-btn {
+                padding: 8px 10px;
                 font-size: 0.8rem;
-                color: white;
-                border-radius: 16px;
-            }
-            
-            .header-actions .language-switcher .lang-btn.active {
-                background: rgba(255,255,255,0.3);
-            }
-            
-            /* Status verstecken */
-            .header-actions .status-indicator {
-                display: none !important;
-            }
-
-            /* Login Button - Icon-Only auf Mobile */
-            .guest-login-btn {
-                width: 40px;
-                height: 40px;
-                padding: 0;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: rgba(255,255,255,0.25);
-                backdrop-filter: blur(10px);
-                -webkit-backdrop-filter: blur(10px);
-                border: none;
-                color: white;
-            }
-
-            .guest-login-btn:active {
-                transform: scale(0.95);
-                background: rgba(255,255,255,0.35);
-            }
-
-            .guest-login-btn span {
-                display: none !important;
-            }
-
-            .guest-login-btn i {
-                width: 20px;
-                height: 20px;
-                color: white;
-            }
-            
-            .guest-login-btn.logged-in {
-                background: rgba(156, 175, 136, 0.4);
             }
 
             /* Main Container */
@@ -1303,26 +1351,6 @@
             /* Quick Nav auf Mobile verstecken - Bottom Nav übernimmt Navigation */
             .quick-nav {
                 display: none !important;
-            }
-            
-            /* Header Navigation auf Mobile: Nur essentials */
-            .header-actions {
-                gap: 8px !important;
-                padding: 0 4px;
-            }
-            
-            .header-icon-btn {
-                min-width: 44px;
-                min-height: 44px;
-                flex-shrink: 0;
-            }
-            
-            .language-switcher {
-                flex-shrink: 0;
-            }
-            
-            .guest-login-btn {
-                flex-shrink: 0;
             }
 
             /* Footer für Mobile Bottom Nav Platz */
@@ -2302,35 +2330,7 @@
             display: none !important;
         }
 
-        /* Language Switcher */
-        .language-switcher {
-            display: flex;
-            gap: 4px;
-            background: rgba(255,255,255,0.15);
-            border-radius: 20px;
-            padding: 4px;
-        }
-
-        .lang-btn {
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            padding: 6px 10px;
-            border-radius: 16px;
-            font-size: 1.1rem;
-            transition: all 0.2s;
-            opacity: 0.7;
-        }
-
-        .lang-btn:hover {
-            opacity: 1;
-            background: rgba(255,255,255,0.1);
-        }
-
-        .lang-btn.active {
-            opacity: 1;
-            background: rgba(255,255,255,0.25);
-        }
+        /* ALTE LANGUAGE SWITCHER ENTFERNT - Jetzt im Dropdown */
 
         /* ============================================
            MOBILE BOTTOM NAVIGATION
@@ -2524,31 +2524,48 @@
 <body>
     <!-- Header -->
     <header class="header">
+        <!-- MINIMALISTISCHER HEADER: Nur User-Icon sichtbar -->
         <div class="header-actions">
-            <!-- LINKS: Admin-Tools (nur für eingeloggte Admins sichtbar) -->
-            <div class="header-left" id="headerAdminTools" style="display: none;">
-                <a href="/admin" class="header-icon-btn" title="Admin-Bereich">
-                    <i data-lucide="layout-dashboard"></i>
-                </a>
-                <button class="header-icon-btn edit-mode-toggle" id="editModeToggle" title="Bearbeiten">
-                    <i data-lucide="pencil"></i>
-                </button>
-            </div>
+            <!-- User Menu Button (immer sichtbar) -->
+            <button class="header-user-btn" id="headerUserBtn" title="Menü öffnen">
+                <i data-lucide="user"></i>
+                <span class="user-name" id="headerUserName" data-i18n="header.login">Anmelden</span>
+                <i data-lucide="chevron-down" class="dropdown-icon"></i>
+            </button>
             
-            <!-- RECHTS: User-Tools -->
-            <div class="header-right">
-                <div class="language-switcher" id="language-switcher">
-                    <button class="lang-btn active" data-lang="de" title="Deutsch">DE</button>
-                    <button class="lang-btn" data-lang="en" title="English">EN</button>
+            <!-- User Dropdown Menu (versteckt, öffnet bei Klick) -->
+            <div class="header-user-dropdown" id="headerUserDropdown" style="display: none;">
+                <!-- Admin-Section (nur wenn eingeloggt als Admin) -->
+                <div class="dropdown-section admin-section" id="dropdownAdminSection" style="display: none;">
+                    <a href="/admin" class="dropdown-item">
+                        <i data-lucide="layout-dashboard"></i>
+                        <span>Admin</span>
+                    </a>
+                    <button class="dropdown-item" id="dropdownEditToggle">
+                        <i data-lucide="pencil"></i>
+                        <span>Bearbeiten</span>
+                    </button>
+                    <div class="dropdown-divider"></div>
                 </div>
-                <button class="guest-login-btn" id="guestLoginBtn">
-                    <i data-lucide="user"></i>
-                    <span data-i18n="header.login">Anmelden</span>
-                </button>
+                
+                <!-- Sprache -->
+                <div class="dropdown-section">
+                    <div class="dropdown-label">Sprache</div>
+                    <div class="dropdown-lang-buttons">
+                        <button class="dropdown-lang-btn active" data-lang="de">🇩🇪 Deutsch</button>
+                        <button class="dropdown-lang-btn" data-lang="en">🇬🇧 English</button>
+                    </div>
+                </div>
+                
+                <!-- Logout (nur wenn eingeloggt) -->
+                <div class="dropdown-section" id="dropdownLogoutSection" style="display: none;">
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item logout-item" id="dropdownLogoutBtn">
+                        <i data-lucide="log-out"></i>
+                        <span>Abmelden</span>
+                    </button>
+                </div>
             </div>
-            
-            <!-- Status Indicator (versteckt auf Mobile) -->
-            <span class="status-indicator offline" id="statusIndicatorHeader" title="Verbindungsstatus" style="display: none;"></span>
         </div>
         <div class="header-content">
             <img src="/logo-neu.png" alt="Logo" class="header-logo" loading="lazy" decoding="async">

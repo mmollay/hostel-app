@@ -1015,7 +1015,72 @@ function showError() {
  * Guest UI initialisieren
  */
 function initGuestUI() {
-  // Guest Login Button
+  // === NEW: User Dropdown Menu ===
+  const headerUserBtn = document.getElementById("headerUserBtn");
+  const headerUserDropdown = document.getElementById("headerUserDropdown");
+  
+  if (headerUserBtn && headerUserDropdown) {
+    // Toggle Dropdown bei Klick
+    headerUserBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isOpen = headerUserDropdown.style.display === "block";
+      
+      if (isOpen) {
+        closeHeaderDropdown();
+      } else {
+        if (guestToken) {
+          // Eingeloggt: Dropdown öffnen
+          openHeaderDropdown();
+        } else {
+          // Nicht eingeloggt: Login Modal öffnen
+          openGuestLoginModal();
+        }
+      }
+    });
+    
+    // Dropdown schließen bei Klick außerhalb
+    document.addEventListener("click", (e) => {
+      if (!headerUserDropdown.contains(e.target) && !headerUserBtn.contains(e.target)) {
+        closeHeaderDropdown();
+      }
+    });
+  }
+  
+  // Sprach-Buttons im Dropdown
+  const langButtons = document.querySelectorAll(".dropdown-lang-btn");
+  langButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const lang = btn.dataset.lang;
+      if (typeof I18N !== 'undefined') {
+        I18N.setLanguage(lang);
+        // Button-Status aktualisieren
+        langButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+      }
+    });
+  });
+  
+  // Edit Mode Toggle im Dropdown
+  const dropdownEditToggle = document.getElementById("dropdownEditToggle");
+  if (dropdownEditToggle) {
+    dropdownEditToggle.addEventListener("click", () => {
+      if (typeof toggleInlineEditMode === 'function') {
+        toggleInlineEditMode();
+      }
+      closeHeaderDropdown();
+    });
+  }
+  
+  // Logout im Dropdown
+  const dropdownLogoutBtn = document.getElementById("dropdownLogoutBtn");
+  if (dropdownLogoutBtn) {
+    dropdownLogoutBtn.addEventListener("click", () => {
+      handleGuestLogout();
+      closeHeaderDropdown();
+    });
+  }
+
+  // === OLD: Guest Login Button (Legacy, falls noch irgendwo) ===
   const guestBtn = document.getElementById("guestLoginBtn");
   if (guestBtn) {
     guestBtn.addEventListener("click", () => {
@@ -1085,6 +1150,42 @@ function initGuestUI() {
 
   // Easter Egg: Konami Code
   initEasterEggs();
+}
+
+/**
+ * Header Dropdown öffnen
+ */
+function openHeaderDropdown() {
+  const dropdown = document.getElementById("headerUserDropdown");
+  const btn = document.getElementById("headerUserBtn");
+  
+  if (dropdown && btn) {
+    dropdown.style.display = "block";
+    setTimeout(() => {
+      dropdown.classList.add("show");
+      btn.classList.add("active");
+      // Icons im Dropdown initialisieren
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+    }, 10);
+  }
+}
+
+/**
+ * Header Dropdown schließen
+ */
+function closeHeaderDropdown() {
+  const dropdown = document.getElementById("headerUserDropdown");
+  const btn = document.getElementById("headerUserBtn");
+  
+  if (dropdown && btn) {
+    dropdown.classList.remove("show");
+    btn.classList.remove("active");
+    setTimeout(() => {
+      dropdown.style.display = "none";
+    }, 300);
+  }
 }
 
 /**
@@ -1270,7 +1371,58 @@ function handleGuestLogout() {
  * Guest UI Status aktualisieren
  */
 function updateGuestUI() {
+  // === NEW: Update Header User Button & Dropdown ===
+  const headerUserBtn = document.getElementById("headerUserBtn");
+  const headerUserName = document.getElementById("headerUserName");
+  const dropdownAdminSection = document.getElementById("dropdownAdminSection");
+  const dropdownLogoutSection = document.getElementById("dropdownLogoutSection");
+  
+  if (headerUserBtn && headerUserName) {
+    // Button-Status aktualisieren
+    headerUserBtn.classList.toggle("logged-in", !!guestToken);
+    
+    // Name im Button anzeigen
+    const displayName = guestToken && guestData ? guestData.name : "Anmelden";
+    headerUserName.textContent = displayName;
+    
+    // i18n attribute entfernen wenn eingeloggt
+    if (guestToken && guestData) {
+      headerUserName.removeAttribute("data-i18n");
+    } else {
+      headerUserName.setAttribute("data-i18n", "header.login");
+    }
+    
+    console.log('[Guest] Header user button updated:', displayName);
+  }
+  
+  // Admin-Section im Dropdown nur für Admins zeigen
+  // TODO: Admin-Check implementieren (vorerst alle eingeloggten User)
+  if (dropdownAdminSection) {
+    dropdownAdminSection.style.display = guestToken ? "block" : "none";
+  }
+  
+  // Logout-Section nur für eingeloggte User
+  if (dropdownLogoutSection) {
+    dropdownLogoutSection.style.display = guestToken ? "block" : "none";
+  }
+
+  // === OLD: Legacy Guest Login Button (falls noch vorhanden) ===
   const btn = document.getElementById("guestLoginBtn");
+  if (btn) {
+    btn.classList.toggle("logged-in", !!guestToken);
+    const btnText = btn.querySelector("span");
+    if (btnText) {
+      const displayName = guestToken && guestData ? guestData.name : "Anmelden";
+      btnText.textContent = displayName;
+      if (guestToken && guestData) {
+        btnText.removeAttribute("data-i18n");
+      } else {
+        btnText.setAttribute("data-i18n", "header.login");
+      }
+    }
+  }
+
+  // === Cards & Features (nur für eingeloggte Gäste) ===
   const energyCard = document.getElementById("energyCard");
   const weatherCard = document.getElementById("weatherCard");
   const recommendationsCard = document.getElementById("recommendationsCard");
@@ -1280,23 +1432,6 @@ function updateGuestUI() {
   const wifiInfoName = document.getElementById("wifiInfoName");
   const wifiInfoPassword = document.getElementById("wifiInfoPassword");
 
-  if (btn) {
-    btn.classList.toggle("logged-in", !!guestToken);
-    const btnText = btn.querySelector("span");
-    if (btnText) {
-      const displayName = guestToken && guestData ? guestData.name : "Anmelden";
-      btnText.textContent = displayName;
-      // Remove i18n attribute when logged in to prevent translation override
-      if (guestToken && guestData) {
-        btnText.removeAttribute("data-i18n");
-      } else {
-        btnText.setAttribute("data-i18n", "header.login");
-      }
-      console.log('[Guest] Button text updated to:', displayName);
-    }
-  }
-
-  // Karten nur für eingeloggte Gäste anzeigen
   if (energyCard) energyCard.style.display = guestToken ? "block" : "none";
   if (weatherCard) weatherCard.style.display = guestToken ? "block" : "none";
   if (recommendationsCard)
@@ -1306,10 +1441,6 @@ function updateGuestUI() {
   // Energie-Info-Bar unter Header
   const energyInfoBar = document.getElementById("energyInfoBar");
   if (energyInfoBar) energyInfoBar.style.display = guestToken ? "block" : "none";
-  
-  // Admin-Tools im Header (Admin + Edit Button) nur für eingeloggte Gäste
-  const headerAdminTools = document.getElementById("headerAdminTools");
-  if (headerAdminTools) headerAdminTools.style.display = guestToken ? "flex" : "none";
 
   // WiFi-Infos in "Wichtige Infos" nur für eingeloggte Gäste anzeigen
   if (wifiInfoName) wifiInfoName.style.display = guestToken ? "block" : "none";
@@ -1320,7 +1451,6 @@ function updateGuestUI() {
   if (quickNav) quickNav.style.display = guestToken ? "flex" : "none";
   
   // Mobile Bottom Navigation nur für eingeloggte Gäste anzeigen
-  // Klasse statt inline-style damit CSS Media Query respektiert wird
   if (mobileBottomNav) {
     if (guestToken) {
       mobileBottomNav.classList.add('logged-in');
